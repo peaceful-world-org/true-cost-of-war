@@ -509,7 +509,6 @@
       
       .pw2-hero { padding: 0 !important; border-radius: 0 !important; }
       
-      /* Reorder только для обычного мобильного вида (не ломает embed-режим) */
       .pw2-widget-container:not(.pw2-embed-mode) .pw2-hero { 
         display: flex !important; 
         flex-direction: column !important; 
@@ -541,7 +540,6 @@
       .pw2-grid-top, .pw2-grid-bottom { grid-template-columns: 1fr !important; gap: 12px !important; margin-top: 16px !important; }
       .pw2-card { padding: 20px 16px !important; border-radius: 16px !important; border: 1px solid rgba(255, 255, 255, 0.05) !important; background: rgba(30, 41, 59, 0.2) !important; overflow: visible !important; }
       
-      /* Убран конфликтный margin-top. Отступы управляются предсказуемо для каждого режима */
       .pw2-hero-counter { padding: 20px 16px !important; border-radius: 20px !important; border: 1px solid rgba(184, 255, 207, 0.1) !important; background: rgba(184, 255, 207, 0.03) !important; }
       .pw2-embed-mode .pw2-hero-counter { margin-top: 16px !important; }
       .pw2-big-number { font-size: clamp(34px, 8vw, 46px) !important; }
