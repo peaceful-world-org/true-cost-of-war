@@ -661,9 +661,9 @@
       }
 
       .pw2-footer-notes { gap: 16px !important; margin-top: 32px !important; border-top: 1px solid rgba(255,255,255,0.05) !important; padding-top: 32px !important; }
-      .pw2-foot-card { padding: 0 !important; background: transparent !important; border: none !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important; border-radius: 0 !important; padding-bottom: 24px !important; }
-      .pw2-foot-card:last-child { border-bottom: none !important; padding-bottom: 0 !important; }
-      .pw2-foot-card .pw2-share-btn { margin-top: 16px !important; }
+      .pw2-foot-card { padding: 32px !important; border-radius: 24px !important; background: rgba(255,255,255,.02) !important; border: 1px solid rgba(255,255,255,.08) !important; padding-bottom: 32px !important; }
+      .pw2-foot-card:last-child { border-bottom: 1px solid rgba(255,255,255,.08) !important; padding-bottom: 32px !important; }
+      .pw2-foot-card .pw2-share-btn { margin-top: 0 !important; }
       
       .pw2-tooltip { display: none !important; }
       .pw2-drawer-panel { padding: 24px 24px 120px 24px !important; }
@@ -1093,6 +1093,65 @@
       </div>
 
       <div class="pw2-footer-notes pw2-embed-hidden">
+        <div class="pw2-foot-card">
+          <div class="pw2-h4" style="display:flex; align-items:center;">
+            <svg class="pw2-icon pw2-icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Открытая методология
+          </div>
+          <div class="pw2-foot-card-text" style="margin-bottom: 16px;">
+            Это аналитическая макромодель, созданная для визуализации экономических и демографических потерь от конфликтов. Алгоритм опирается исключительно на консервативные оценки и официальные данные признанных международных институтов (включая SIPRI, UCDP, ООН и Всемирный банк).
+          </div>
+          <div style="margin-top: auto;">
+            <button id="pw2-open-drawer-btn" class="pw2-share-btn" style="width: 100%; background: rgba(131, 215, 255, 0.05); border-color: rgba(131, 215, 255, 0.2); color: var(--accent);">
+              <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>Изучить источники и расчёты</span>
+            </button>
+            
+            <!-- INLINE METHODOLOGY PANEL FOR MOBILE/IFRAME -->
+            <div id="pw2-inline-methodology">
+               <div class="pw2-drawer-text">Это аналитическая макромодель, созданная для визуализации экономических и демографических потерь от конфликтов. Алгоритм опирается исключительно на консервативные оценки и официальные данные признанных международных институтов.</div>
+               
+               <div class="pw2-drawer-item">
+                  <div class="pw2-drawer-item-title">
+                    <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="7" stroke-dasharray="4 4"/><circle cx="12" cy="12" r="3"/></svg>
+                    Глобальные военные расходы
+                  </div>
+                  <div class="pw2-drawer-item-desc">Базовый параметр — <strong>$2.44 трлн в год</strong>. Данные взяты из последнего официального отчета Стокгольмского института исследования проблем мира (SIPRI) о совокупных оборонных бюджетах государств.</div>
+                  <div class="pw2-source-links-wrap">
+                    <a href="https://www.sipri.org/databases/milex" target="_blank" rel="noopener noreferrer" class="pw2-source-link">SIPRI Military Expenditure Database <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                  </div>
+               </div>
+               
+               <div class="pw2-drawer-item">
+                  <div class="pw2-drawer-item-title">
+                    <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="var(--danger-direct)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-3 3 7 3-6 2 2h2"/><line x1="18" y1="12" x2="22" y2="12" stroke-dasharray="2 3"/></svg>
+                    Жертвы вооруженных конфликтов
+                  </div>
+                  <div class="pw2-drawer-item-desc">Базовая оценка — <strong>~150 000 смертей в год</strong> непосредственно от боевых действий (на основе базы данных Уппсальского университета UCDP).</div>
+                  <div class="pw2-source-links-wrap">
+                    <a href="https://ucdp.uu.se/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">UCDP Conflict Encyclopedia <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                  </div>
+               </div>
+               
+               <div class="pw2-drawer-item" style="margin-bottom: 0;">
+                  <div class="pw2-drawer-item-title">
+                    <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="var(--peace)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    Альтернативная стоимость
+                  </div>
+                  <div class="pw2-drawer-item-desc">Стоимость решения глобальных кризисов не является произвольной. Она базируется на актуальных макроэкономических программах развития ООН, ВОЗ и Всемирного Банка.</div>
+                  <div class="pw2-source-links-wrap">
+                    <a href="https://www.unesco.org/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">UNESCO <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                    <a href="https://www.who.int/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">WHO <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                    <a href="https://www.fao.org/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">FAO (UN) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                    <a href="https://www.worldbank.org/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">World Bank <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                    <a href="https://www.itu.int/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">ITU <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                    <a href="https://www.iea.org/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">IEA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                  </div>
+               </div>
+            </div>
+          </div>
+        </div>
+        
         <div class="pw2-foot-card" style="border-color: rgba(131,215,255,0.3); background: rgba(131,215,255,0.02);">
           <div class="pw2-h4" style="display:flex; align-items:center; color: var(--accent);">
             <svg class="pw2-icon pw2-icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -1101,9 +1160,21 @@
           <div class="pw2-foot-card-text" style="margin-bottom: 16px;">
             Вы можете встроить этот интерактивный калькулятор в свои статьи. Он автоматически адаптируется.
           </div>
-          <div style="font-size: 11px; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; color: var(--muted); margin-bottom: 0; font-family: monospace; overflow-x: auto; white-space: nowrap; border: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
-            &lt;iframe src="https://widgets.peaceful-world.org/true-cost-of-war/ru/index.html" width="100%" height="800" style="border:none; border-radius:16px;"&gt;&lt;/iframe&gt;
-          </div>
+          <div style="font-size: 11px; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; color: var(--muted); margin-bottom: 0; font-family: monospace; overflow-x: auto; white-space: pre; border: 1px solid rgba(255,255,255,0.1); margin-top: auto; line-height: 1.4;">&lt;!-- Блок для вставки: Истинная цена войны --&gt;
+&lt;iframe id="pw2-widget-iframe" src="https://widgets.peaceful-world.org/true-cost-of-war/ru/index.html?embed=1" width="100%" style="border: none; border-radius: 20px; overflow: hidden; min-height: 500px; background: transparent;" scrolling="no" title="Истинная цена войны — Интерактивная модель"&gt;&lt;/iframe&gt;
+&lt;script&gt;
+  (function() {
+    window.addEventListener('message', function(event) {
+      if (event.origin !== 'https://widgets.peaceful-world.org') return;
+      try {
+        if (event.data &amp;&amp; event.data.type === 'pw2-resize' &amp;&amp; event.data.height) {
+          var iframe = document.getElementById('pw2-widget-iframe');
+          if (iframe) iframe.style.height = event.data.height + 'px';
+        }
+      } catch(e) {}
+    });
+  })();
+&lt;/script&gt;</div>
         </div>
 
         <div class="pw2-foot-card">
