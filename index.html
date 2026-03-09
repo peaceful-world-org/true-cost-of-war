@@ -507,7 +507,20 @@
       .pw2-widget-container { padding: 16px 16px 40px 16px !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; border: none !important; }
       .pw2-wrap { padding: 0 !important; }
       
-      .pw2-hero { padding: 0 !important; border-radius: 0 !important; }
+      .pw2-hero { 
+        padding: 0 !important; 
+        border-radius: 0 !important; 
+        display: flex !important; 
+        flex-direction: column !important; 
+      }
+      .pw2-hero > .pw2-badge-row { order: 1; }
+      .pw2-hero > .pw2-h1 { order: 2; }
+      .pw2-hero > .pw2-hero-fact { order: 3; }
+      .pw2-hero > .pw2-hero-counter { order: 4; margin-top: 0 !important; margin-bottom: 24px !important; }
+      .pw2-hero > .pw2-lead { order: 5; margin-bottom: 24px !important; }
+      .pw2-hero > .pw2-time-wrap { order: 6; margin-top: 0 !important; margin-bottom: 24px !important; }
+      .pw2-hero > .pw2-grid-top { order: 7; margin-top: 0 !important; }
+
       .pw2-section { 
         padding: 32px 0 0 0 !important; 
         border-radius: 0 !important; 
@@ -1181,9 +1194,9 @@
           <button id="pw2-drawer-close" class="pw2-drawer-close" tabindex="0" aria-label="Закрыть">&times;</button>
           <h2 class="pw2-h2" style="margin-bottom: 24px; font-size: 26px; color: #fff !important;">Методология и Источники данных</h2>
           <div class="pw2-drawer-text">
-             <p style="color: #e2e8f0 !important; font-size: 16px;">Это аналитическая макромодель, созданная для визуализации экономических и демографических потерь от конфликтов. Алгоритм опирается исключительно на консервативные оценки и официальные данные признанных международных институтов.</p>
-             
-             <div class="pw2-drawer-item">
+              <p style="color: #e2e8f0 !important; font-size: 16px;">Это аналитическая макромодель, созданная для визуализации экономических и демографических потерь от конфликтов. Алгоритм опирается исключительно на консервативные оценки и официальные данные признанных международных институтов.</p>
+              
+              <div class="pw2-drawer-item">
                 <div class="pw2-drawer-item-title">
                   <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="7" stroke-dasharray="4 4"/><circle cx="12" cy="12" r="3"/></svg>
                   Глобальные военные расходы
