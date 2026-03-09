@@ -507,19 +507,20 @@
       .pw2-widget-container { padding: 16px 16px 40px 16px !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; border: none !important; }
       .pw2-wrap { padding: 0 !important; }
       
-      .pw2-hero { 
-        padding: 0 !important; 
-        border-radius: 0 !important; 
+      .pw2-hero { padding: 0 !important; border-radius: 0 !important; }
+      
+      /* Reorder только для обычного мобильного вида (не ломает embed-режим) */
+      .pw2-widget-container:not(.pw2-embed-mode) .pw2-hero { 
         display: flex !important; 
         flex-direction: column !important; 
       }
-      .pw2-hero > .pw2-badge-row { order: 1; }
-      .pw2-hero > .pw2-h1 { order: 2; }
-      .pw2-hero > .pw2-hero-fact { order: 3; }
-      .pw2-hero > .pw2-hero-counter { order: 4; margin-top: 0 !important; margin-bottom: 24px !important; }
-      .pw2-hero > .pw2-lead { order: 5; margin-bottom: 24px !important; }
-      .pw2-hero > .pw2-time-wrap { order: 6; margin-top: 0 !important; margin-bottom: 24px !important; }
-      .pw2-hero > .pw2-grid-top { order: 7; margin-top: 0 !important; }
+      .pw2-widget-container:not(.pw2-embed-mode) .pw2-hero > .pw2-badge-row { order: 1; }
+      .pw2-widget-container:not(.pw2-embed-mode) .pw2-hero > .pw2-h1 { order: 2; }
+      .pw2-widget-container:not(.pw2-embed-mode) .pw2-hero > .pw2-hero-fact { order: 3; }
+      .pw2-widget-container:not(.pw2-embed-mode) .pw2-hero > .pw2-hero-counter { order: 4; margin-top: 0 !important; margin-bottom: 24px !important; }
+      .pw2-widget-container:not(.pw2-embed-mode) .pw2-hero > .pw2-lead { order: 5; margin-bottom: 24px !important; }
+      .pw2-widget-container:not(.pw2-embed-mode) .pw2-hero > .pw2-time-wrap { order: 6; margin-top: 0 !important; margin-bottom: 24px !important; }
+      .pw2-widget-container:not(.pw2-embed-mode) .pw2-hero > .pw2-grid-top { order: 7; margin-top: 0 !important; }
 
       .pw2-section { 
         padding: 32px 0 0 0 !important; 
@@ -540,7 +541,9 @@
       .pw2-grid-top, .pw2-grid-bottom { grid-template-columns: 1fr !important; gap: 12px !important; margin-top: 16px !important; }
       .pw2-card { padding: 20px 16px !important; border-radius: 16px !important; border: 1px solid rgba(255, 255, 255, 0.05) !important; background: rgba(30, 41, 59, 0.2) !important; overflow: visible !important; }
       
-      .pw2-hero-counter { padding: 20px 16px !important; border-radius: 20px !important; border: 1px solid rgba(184, 255, 207, 0.1) !important; background: rgba(184, 255, 207, 0.03) !important; margin-top: 16px !important; }
+      /* Убран конфликтный margin-top. Отступы управляются предсказуемо для каждого режима */
+      .pw2-hero-counter { padding: 20px 16px !important; border-radius: 20px !important; border: 1px solid rgba(184, 255, 207, 0.1) !important; background: rgba(184, 255, 207, 0.03) !important; }
+      .pw2-embed-mode .pw2-hero-counter { margin-top: 16px !important; }
       .pw2-big-number { font-size: clamp(34px, 8vw, 46px) !important; }
       .pw2-live-box { padding: 16px 0 0 0 !important; background: transparent !important; border: none !important; border-top: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 0 !important; box-shadow: none !important; margin-top: 16px !important; }
       .pw2-live-label { font-size: 13px !important; margin-bottom: 8px !important; }
