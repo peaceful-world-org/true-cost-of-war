@@ -1785,7 +1785,33 @@
       setupCopyBtn(els.copyFactBtn, () => els.factText.textContent);
       
       render();
+          function sendWidgetHeight() {
+        try {
+          const root = document.getElementById('pw2-widget-container');
+          const height = root ? Math.ceil(root.scrollHeight) : Math.ceil(document.body.scrollHeight);
+          window.parent.postMessage({ type: 'pw2-resize', height: height }, '*');
+        } catch (e) {}
+      }
+
+      window.addEventListener('load', function() {
+        setTimeout(sendWidgetHeight, 100);
+        setTimeout(sendWidgetHeight, 500);
+        setTimeout(sendWidgetHeight, 1200);
+      });
+
+      window.addEventListener('resize', sendWidgetHeight);
+
+      const ro = new ResizeObserver(() => sendWidgetHeight());
+      const widgetRoot = document.getElementById('pw2-widget-container');
+      if (widgetRoot) ro.observe(widgetRoot);
+
+      window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'pw2-request-resize') {
+          sendWidgetHeight();
+        }
+      });
     })();
   </script>
 </body>
+
 </html>
