@@ -55,7 +55,7 @@
       text-align: left;
       position: relative;
 
-      overflow: hidden;
+      overflow: visible;
       isolation: isolate;
       background-clip: padding-box;
     }
@@ -1342,6 +1342,7 @@
       let initialShare = (!isNaN(parsedShare) && parsedShare >= 5 && parsedShare <= 50) ? parsedShare : 10;
       
       const currentYear = new Date().getFullYear();
+      const PUBLIC_PAGE_URL = 'https://peaceful-world.org/true-cost-of-war/ru';
       let parsedYear = parseInt(urlParams.get('year'));
       let initialYear = (!isNaN(parsedYear) && parsedYear >= 1920 && parsedYear <= currentYear) ? parsedYear : 1990;
 
@@ -1819,4 +1820,5 @@
 </body>
 
 </html>
+
 
