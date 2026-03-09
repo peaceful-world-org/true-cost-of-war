@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Истинная цена войны — Интерактивная модель</title>
   <style>
-    /* Подключаем шрифты: Montserrat (Заголовки) + Inter (Цифры и текст) - В самом начале! */
+    /* Подключаем шрифты: Montserrat (Заголовки) + Inter (Цифры и текст) */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap');
 
     /* Плавный скролл для якорных ссылок */
     html { scroll-behavior: smooth; }
     
     /* Базовые стили для корректного отображения */
-    body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #020617; }
+    body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: transparent; }
 
     /* ==============================================
        БЕСШОВНАЯ ИНТЕГРАЦИЯ И ЗАЩИТА СТИЛЕЙ
@@ -54,10 +54,6 @@
       box-sizing: border-box;
       text-align: left;
       position: relative;
-
-      overflow: visible;
-      isolation: isolate;
-      background-clip: padding-box;
     }
 
     .pw2-widget-container * { box-sizing: border-box; }
@@ -129,19 +125,44 @@
     
     .pw2-tooltip {
       position: absolute; bottom: 135%; right: 50%; transform: translateX(50%) translateY(5px);
-      width: 320px; background: #1e293b; border: 1px solid rgba(255,255,255,0.15); color: #f8fafc;
+      width: max-content; max-width: 320px; background: #1e293b; border: 1px solid rgba(255,255,255,0.15); color: #f8fafc;
       padding: 16px 20px; border-radius: 12px; font-size: 14px; font-weight: 500; font-family: var(--font-body);
       line-height: 1.5; opacity: 0; visibility: hidden;
-      transition: all 0.2s ease; box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 1001; 
+      transition: opacity 0.2s ease, transform 0.2s ease, right 0s, left 0s; box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 1001; 
       text-transform: none; letter-spacing: normal; text-align: left; pointer-events: none; white-space: normal;
     }
+    /* Touch support visually overrides desktop hover if clicked */
     .pw2-info-trigger:hover .pw2-tooltip, .pw2-info-trigger:focus .pw2-tooltip { 
-      opacity: 1; visibility: visible; transform: translateX(50%) translateY(0); pointer-events: auto;
+      opacity: 1; visibility: visible; pointer-events: auto;
     }
     .pw2-tooltip::after {
       content: ''; position: absolute; top: 100%; right: 50%; transform: translateX(50%);
       border-width: 6px; border-style: solid; border-color: #1e293b transparent transparent transparent;
     }
+
+    /* INLINE MOBILE POPOVER */
+    #pw2-inline-tooltip-container {
+      display: none;
+      position: absolute;
+      z-index: 10000;
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+      width: calc(100% - 32px);
+      max-width: 320px;
+      box-sizing: border-box;
+      font-size: 14px;
+      line-height: 1.5;
+      font-family: var(--font-body);
+    }
+    #pw2-inline-tooltip-close {
+      background: transparent; border: none; color: var(--muted); font-size: 24px; cursor: pointer; padding: 0; line-height: 0.8;
+      transition: color 0.2s; outline: none;
+    }
+    #pw2-inline-tooltip-close:hover { color: #fff; }
 
     .pw2-badge-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 24px; gap: 10px;}
     .pw2-badge {
@@ -180,7 +201,7 @@
     .pw2-glow-surface:hover::before { opacity: 1; }
     .pw2-glow-surface > *:not(.pw2-item-bg) { position: relative; z-index: 2; }
 
-    /* DRAWER МЕТОДОЛОГИИ И ССЫЛКИ */
+    /* DRAWER МЕТОДОЛОГИИ И ССЫЛКИ (Десктоп) */
     .pw2-drawer-overlay {
       box-sizing: border-box; position: fixed; top: 0; left: 0; width: 100%; height: 100dvh;
       background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
@@ -419,58 +440,14 @@
       border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 10px 20px rgba(0,0,0,0.5);
     }
 
-    /* ГЛОБАЛЬНЫЙ MOBILE TOOLTIP (Шторка) */
-    .pw2-mobile-tooltip-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100dvh;
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-      z-index: 9999990; opacity: 0; visibility: hidden; transition: opacity 0.3s;
-      box-sizing: border-box !important;
+    /* INLINE MOBILE METHODOLOGY PANEL */
+    #pw2-inline-methodology {
+      display: none; margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); text-align: left;
     }
-    .pw2-mobile-tooltip-sheet {
-      position: fixed; bottom: 0; left: 0; width: 100%;
-      background: #1e293b; border-top: 1px solid rgba(255,255,255,0.15);
-      border-radius: 24px 24px 0 0; 
-      padding: 24px 24px calc(24px + env(safe-area-inset-bottom, 0px)); 
-      box-sizing: border-box !important;
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.5); z-index: 9999991;
-      transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      color: #f8fafc; font-family: var(--font-body); font-size: 15px; line-height: 1.6;
-      max-height: calc(100dvh - 40px);
-      display: flex;
-      flex-direction: column;
-    }
-    .pw2-mobile-tooltip-sheet * {
-      box-sizing: border-box !important;
-    }
-    .pw2-mobile-tooltip-overlay.active { opacity: 1; visibility: visible; }
-    .pw2-mobile-tooltip-sheet.active { transform: translateY(0); }
-    .pw2-mobile-sheet-drag {
-      width: 40px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.2);
-      margin: 0 auto 20px;
-      flex-shrink: 0;
-    }
-    
-    #pw2-mobile-sheet-text { 
-      overflow-y: auto; 
-      flex: 1 1 auto; 
-      min-height: 0; 
-      padding-right: 4px; 
-      overscroll-behavior: contain; 
-      -webkit-overflow-scrolling: touch; 
-    }
-    #pw2-mobile-sheet-close { 
-      width: 100%; 
-      margin-top: 24px; 
-      background: rgba(255,255,255,0.1); 
-      border-color: rgba(255,255,255,0.2); 
-      color: #fff; 
-      flex: 0 0 auto; 
-    }
-    
-    .pw2-mission-note { display: inline-block; margin-top: 6px; }
-    .pw2-impact-icon { color: var(--peace); flex-shrink: 0; margin-top: 2px; margin-right: 12px; }
-    .pw2-impact-text-wrap { line-height: 1.3; flex-grow: 1; min-width: 0; }
-    .pw2-impact-highlight { color: var(--accent2); font-size: 18px; margin-top: 4px; line-height: 1.4; }
+    #pw2-inline-methodology .pw2-drawer-text { font-size: 14px; color: #e2e8f0; margin-bottom: 16px; line-height: 1.6; }
+    #pw2-inline-methodology .pw2-drawer-item { margin-bottom: 24px; }
+    #pw2-inline-methodology .pw2-drawer-item-title { font-family: var(--font-heading); font-weight: 800; color: #fff; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+    #pw2-inline-methodology .pw2-drawer-item-desc { color: #cbd5e1; font-size: 14px; margin-bottom: 8px; line-height: 1.5; }
 
     /* ==============================================
        ЭМБЕД-РЕЖИМ
@@ -521,8 +498,6 @@
         border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 20px; padding: 24px;
       }
       .pw2-mobile-summary-desc { color: var(--muted); font-size: 14px; margin-bottom: 16px; line-height: 1.5; font-weight: 500;}
-      .pw2-mobile-jump-btn { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); color: var(--peace); justify-content: space-between; padding: 14px 20px; width: 100%; }
-      .pw2-mobile-jump-btn:hover { background: rgba(16,185,129,0.15); }
       
       .pw2-list.pw2-collapsed-mobile .pw2-mobile-hideable { display: none !important; }
       .pw2-show-more-wrap.is-visible { display: flex; margin-bottom: 24px; justify-content: center; }
@@ -646,7 +621,7 @@
       }
       #pw2-fact-text { font-size: 14px !important; background: rgba(0,0,0,0.2) !important; padding: 16px !important; border-radius: 16px !important; border: 1px solid rgba(255,255,255,0.05) !important; }
 
-      .pw2-share-btn, .pw2-mobile-jump-btn, #pw2-show-more-btn { 
+      .pw2-share-btn, #pw2-show-more-btn { 
         padding: 16px !important; 
         font-size: 16px !important; 
         border-radius: 14px !important; 
@@ -1026,12 +1001,6 @@
           </div>
         </div>
 
-        <div class="pw2-embed-cta-wrap pw2-embed-only">
-          <a href="https://peaceful-world.org/true-cost-of-war/ru" target="_blank" rel="noopener noreferrer" class="pw2-embed-cta">
-            Открыть полную версию
-            <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          </a>
-        </div>
       </div>
       
       <div class="pw2-section pw2-embed-hidden" style="background: linear-gradient(135deg, rgba(52, 211, 153, 0.05) 0%, rgba(15, 31, 53, 0.4) 100%); border-color: rgba(52, 211, 153, 0.2);">
@@ -1119,6 +1088,49 @@
               <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               <span>Изучить источники и расчёты</span>
             </button>
+            
+            <!-- INLINE METHODOLOGY PANEL FOR MOBILE/IFRAME -->
+            <div id="pw2-inline-methodology">
+               <div class="pw2-drawer-text">Это аналитическая макромодель, созданная для визуализации экономических и демографических потерь от конфликтов. Алгоритм опирается исключительно на консервативные оценки и официальные данные признанных международных институтов.</div>
+               
+               <div class="pw2-drawer-item">
+                  <div class="pw2-drawer-item-title">
+                    <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="7" stroke-dasharray="4 4"/><circle cx="12" cy="12" r="3"/></svg>
+                    Глобальные военные расходы
+                  </div>
+                  <div class="pw2-drawer-item-desc">Базовый параметр — <strong>$2.44 трлн в год</strong>. Данные взяты из последнего официального отчета Стокгольмского института исследования проблем мира (SIPRI) о совокупных оборонных бюджетах государств.</div>
+                  <div class="pw2-source-links-wrap">
+                    <a href="https://www.sipri.org/databases/milex" target="_blank" rel="noopener noreferrer" class="pw2-source-link">SIPRI Military Expenditure Database <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                  </div>
+               </div>
+               
+               <div class="pw2-drawer-item">
+                  <div class="pw2-drawer-item-title">
+                    <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="var(--danger-direct)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-3 3 7 3-6 2 2h2"/><line x1="18" y1="12" x2="22" y2="12" stroke-dasharray="2 3"/></svg>
+                    Жертвы вооруженных конфликтов
+                  </div>
+                  <div class="pw2-drawer-item-desc">Базовая оценка — <strong>~150 000 смертей в год</strong> непосредственно от боевых действий (на основе базы данных Уппсальского университета UCDP).</div>
+                  <div class="pw2-source-links-wrap">
+                    <a href="https://ucdp.uu.se/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">UCDP Conflict Encyclopedia <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                  </div>
+               </div>
+               
+               <div class="pw2-drawer-item" style="margin-bottom: 0;">
+                  <div class="pw2-drawer-item-title">
+                    <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="var(--peace)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    Альтернативная стоимость
+                  </div>
+                  <div class="pw2-drawer-item-desc">Стоимость решения глобальных кризисов не является произвольной. Она базируется на актуальных макроэкономических программах развития ООН, ВОЗ и Всемирного Банка.</div>
+                  <div class="pw2-source-links-wrap">
+                    <a href="https://www.unesco.org/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">UNESCO <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                    <a href="https://www.who.int/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">WHO <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                    <a href="https://www.fao.org/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">FAO (UN) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                    <a href="https://www.worldbank.org/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">World Bank <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                    <a href="https://www.itu.int/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">ITU <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                    <a href="https://www.iea.org/" target="_blank" rel="noopener noreferrer" class="pw2-source-link">IEA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg></a>
+                  </div>
+               </div>
+            </div>
           </div>
         </div>
 
@@ -1131,7 +1143,7 @@
             Вы можете встроить этот интерактивный калькулятор в свои статьи. Он автоматически адаптируется.
           </div>
           <div style="font-size: 11px; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; color: var(--muted); margin-bottom: 0; font-family: monospace; overflow-x: auto; white-space: nowrap; border: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
-            &lt;iframe src="https://peaceful-world.org/true-cost-of-war/ru?embed=1" width="100%" height="800" style="border:none; border-radius:16px;"&gt;&lt;/iframe&gt;
+            &lt;iframe src="https://widgets.peaceful-world.org/true-cost-of-war/ru/index.html" width="100%" height="800" style="border:none; border-radius:16px;"&gt;&lt;/iframe&gt;
           </div>
         </div>
 
@@ -1151,6 +1163,15 @@
           </div>
         </div>
 
+      </div>
+
+      <!-- INLINE MOBILE POPOVER TOOLTIP CONTAINER -->
+      <div id="pw2-inline-tooltip-container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+          <div style="font-weight: 700; color: var(--accent); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Справка</div>
+          <button id="pw2-inline-tooltip-close">&times;</button>
+        </div>
+        <div id="pw2-inline-tooltip-text"></div>
       </div>
 
     </div>
@@ -1205,15 +1226,41 @@
     </div>
   </div>
 
-  <div id="pw2-mobile-tooltip-overlay" class="pw2-mobile-tooltip-overlay"></div>
-  <div id="pw2-mobile-tooltip-sheet" class="pw2-mobile-tooltip-sheet">
-    <div class="pw2-mobile-sheet-drag"></div>
-    <div id="pw2-mobile-sheet-text"></div>
-    <button id="pw2-mobile-sheet-close" class="pw2-share-btn">Понятно</button>
-  </div>
-
   <script>
     (function(){
+      // КОНФИГУРАЦИЯ: ГЛАВНЫЙ URL ПУБЛИЧНОЙ СТРАНИЦЫ
+      const PUBLIC_PAGE_URL = 'https://peaceful-world.org/true-cost-of-war/ru';
+
+      // СИСТЕМА ОТПРАВКИ ВЫСОТЫ ВО ВНЕШНИЙ IFRAME
+      function sendWidgetHeight() {
+        try {
+          const root = document.getElementById('pw2-widget-container');
+          const height = root ? Math.ceil(root.scrollHeight) : Math.ceil(document.body.scrollHeight);
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'pw2-resize', height: height }, '*');
+          }
+        } catch (e) {}
+      }
+
+      window.addEventListener('load', function() {
+        setTimeout(sendWidgetHeight, 100);
+        setTimeout(sendWidgetHeight, 500);
+        setTimeout(sendWidgetHeight, 1200);
+      });
+      window.addEventListener('resize', sendWidgetHeight);
+
+      if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(() => sendWidgetHeight());
+        const widgetRoot = document.getElementById('pw2-widget-container');
+        if (widgetRoot) ro.observe(widgetRoot);
+      }
+
+      window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'pw2-request-resize') {
+          sendWidgetHeight();
+        }
+      });
+
       const ScrollManager = (function() {
         let lockCount = 0;
         let savedScrollY = 0;
@@ -1258,6 +1305,32 @@
         });
       });
 
+      // Desktop clipping protection for tooltips
+      document.querySelectorAll('.pw2-info-trigger').forEach(trigger => {
+        trigger.addEventListener('mouseenter', function() {
+          const tooltip = this.querySelector('.pw2-tooltip');
+          if(!tooltip) return;
+          const rect = tooltip.getBoundingClientRect();
+          if (rect.right > window.innerWidth) {
+            tooltip.style.right = '0';
+            tooltip.style.transform = 'translateX(0) translateY(5px)';
+          }
+          if (rect.left < 0) {
+            tooltip.style.right = 'auto';
+            tooltip.style.left = '0';
+            tooltip.style.transform = 'translateX(0) translateY(5px)';
+          }
+        });
+        trigger.addEventListener('mouseleave', function() {
+          const tooltip = this.querySelector('.pw2-tooltip');
+          if(tooltip) {
+            tooltip.style.right = '50%';
+            tooltip.style.left = 'auto';
+            tooltip.style.transform = 'translateX(50%) translateY(5px)';
+          }
+        });
+      });
+
       const drawerOverlay = document.getElementById('pw2-methodology-drawer');
       const drawerCloseBtn = document.getElementById('pw2-drawer-close');
       const drawerOpenBtn = document.getElementById('pw2-open-drawer-btn');
@@ -1275,51 +1348,95 @@
           ScrollManager.unlock();
           if (drawerOpenBtn) drawerOpenBtn.focus();
         };
-        drawerOpenBtn.addEventListener('click', openDrawer);
+
+        drawerOpenBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const isIframe = window.self !== window.top;
+          const isMobile = window.innerWidth <= 600 || window.matchMedia("(pointer: coarse)").matches;
+          
+          if (isIframe && isMobile) {
+            // Inline methodology for mobile embedded mode
+            const inlineMeth = document.getElementById('pw2-inline-methodology');
+            const spanText = drawerOpenBtn.querySelector('span');
+            if (inlineMeth.style.display === 'none' || inlineMeth.style.display === '') {
+              inlineMeth.style.display = 'block';
+              if(spanText) spanText.textContent = 'Скрыть источники';
+            } else {
+              inlineMeth.style.display = 'none';
+              if(spanText) spanText.textContent = 'Изучить источники и расчёты';
+            }
+            setTimeout(sendWidgetHeight, 50);
+          } else {
+            // Normal desktop overlay drawer
+            openDrawer(e);
+          }
+        });
+
         drawerCloseBtn.addEventListener('click', closeDrawer);
         drawerOverlay.addEventListener('click', (e) => { if (e.target === drawerOverlay) closeDrawer(); });
       }
 
-      const tOverlay = document.getElementById('pw2-mobile-tooltip-overlay');
-      const tSheet = document.getElementById('pw2-mobile-tooltip-sheet');
-      const tText = document.getElementById('pw2-mobile-sheet-text');
-      const tClose = document.getElementById('pw2-mobile-sheet-close');
+      // INLINE MOBILE POPOVER LOGIC
+      const inlineTooltip = document.getElementById('pw2-inline-tooltip-container');
+      const inlineTooltipText = document.getElementById('pw2-inline-tooltip-text');
+      const inlineTooltipClose = document.getElementById('pw2-inline-tooltip-close');
 
-      function closeMobileTooltip() {
-        if(tOverlay && tOverlay.classList.contains('active')) {
-          tOverlay.classList.remove('active');
-          if(tSheet) tSheet.classList.remove('active');
-          ScrollManager.unlock();
+      function closeInlineTooltip() {
+        if (inlineTooltip) {
+          inlineTooltip.style.display = 'none';
+          sendWidgetHeight();
         }
+      }
+
+      if (inlineTooltipClose) {
+        inlineTooltipClose.addEventListener('click', (e) => {
+          e.preventDefault();
+          closeInlineTooltip();
+        });
       }
 
       document.addEventListener('click', (e) => {
         const trigger = e.target.closest('.pw2-info-trigger');
         const widget = document.getElementById('pw2-widget-container');
         const isTouch = window.matchMedia("(pointer: coarse)").matches || window.innerWidth <= 600 || (widget && widget.classList.contains('pw2-force-mobile'));
+        const isIframe = window.self !== window.top;
         
-        if (trigger && isTouch) {
+        // Auto-close inline tooltip if clicking outside
+        if (!trigger && !e.target.closest('#pw2-inline-tooltip-container')) {
+          if (inlineTooltip && inlineTooltip.style.display === 'block') {
+            closeInlineTooltip();
+          }
+        }
+        
+        if (trigger && isTouch && isIframe) {
           e.preventDefault();
           const tooltipEl = trigger.querySelector('.pw2-tooltip');
           
-          if(tooltipEl && tText && tOverlay && tSheet) {
-            if (!tOverlay.classList.contains('active')) {
-              ScrollManager.lock();
-            }
-            tText.innerHTML = tooltipEl.innerHTML;
-            tOverlay.classList.add('active');
-            tSheet.classList.add('active');
+          if(tooltipEl && inlineTooltip && inlineTooltipText) {
+            inlineTooltipText.innerHTML = tooltipEl.innerHTML;
+            inlineTooltip.style.display = 'block';
+            
+            // Position tooltip dynamically within the widget
+            const widgetRect = widget.getBoundingClientRect();
+            const triggerRect = trigger.getBoundingClientRect();
+            
+            let leftPos = (triggerRect.left - widgetRect.left) + (triggerRect.width / 2) - 160; 
+            if (leftPos < 16) leftPos = 16;
+            if (leftPos + 320 > widgetRect.width - 16) leftPos = widgetRect.width - 320 - 16;
+
+            inlineTooltip.style.top = (triggerRect.bottom - widgetRect.top + 10) + 'px';
+            inlineTooltip.style.left = leftPos + 'px';
+
+            sendWidgetHeight();
           }
         }
       });
 
-      if (tOverlay) tOverlay.addEventListener('click', closeMobileTooltip);
-      if (tClose) tClose.addEventListener('click', closeMobileTooltip);
-
+      // Escape key to close
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           if (drawerOverlay && drawerOverlay.classList.contains('open')) drawerCloseBtn.click();
-          if (tOverlay && tOverlay.classList.contains('active')) closeMobileTooltip();
+          closeInlineTooltip();
         }
       });
 
@@ -1332,6 +1449,7 @@
           altList.classList.remove('pw2-collapsed-mobile');
           showMoreWrap.classList.remove('is-visible');
           showMoreWrap.style.display = 'none'; 
+          sendWidgetHeight();
         });
       }
 
@@ -1342,7 +1460,6 @@
       let initialShare = (!isNaN(parsedShare) && parsedShare >= 5 && parsedShare <= 50) ? parsedShare : 10;
       
       const currentYear = new Date().getFullYear();
-      const PUBLIC_PAGE_URL = 'https://peaceful-world.org/true-cost-of-war/ru';
       let parsedYear = parseInt(urlParams.get('year'));
       let initialYear = (!isNaN(parsedYear) && parsedYear >= 1920 && parsedYear <= currentYear) ? parsedYear : 1990;
 
@@ -1444,30 +1561,20 @@
 
       function updateURLState() {
         if (isEmbed) return;
-        try {
-          const url = new URL(window.location.href);
-          url.searchParams.set('mode', els.mode.value);
-          url.searchParams.set('share', els.share.value);
-          if (els.mode.value === 'lifetime') url.searchParams.set('year', els.birthYear.value || '1990');
-          else url.searchParams.delete('year');
-          if (window.location.protocol !== 'blob:') window.history.replaceState({}, '', url.toString());
-        } catch (e) {}
+        // Inside external iframe, replacing state does not update parent URL and traps history.
       }
 
       function getCurrentShareUrl() {
         try {
-          const url = new URL(window.location.href);
-          url.hash = '';
+          const url = new URL(PUBLIC_PAGE_URL);
           url.searchParams.set('mode', els.mode.value);
           url.searchParams.set('share', els.share.value);
           if (els.mode.value === 'lifetime') {
             url.searchParams.set('year', els.birthYear.value || currentYear);
-          } else {
-            url.searchParams.delete('year');
           }
           return url.toString();
         } catch(e) {
-          return window.location.href.split('#')[0];
+          return PUBLIC_PAGE_URL;
         }
       }
 
@@ -1607,6 +1714,7 @@
           e.preventDefault();
           if (els.factOutputContainer.style.display === 'block') {
              els.factOutputContainer.style.display = 'none';
+             sendWidgetHeight();
              return;
           }
 
@@ -1624,7 +1732,7 @@
               return Math.floor(num).toLocaleString('ru-RU');
             };
             
-            const cleanUrl = window.location.href.split('?')[0].split('#')[0];
+            const cleanUrl = PUBLIC_PAGE_URL;
             let fact = `Ежедневно мир тратит на гонку вооружений ${formatMoneyText(dailySpend, true)}.\n\n`;
             fact += `Вместо этого мы могли бы всего за один день:\n`;
             fact += `• Спасти от голода ${formatMln(hunger)} человек\n`;
@@ -1636,6 +1744,7 @@
             els.factOutputContainer.style.display = 'block';
             els.cardOutputContainer.style.display = 'none';
             els.generateFactBtn.innerHTML = originalHTML;
+            sendWidgetHeight();
           }, 300);
         });
       }
@@ -1712,6 +1821,7 @@
           e.preventDefault();
           if (els.cardOutputContainer.style.display === 'block') {
              els.cardOutputContainer.style.display = 'none';
+             sendWidgetHeight();
              return;
           }
           
@@ -1732,6 +1842,7 @@
                 els.cardOutputContainer.style.display = 'block';
                 els.factOutputContainer.style.display = 'none';
                 els.generateCardBtn.innerHTML = originalHTML;
+                sendWidgetHeight();
             }
           }, 300); 
         });
@@ -1790,35 +1901,7 @@
       setupCopyBtn(els.copyFactBtn, () => els.factText.textContent);
       
       render();
-          function sendWidgetHeight() {
-        try {
-          const root = document.getElementById('pw2-widget-container');
-          const height = root ? Math.ceil(root.scrollHeight) : Math.ceil(document.body.scrollHeight);
-          window.parent.postMessage({ type: 'pw2-resize', height: height }, '*');
-        } catch (e) {}
-      }
-
-      window.addEventListener('load', function() {
-        setTimeout(sendWidgetHeight, 100);
-        setTimeout(sendWidgetHeight, 500);
-        setTimeout(sendWidgetHeight, 1200);
-      });
-
-      window.addEventListener('resize', sendWidgetHeight);
-
-      const ro = new ResizeObserver(() => sendWidgetHeight());
-      const widgetRoot = document.getElementById('pw2-widget-container');
-      if (widgetRoot) ro.observe(widgetRoot);
-
-      window.addEventListener('message', function(event) {
-        if (event.data && event.data.type === 'pw2-request-resize') {
-          sendWidgetHeight();
-        }
-      });
     })();
   </script>
 </body>
-
 </html>
-
-
