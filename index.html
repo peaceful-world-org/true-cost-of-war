@@ -1373,6 +1373,19 @@
       const drawerOverlay = document.getElementById('pw2-methodology-drawer');
       const drawerCloseBtn = document.getElementById('pw2-drawer-close');
       const drawerOpenBtn = document.getElementById('pw2-open-drawer-btn');
+      const widgetContainer = document.getElementById('pw2-widget-container');
+
+      // Portal: переносим drawer в body и динамически копируем CSS-переменные
+      if (drawerOverlay && widgetContainer && drawerOverlay.parentNode !== document.body) {
+        const computed = getComputedStyle(widgetContainer);
+        const vars = [
+          '--bg2', '--card', '--cardBorder', '--text', '--muted', '--accent', '--accent2', 
+          '--danger-direct', '--danger-indirect', '--danger-muted', '--danger', 
+          '--gold', '--peace', '--shadow', '--radius', '--font-heading', '--font-body'
+        ];
+        vars.forEach(v => drawerOverlay.style.setProperty(v, computed.getPropertyValue(v)));
+        document.body.appendChild(drawerOverlay);
+      }
 
       if (drawerOpenBtn && drawerOverlay) {
         const openDrawer = (e) => {
@@ -1391,6 +1404,7 @@
         drawerOpenBtn.addEventListener('click', (e) => {
           e.preventDefault();
           const isMobile = window.innerWidth <= 600;
+          const isEmbedMode = new URLSearchParams(window.location.search).get('embed') === '1';
           
           if (isMobile) {
             // Inline methodology for mobile/touch mode everywhere
@@ -1405,7 +1419,8 @@
             }
             setTimeout(sendWidgetHeight, 50);
           } else {
-            // Normal desktop overlay drawer
+            // Normal desktop overlay drawer (явная защита для embed-режима)
+            if (isEmbedMode) return; 
             openDrawer(e);
           }
         });
