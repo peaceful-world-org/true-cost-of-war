@@ -133,7 +133,7 @@
     }
     /* Touch support visually overrides desktop hover if clicked */
     .pw2-info-trigger:hover .pw2-tooltip, .pw2-info-trigger:focus .pw2-tooltip { 
-      opacity: 1; visibility: visible; transform: translateX(50%) translateY(0); pointer-events: auto;
+      opacity: 1; visibility: visible; pointer-events: auto;
     }
     .pw2-tooltip::after {
       content: ''; position: absolute; top: 100%; right: 50%; transform: translateX(50%);
@@ -520,7 +520,8 @@
       
       .pw2-h1 { font-size: clamp(32px, 8vw, 42px) !important; margin-bottom: 12px !important; line-height: 1.1 !important; }
       .pw2-h2 { font-size: 26px !important; margin-bottom: 12px !important; text-align: left !important; }
-      .pw2-lead { font-size: 16px !important; margin-bottom: 24px !important; line-height: 1.5 !important; span { white-space: normal !important; } }
+      .pw2-lead { font-size: 16px !important; margin-bottom: 24px !important; line-height: 1.5 !important; }
+      .pw2-lead span { white-space: normal !important; }
       .pw2-intro { font-size: 16px !important; margin-bottom: 24px !important; color: var(--muted) !important; text-align: left !important; }
       
       .pw2-grid-top, .pw2-grid-bottom { grid-template-columns: 1fr !important; gap: 12px !important; margin-top: 16px !important; }
@@ -1186,7 +1187,18 @@
       function sendWidgetHeight() {
         try {
           const root = document.getElementById('pw2-widget-container');
-          const height = root ? Math.ceil(root.scrollHeight) : Math.ceil(document.body.scrollHeight);
+          let height = root ? Math.ceil(root.scrollHeight) : Math.ceil(document.body.scrollHeight);
+          
+          const inlineTooltip = document.getElementById('pw2-inline-tooltip-container');
+          if (inlineTooltip && inlineTooltip.style.display === 'block') {
+            const tooltipRect = inlineTooltip.getBoundingClientRect();
+            const rootRect = root ? root.getBoundingClientRect() : document.body.getBoundingClientRect();
+            const tooltipBottom = (tooltipRect.bottom - rootRect.top) + 32; // 32px safe buffer
+            if (tooltipBottom > height) {
+              height = Math.ceil(tooltipBottom);
+            }
+          }
+
           if (window.parent && window.parent !== window) {
             window.parent.postMessage({ type: 'pw2-resize', height: height }, '*');
           }
@@ -1258,7 +1270,7 @@
 
       // Desktop clipping protection for tooltips
       document.querySelectorAll('.pw2-info-trigger').forEach(trigger => {
-        trigger.addEventListener('mouseenter', function() {
+        const handleOpen = function() {
           if (window.matchMedia("(pointer: coarse)").matches || window.innerWidth <= 600) return;
           const tooltip = this.querySelector('.pw2-tooltip');
           if(!tooltip) return;
@@ -1266,9 +1278,9 @@
           // Clear any inline transform first to measure correctly
           tooltip.style.transform = '';
           
-          const triggerRect = trigger.getBoundingClientRect();
+          const triggerRect = this.getBoundingClientRect();
           const triggerCenter = triggerRect.left + triggerRect.width / 2;
-          const tooltipWidth = tooltip.offsetWidth;
+          const tooltipWidth = tooltip.offsetWidth || 320;
           
           const expectedLeft = triggerCenter - tooltipWidth / 2;
           const expectedRight = triggerCenter + tooltipWidth / 2;
@@ -1287,19 +1299,25 @@
           } else {
              tooltip.style.transform = `translateX(50%) translateY(0)`;
           }
-        });
-        
-        trigger.addEventListener('mouseleave', function() {
+        };
+
+        const handleClose = function() {
           const tooltip = this.querySelector('.pw2-tooltip');
           if(tooltip) {
             // Restore default CSS transform smoothly
             setTimeout(() => {
-              if (!trigger.matches(':hover')) {
+              if (!this.matches(':hover') && !this.matches(':focus')) {
                 tooltip.style.transform = '';
               }
             }, 200);
           }
-        });
+        };
+
+        trigger.addEventListener('mouseenter', handleOpen);
+        trigger.addEventListener('focus', handleOpen);
+        trigger.addEventListener('mouseleave', handleClose);
+        trigger.addEventListener('blur', handleClose);
+        trigger.addEventListener('focusout', handleClose);
       });
 
       const drawerOverlay = document.getElementById('pw2-methodology-drawer');
@@ -1388,10 +1406,11 @@
             // Position tooltip dynamically within the widget
             const widgetRect = widget.getBoundingClientRect();
             const triggerRect = trigger.getBoundingClientRect();
+            const tooltipWidth = inlineTooltip.offsetWidth;
             
-            let leftPos = (triggerRect.left - widgetRect.left) + (triggerRect.width / 2) - 160; 
+            let leftPos = (triggerRect.left - widgetRect.left) + (triggerRect.width / 2) - (tooltipWidth / 2); 
             if (leftPos < 16) leftPos = 16;
-            if (leftPos + 320 > widgetRect.width - 16) leftPos = widgetRect.width - 320 - 16;
+            if (leftPos + tooltipWidth > widgetRect.width - 16) leftPos = widgetRect.width - tooltipWidth - 16;
 
             inlineTooltip.style.top = (triggerRect.bottom - widgetRect.top + 10) + 'px';
             inlineTooltip.style.left = leftPos + 'px';
