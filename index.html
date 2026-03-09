@@ -1233,6 +1233,9 @@
       // КОНФИГУРАЦИЯ: ГЛАВНЫЙ URL ПУБЛИЧНОЙ СТРАНИЦЫ
       const PUBLIC_PAGE_URL = 'https://peaceful-world.org/true-cost-of-war/ru';
 
+      const urlParams = new URLSearchParams(window.location.search);
+      const isEmbed = urlParams.get('embed') === '1';
+
       // СИСТЕМА ОТПРАВКИ ВЫСОТЫ ВО ВНЕШНИЙ IFRAME
       function sendWidgetHeight() {
         try {
@@ -1404,7 +1407,6 @@
         drawerOpenBtn.addEventListener('click', (e) => {
           e.preventDefault();
           const isMobile = window.innerWidth <= 600;
-          const isEmbedMode = new URLSearchParams(window.location.search).get('embed') === '1';
           
           if (isMobile) {
             // Inline methodology for mobile/touch mode everywhere
@@ -1420,7 +1422,7 @@
             setTimeout(sendWidgetHeight, 50);
           } else {
             // Normal desktop overlay drawer (явная защита для embed-режима)
-            if (isEmbedMode) return; 
+            if (isEmbed) return; 
             openDrawer(e);
           }
         });
@@ -1506,8 +1508,6 @@
         });
       }
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const isEmbed = urlParams.get('embed') === '1';
       let initialMode = urlParams.get('mode') || 'year';
       let parsedShare = parseInt(urlParams.get('share'));
       let initialShare = (!isNaN(parsedShare) && parsedShare >= 5 && parsedShare <= 50) ? parsedShare : 10;
