@@ -497,9 +497,12 @@
     @media (max-width: 1080px) {
       .pw2-grid-top { grid-template-columns: repeat(2, 1fr); }
       .pw2-grid-bottom { grid-template-columns: repeat(2, 1fr); }
+      .pw2-hero-topline { grid-template-columns: 1fr; gap: 20px;}
+    }
+
+    @media (max-width: 900px) {
       .pw2-split { grid-template-columns: 1fr; }
       .pw2-peace-fund { position: static; margin-top: 20px; }
-      .pw2-hero-topline { grid-template-columns: 1fr; gap: 20px;}
       
       .pw2-mobile-summary {
         display: block; margin-bottom: 24px;
@@ -1539,7 +1542,7 @@
       const MODEL = {
         annualMilitarySpend: 2.44e12, annualDirectDeaths: 150000, indirectMultiplier: 4, annualInfraDamage: 7.3e11, avgYearsLostPerDeath: 39,
         economicValuePerDeath: 500000, educationCost: 39e9, hungerCost: 50e9, healthCost: 250e9, waterCost: 150e9, electricityCost: 35e9,
-        internetCost: 43e9, climateCost: 1.5e12, povertyCost: 7e11, schoolCost: 5e6
+        internetCost: 43e9, climateCost: 1.5e12, schoolCost: 5e6
       };
 
       let activeTimeMs = 0;
