@@ -1,0 +1,359 @@
+<!-- Подключаем библиотеку иконок Lucide (если она еще не подключена на вашем сайте) -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+/* Изолированные стили виджета (префикс pw- защищает от конфликтов с Tilda) */
+.pw-share-widget {
+    --pw-text-main: #ffffff;
+    --pw-text-muted: #94a3b8;
+    --pw-card-bg: #111c2e;
+    --pw-card-border: rgba(255, 255, 255, 0.05);
+    --pw-btn-primary-bg: #3b82f6;
+    --pw-btn-primary-hover: #2563eb;
+    
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    width: 100%;
+    max-width: 1200px;
+    /* ИЗМЕНЕНО: Добавлен отступ сверху 80px и снизу 40px, чтобы блоки не наезжали друг на друга */
+    margin: 80px auto 40px auto; 
+    box-sizing: border-box;
+    position: relative;
+    z-index: 10;
+}
+
+.pw-share-widget * {
+    box-sizing: border-box;
+}
+
+.pw-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    width: 100%;
+}
+
+@media (min-width: 800px) {
+    .pw-cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.pw-card {
+    background: var(--pw-card-bg);
+    border: 1px solid var(--pw-card-border);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.pw-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--pw-text-main);
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.pw-card-body {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--pw-text-muted);
+    margin-bottom: 24px;
+}
+
+.pw-card-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    font-family: inherit;
+    outline: none;
+}
+
+.pw-card-btn-outline {
+    background: transparent;
+    color: var(--pw-text-main);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.pw-card-btn-outline:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.pw-card-btn-primary {
+    background: var(--pw-btn-primary-bg);
+    color: #ffffff;
+    border: none;
+}
+.pw-card-btn-primary:hover {
+    background: var(--pw-btn-primary-hover);
+}
+
+.pw-hidden-embed-code {
+    position: absolute; left: -99999px; top: -99999px; opacity: 0; pointer-events: none;
+}
+
+/* --- СТИЛИ ДЛЯ ВСПЛЫВАЮЩЕГО ОКНА МЕТОДОЛОГИИ --- */
+.pw-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+    z-index: 9999999; display: flex; justify-content: center; align-items: center;
+    opacity: 0; visibility: hidden; transition: all 0.3s ease;
+    padding: 20px; box-sizing: border-box;
+}
+.pw-modal-overlay.pw-open {
+    opacity: 1; visibility: visible;
+}
+.pw-modal-panel {
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px; width: 100%; max-width: 600px; max-height: 90vh;
+    overflow-y: auto; padding: 32px; position: relative;
+    transform: translateY(20px) scale(0.98); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    color: #f8fafc; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: left;
+}
+.pw-modal-overlay.pw-open .pw-modal-panel {
+    transform: translateY(0) scale(1);
+}
+.pw-modal-close {
+    position: absolute; top: 24px; right: 24px;
+    background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
+    width: 36px; height: 36px; color: #fff; font-size: 24px; line-height: 1;
+    cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center;
+    padding: 0; outline: none;
+}
+.pw-modal-close:hover { background: rgba(255,255,255,0.2); }
+.pw-modal-title { font-size: 24px; font-weight: 800; margin-top: 0; margin-bottom: 16px; padding-right: 40px; line-height: 1.2; }
+.pw-modal-text { font-size: 15px; color: #cbd5e1; line-height: 1.6; margin-bottom: 0; }
+.pw-modal-item { margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); }
+.pw-modal-item-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: #fff; }
+.pw-modal-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.pw-modal-link { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: #38bdf8; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); padding: 6px 12px; border-radius: 8px; text-decoration: none; transition: all 0.2s ease; }
+.pw-modal-link:hover { background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.4); }
+
+/* Кастомный скроллбар для модалки */
+.pw-modal-panel::-webkit-scrollbar { width: 6px; }
+.pw-modal-panel::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
+.pw-modal-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+.pw-modal-panel::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+</style>
+
+<!-- ОСНОВНОЙ HTML ВИДЖЕТА -->
+<div class="pw-share-widget">
+    <div class="pw-cards-grid">
+        
+        <!-- Карточка 1: Методология -->
+        <div class="pw-card">
+            <div class="pw-card-header">
+                <i data-lucide="file-text" style="width: 20px; height: 20px;"></i>
+                Méthodologie Ouverte
+            </div>
+            <div class="pw-card-body">
+                Il s'agit d'un macro-modèle analytique conçu pour visualiser le coût économique et démographique des conflits. L'algorithme repose strictement sur des estimations prudentes et des données officielles d'institutions internationales reconnues.
+            </div>
+            <!-- Добавлен ID для вызова попапа -->
+            <button id="pw-meth-btn" class="pw-card-btn pw-card-btn-outline" style="margin-top: auto;">
+                <i data-lucide="info" style="width: 18px; height: 18px;"></i>
+                <span>Voir les sources et les calculs</span>
+            </button>
+        </div>
+
+        <!-- Карточка 2: СМИ и блоги -->
+        <div class="pw-card">
+            <div class="pw-card-header">
+                <i data-lucide="message-square" style="width: 20px; height: 20px; color: #38bdf8;"></i>
+                Pour les Médias et Blogs
+            </div>
+            <div class="pw-card-body">
+                Vous pouvez intégrer ce calculateur interactif dans vos articles. Il est entièrement responsive et s'adapte automatiquement.
+            </div>
+            
+            <textarea id="pw-embed-code-val" class="pw-hidden-embed-code" aria-hidden="true">
+<iframe src="https://widgets.peaceful-world.org/true-cost-of-war/index-fr.html?embed=1" width="100%" style="border: none; border-radius: 20px; overflow: hidden; min-height: 500px; background: transparent; display: block;" scrolling="no" loading="lazy" title="Le Véritable Coût de la Guerre — Modèle Interactif"></iframe>
+<script>
+  (function() {
+    window.addEventListener('message', function(event) {
+      if (event.origin !== 'https://widgets.peaceful-world.org') return;
+      try {
+        if (event.data && event.data.type === 'pw2-resize' && event.data.height) {
+          var iframes = document.querySelectorAll('iframe[src*="peaceful-world.org/true-cost-of-war"]');
+          for (var i = 0; i < iframes.length; i++) {
+            if (iframes[i].contentWindow === event.source) {
+              iframes[i].style.height = event.data.height + 'px';
+              break;
+            }
+          }
+        }
+      } catch(e) {}
+    });
+  })();
+</script>
+            </textarea>
+
+            <button id="pw-copy-embed-btn" class="pw-card-btn pw-card-btn-outline" style="margin-top: auto;">
+                <i data-lucide="code" style="width: 18px; height: 18px;"></i>
+                <span>Copier le code d'intégration</span>
+            </button>
+        </div>
+
+        <!-- Карточка 3: Прямая ссылка -->
+        <div class="pw-card">
+            <div class="pw-card-header">
+                <i data-lucide="external-link" style="width: 20px; height: 20px;"></i>
+                Lien Direct
+            </div>
+            <div class="pw-card-body">
+                Partagez cet outil avec vos amis ou collègues. Prendre conscience de l'ampleur du problème est la première étape pour le résoudre.
+            </div>
+            <button id="pw-copy-link-btn" class="pw-card-btn pw-card-btn-outline" style="margin-top: auto;">
+                <i data-lucide="link" style="width: 18px; height: 18px;"></i>
+                <span>Copier le lien</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО МЕТОДОЛОГИИ -->
+    <div id="pw-meth-modal" class="pw-modal-overlay">
+        <div class="pw-modal-panel">
+            <button id="pw-meth-close" class="pw-modal-close" aria-label="Fermer">&times;</button>
+            <div class="pw-modal-title">Méthodologie et Sources de Données</div>
+            <div class="pw-modal-text">Il s'agit d'un macro-modèle analytique conçu pour visualiser le coût économique et démographique des conflits. L'algorithme repose strictement sur des estimations prudentes et des données officielles d'institutions internationales reconnues.</div>
+            
+            <div class="pw-modal-item">
+                <div class="pw-modal-item-title">
+                    <i data-lucide="target" style="width:20px; height:20px; color:#fbbf24;"></i>
+                    Dépenses Militaires Mondiales
+                </div>
+                <div class="pw-modal-text">La base de référence est de <strong>2&nbsp;440 milliards de dollars par an</strong>. Les données proviennent du dernier rapport officiel de l'Institut international de recherche sur la paix de Stockholm (SIPRI) concernant les budgets totaux de la défense nationale.</div>
+                <div class="pw-modal-links">
+                    <a href="https://www.sipri.org/databases/milex" target="_blank" rel="noopener noreferrer" class="pw-modal-link">Base de données du SIPRI <i data-lucide="external-link" style="width:12px; height:12px;"></i></a>
+                </div>
+            </div>
+
+            <div class="pw-modal-item">
+                <div class="pw-modal-item-title">
+                    <i data-lucide="activity" style="width:20px; height:20px; color:#ef4444;"></i>
+                    Victimes de Conflits Armés
+                </div>
+                <div class="pw-modal-text">L'estimation de base est d'environ <strong>150&nbsp;000 décès par an</strong> résultant directement des opérations de combat (sur la base du programme de données sur les conflits d'Uppsala — UCDP).</div>
+                <div class="pw-modal-links">
+                    <a href="https://ucdp.uu.se/" target="_blank" rel="noopener noreferrer" class="pw-modal-link">Encyclopédie de l'UCDP <i data-lucide="external-link" style="width:12px; height:12px;"></i></a>
+                </div>
+            </div>
+
+            <div class="pw-modal-item">
+                <div class="pw-modal-item-title">
+                    <i data-lucide="globe-2" style="width:20px; height:20px; color:#34d399;"></i>
+                    Coût d'Opportunité
+                </div>
+                <div class="pw-modal-text">Le coût de la résolution des crises mondiales est basé sur les programmes actuels de développement macroéconomique de l'ONU, de l'OMS et de la Banque mondiale.</div>
+                <div class="pw-modal-links">
+                    <a href="https://www.unesco.org/" target="_blank" rel="noopener noreferrer" class="pw-modal-link">UNESCO</a>
+                    <a href="https://www.who.int/" target="_blank" rel="noopener noreferrer" class="pw-modal-link">OMS</a>
+                    <a href="https://www.fao.org/" target="_blank" rel="noopener noreferrer" class="pw-modal-link">FAO (ONU)</a>
+                    <a href="https://www.worldbank.org/" target="_blank" rel="noopener noreferrer" class="pw-modal-link">Banque mondiale</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- СКРИПТЫ ВИДЖЕТА -->
+<script>
+    // Рендерим иконки
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    (function() {
+        // Логика копирования
+        function setupCopyBtn(btnId, getTextFn, successText, defaultHtml) {
+            var btn = document.getElementById(btnId);
+            if (!btn) return;
+
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                var textToCopy = getTextFn();
+                
+                var tempTextArea = document.createElement("textarea");
+                tempTextArea.value = textToCopy;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                try {
+                    document.execCommand('copy');
+                    btn.innerHTML = '<span>' + successText + '</span>';
+                    setTimeout(function() {
+                        btn.innerHTML = defaultHtml;
+                        if (typeof lucide !== 'undefined') lucide.createIcons({root: btn});
+                    }, 2000);
+                } catch (err) {
+                    console.error('Copy error', err);
+                }
+                document.body.removeChild(tempTextArea);
+            });
+        }
+
+        // Копирование iframe-кода
+        var embedBtn = document.getElementById('pw-copy-embed-btn');
+        var embedTextarea = document.getElementById('pw-embed-code-val');
+        if (embedBtn && embedTextarea) {
+            var originalEmbedHtml = embedBtn.innerHTML;
+            setupCopyBtn('pw-copy-embed-btn', function() { return embedTextarea.value; }, 'Copié&nbsp;✓', originalEmbedHtml);
+        }
+
+        // Копирование прямой ссылки
+        var linkBtn = document.getElementById('pw-copy-link-btn');
+        if (linkBtn) {
+            var originalLinkHtml = linkBtn.innerHTML;
+            setupCopyBtn('pw-copy-link-btn', function() { return "https://peaceful-world.org/true-cost-of-war/fr"; }, 'Copié&nbsp;✓', originalLinkHtml);
+        }
+
+        // Логика Модального окна (Методология)
+        var methBtn = document.getElementById('pw-meth-btn');
+        var methModal = document.getElementById('pw-meth-modal');
+        var methClose = document.getElementById('pw-meth-close');
+        
+        if (methBtn && methModal && methClose) {
+            // Открыть модалку
+            methBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                methModal.classList.add('pw-open');
+                document.body.style.overflow = 'hidden'; // Блокируем скролл сайта
+            });
+            
+            // Закрыть по крестику
+            methClose.addEventListener('click', function() {
+                methModal.classList.remove('pw-open');
+                document.body.style.overflow = '';
+            });
+            
+            // Закрыть по клику на темный фон
+            methModal.addEventListener('click', function(e) {
+                if (e.target === methModal) {
+                    methModal.classList.remove('pw-open');
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Закрыть по клавише Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && methModal.classList.contains('pw-open')) {
+                    methModal.classList.remove('pw-open');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+    })();
+</script>
