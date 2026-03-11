@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Справжня ціна війни — Інтерактивна модель</title>
+  <title>Реальна вартість конфліктів — Аналітична модель</title>
   <style>
     /* Подключаем шрифты: Montserrat (Заголовки) + Inter (Цифры и текст) */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap');
@@ -633,13 +633,13 @@
       
       <div class="pw2-hero">
         
-        <h1 class="pw2-h1">Ціна війни<br>в реальному часі</h1>
+        <h1 class="pw2-h1">Вартість конфліктів<br>у реальному часі</h1>
         <div class="pw2-hero-fact">
-          <div>Світ витрачає на гонку озброєнь <span id="pw2-spend-per-sec" class="pw2-tnum"><span class="pw2-currency-sign">$</span>&nbsp;0</span> щосекунди.</div>
+          <div>Глобальні військові витрати становлять <span id="pw2-spend-per-sec" class="pw2-tnum"><span class="pw2-currency-sign">$</span>&nbsp;0</span> щосекунди.</div>
         </div>
         <div class="pw2-lead pw2-embed-hidden">
           <svg class="pw2-icon pw2-icon-inline" style="color:var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg> 
-          Війна — це не лише зруйновані міста та втрачені життя. Це трильйони доларів, вилучені з глобального розвитку. Це ціна непобудованих шкіл, ненайдених ліків та невирішених криз.&nbsp;<span class="pw2-info-trigger pw2-info-trigger-sm" tabindex="0">i<span class="pw2-tooltip">Модель об'єднує дані SIPRI про військові бюджети та UCDP про жертви конфліктів, розраховуючи не лише прямі втрати, але й втрачені можливості для розвитку цивілізації.</span></span>
+          Мілітаризація призводить до вилучення трильйонів доларів із макроекономічного розвитку. Це альтернативна вартість нереалізованих освітніх проєктів, невідкритих методів лікування та невирішених гуманітарних криз.&nbsp;<span class="pw2-info-trigger pw2-info-trigger-sm" tabindex="0">i<span class="pw2-tooltip">Модель агрегує дані SIPRI щодо військових бюджетів та UCDP щодо втрат у конфліктах, розраховуючи прямі економічні наслідки та макроекономічну альтернативну вартість.</span></span>
         </div>
 
         <div class="pw2-time-wrap">
@@ -648,7 +648,7 @@
             <option value="year" selected>З початку року (Live)</option>
             <option value="1year">За останні 365 днів</option>
             <option value="10years">За 10 років</option>
-            <option value="lifetime">За моє життя</option>
+            <option value="lifetime">За період мого життя</option>
             <option value="day">За один день</option>
             <option value="hour">За одну годину</option>
             <option value="minute">За одну хвилину</option>
@@ -666,22 +666,22 @@
               </div>
               <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
                 <div class="pw2-big-number" id="pw2-totalSpend" style="margin-bottom: 0;"><span class="pw2-currency-sign">$</span>&nbsp;0</div>
-                <span class="pw2-info-trigger" tabindex="0" style="flex-shrink: 0;">i<span class="pw2-tooltip">Оцінка базується на звітах Стокгольмського інституту дослідження проблем миру (SIPRI). Глобальні військові витрати становлять понад $2.44 трлн на рік. Сума на екрані розраховується пропорційно обраному періоду.</span></span>
+                <span class="pw2-info-trigger" tabindex="0" style="flex-shrink: 0;">i<span class="pw2-tooltip">Оцінка базується на звітах Стокгольмського інституту дослідження проблем миру (SIPRI). Глобальні оборонні бюджети перевищують $2.44 трлн на рік. Значення розраховується пропорційно до обраного періоду.</span></span>
               </div>
-              <div class="pw2-subcopy" id="pw2-heroSubcopy">Ці ресурси вилучаються з глобального бюджету розвитку та спрямовуються на утримання військової системи.</div>
+              <div class="pw2-subcopy" id="pw2-heroSubcopy">Ці ресурси переспрямовуються з глобального сектору розвитку на фінансування оборонної інфраструктури.</div>
             </div>
             <div class="pw2-live-box pw2-embed-hidden">
               <div class="pw2-live-label">
                 <svg class="pw2-icon pw2-icon-inline" style="color:var(--danger-indirect);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
-                Поки ви читаєте цю сторінку:
+                За час вашого перебування на сторінці:
               </div>
               <div class="pw2-live-value" id="pw2-viewerSpend"><span class="pw2-currency-sign">$</span>&nbsp;0</div>
-              <div class="pw2-live-note" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">вже витрачено на гонку озброєнь.</div>
-              <div style="font-size: 13px; color: var(--text); font-weight: 600; margin-bottom: 6px;">Ці гроші могли б:</div>
+              <div class="pw2-live-note" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">було спрямовано на оборонні бюджети.</div>
+              <div style="font-size: 13px; color: var(--text); font-weight: 600; margin-bottom: 6px;">Альтернативний розподіл цих коштів дозволив би:</div>
               <div style="font-size: 13px; color: var(--muted); line-height: 1.6;">
-                • врятувати від гострого голоду <span id="pw2-live-hunger" class="pw2-live-stat">0</span> людей<br>
-                • забезпечити базовою медициною <span id="pw2-live-health" class="pw2-live-stat">0</span> людей<br>
-                • витягнути з крайньої бідності <span id="pw2-live-poverty" class="pw2-live-stat">0</span> людей
+                • забезпечити продовольством <span id="pw2-live-hunger" class="pw2-live-stat">0</span> осіб<br>
+                • надати доступ до базової медицини <span id="pw2-live-health" class="pw2-live-stat">0</span> особам<br>
+                • вивести з крайньої бідності <span id="pw2-live-poverty" class="pw2-live-stat">0</span> осіб
               </div>
             </div>
           </div>
@@ -692,92 +692,92 @@
             <div class="pw2-h3-wrap">
               <div class="pw2-h3-title">
                 <svg class="pw2-icon pw2-icon-inline" style="color:var(--gold);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                Прихований податок
+                Непряме фінансове навантаження
               </div>
-              <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">Глобальні військові витрати, розділені на все населення Землі (≈8.1 млрд осіб). Це та сума, яку кожна людина на планеті побічно віддає на гонку озброєнь.</span></span>
+              <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">Глобальні військові витрати в розрахунку на кожну людину (≈8.1 млрд осіб). Це обсяг коштів, який глобальна економіка недоотримує внаслідок мілітаризації.</span></span>
             </div>
             <div class="pw2-metric" id="pw2-personal-tax"><span class="pw2-currency-sign">$</span>&nbsp;0</div>
-            <div class="pw2-desc">Прихований податок на кожного жителя планети, що стягується через інфляцію.</div>
+            <div class="pw2-desc">Оціночне фінансове навантаження на кожного жителя планети.</div>
           </div>
 
           <div class="pw2-card pw2-glow-surface">
             <div class="pw2-h3-wrap">
               <div class="pw2-h3-title" style="color:var(--danger-direct);">
                 <svg class="pw2-icon pw2-icon-inline" style="color:var(--danger-direct);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-3 3 7 3-6 2 2h2"/><line x1="18" y1="12" x2="22" y2="12" stroke-dasharray="2 3"/></svg>
-                Прямі смерті
+                Прямі демографічні втрати
               </div>
               <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">Смерті безпосередньо внаслідок бойових дій (солдати та цивільні). Середній показник ~150 000 на рік.</span></span>
             </div>
             <div class="pw2-metric" style="color: var(--danger-direct);" id="pw2-directDeaths">0</div>
-            <div class="pw2-desc">Люди, які загинули безпосередньо під час бойових дій.</div>
+            <div class="pw2-desc">Кількість загиблих безпосередньо внаслідок бойових дій.</div>
           </div>
           
           <div class="pw2-card pw2-glow-surface">
             <div class="pw2-h3-wrap">
               <div class="pw2-h3-title" style="color:var(--danger-indirect);">
                 <svg class="pw2-icon pw2-icon-inline" style="color:var(--danger-indirect);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7" stroke-dasharray="4 4"/><circle cx="12" cy="12" r="12" stroke-dasharray="4 6"/></svg>
-                Непрямі смерті
+                Надлишкова смертність
               </div>
               <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">Жертви колапсу медицини та інфраструктури. Історичне співвідношення до прямих жертв часто оцінюється як 4 до 1.</span></span>
             </div>
             <div class="pw2-metric" style="color: var(--danger-indirect);" id="pw2-indirectDeaths">0</div>
-            <div class="pw2-desc">Смерті через руйнування інфраструктури, голод та колапс медицини.</div>
+            <div class="pw2-desc">Летальні випадки, зумовлені руйнуванням інфраструктури та колапсом систем охорони здоров'я.</div>
           </div>
         </div>
       </div>
 
       <div class="pw2-section pw2-embed-hidden">
-        <h2 class="pw2-h2">Приховані збитки</h2>
-        <div class="pw2-intro">Бюджети армій — лише вершина айсберга. Конфлікти знищують цивільну інфраструктуру, відкидають економіку на десятиліття назад і забирають мільйони років непрожитих життів.</div>
+        <h2 class="pw2-h2">Побічні економічні та демографічні втрати</h2>
+        <div class="pw2-intro">Прямі оборонні бюджети відображають лише частину витрат. Конфлікти спричиняють руйнування інфраструктури, гальмують макроекономічне зростання та призводять до масштабних втрат людського капіталу.</div>
         
         <div class="pw2-grid pw2-grid-bottom">
           <div class="pw2-card pw2-glow-surface">
             <div class="pw2-h3-wrap">
               <div class="pw2-h3-title">
                 <svg class="pw2-icon pw2-icon-inline" style="color:var(--gold);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>
-                Руйнування
+                Інфраструктурні збитки
               </div>
               <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">Оцінка вартості відновлення знищених об'єктів. У моделі взято консервативну частку в 30% від військових витрат.</span></span>
             </div>
             <div class="pw2-metric" id="pw2-infraDamage"><span class="pw2-currency-sign">$</span>&nbsp;0</div>
-            <div class="pw2-desc">Збитки для цивільної інфраструктури та вартість її відновлення.</div>
+            <div class="pw2-desc">Економічна оцінка шкоди цивільній інфраструктурі та вартості її відновлення.</div>
           </div>
           
           <div class="pw2-card pw2-glow-surface">
             <div class="pw2-h3-wrap">
               <div class="pw2-h3-title" style="color:var(--danger-muted);">
                 <svg class="pw2-icon pw2-icon-inline" style="color:var(--danger-muted);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2h14M5 22h14"/><path d="M5 2l7 10-7 10M19 2l-7 10 7 10"/></svg>
-                Втрачені роки
+                Втрачені роки потенційного життя
               </div>
               <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">Сума років, які могли б прожити загиблі. Середній вік жертви — 34 роки, за очікуваної тривалості у 73.</span></span>
             </div>
             <div class="pw2-metric" id="pw2-lifeYearsLost">0</div>
-            <div class="pw2-desc">Мільйони років життя, які могли бути прожиті з користю.</div>
+            <div class="pw2-desc">Сукупний демографічний показник років, недожитих внаслідок передчасної смертності.</div>
           </div>
           
           <div class="pw2-card pw2-glow-surface">
             <div class="pw2-h3-wrap">
               <div class="pw2-h3-title">
                 <svg class="pw2-icon pw2-icon-inline" style="color:var(--gold);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
-                Збитки для економіки
+                Макроекономічні втрати
               </div>
               <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">Сума прямих витрат, руйнувань та «вартості» втраченого людського капіталу (VSL).</span></span>
             </div>
             <div class="pw2-metric" id="pw2-economicLoss"><span class="pw2-currency-sign">$</span>&nbsp;0</div>
-            <div class="pw2-desc">Сумарний економічний відкат, що відкидає цивілізацію назад.</div>
+            <div class="pw2-desc">Сумарне зниження глобального економічного потенціалу внаслідок конфліктів.</div>
           </div>
         </div>
       </div>
 
       <div class="pw2-section">
-        <h2 class="pw2-h2">Альтернативна вартість конфліктів</h2>
-        <div class="pw2-intro pw2-embed-hidden">Кожен долар, витрачений на зброю, вилучений з глобального розвитку. Подивіться, що людство могло б створити, переспрямувавши хоча б частину оборонних бюджетів на вирішення реальних проблем.</div>
+        <h2 class="pw2-h2">Альтернативна вартість глобальної мілітаризації</h2>
+        <div class="pw2-intro pw2-embed-hidden">Ресурси, спрямовані на військові потреби, є вилученими з сектору глобального розвитку. Аналіз демонструє макроекономічний ефект від перерозподілу частини цих коштів на вирішення системних криз.</div>
         
         <div class="pw2-range-box">
           <div class="pw2-range-header">
             <div class="pw2-range-title">
-              Сценарій переорієнтації:
-              <span class="pw2-info-trigger" tabindex="0" style="margin-left: 10px;">i<span class="pw2-tooltip">Оберіть частку глобального оборонного бюджету, яку людство могло б переспрямувати на вирішення глобальних криз.</span></span>
+              Сценарій перерозподілу:
+              <span class="pw2-info-trigger" tabindex="0" style="margin-left: 10px;">i<span class="pw2-tooltip">Частка глобального військового бюджету, що моделюється для перерозподілу на фінансування програм сталого розвитку.</span></span>
             </div>
             <div class="pw2-range-val" id="pw2-shareValue">10%</div>
           </div>
@@ -795,10 +795,10 @@
         <div class="pw2-mobile-summary pw2-embed-hidden">
           <div class="pw2-pf-header">
             <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-            Бюджет творення
+            Бюджет розвитку
           </div>
           <div class="pw2-pf-amount" id="pw2-mobile-impactTotalAmount"><span class="pw2-currency-sign">$</span>&nbsp;0</div>
-          <div class="pw2-mobile-summary-desc">Ці ресурси можна переспрямувати на вирішення глобальних проблем прямо зараз.</div>
+          <div class="pw2-mobile-summary-desc">Обсяг фінансування, доступний для перерозподілу в межах обраного сценарію.</div>
         </div>
 
         <div class="pw2-split">
@@ -809,8 +809,8 @@
               <div class="pw2-item-content">
                 <div class="pw2-item-title">
                   <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-                  Базова освіта
-                  <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">За даними ЮНЕСКО, $39 млрд на рік достатньо, щоб забезпечити якісною базовою освітою кожну дитину в країнах з низьким рівнем доходу.</span></span>
+                  Забезпечення базової освіти
+                  <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">За даними ЮНЕСКО, $39 млрд на рік достатньо, щоб забезпечити доступом до початкової освіти дітей у країнах, що розвиваються.</span></span>
                 </div>
                 <div class="pw2-item-note">Орієнтир: $39 млрд/рік на закриття глобального дефіциту доступу.</div>
               </div>
@@ -822,7 +822,7 @@
               <div class="pw2-item-content">
                 <div class="pw2-item-title">
                   <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
-                  Подолання голоду
+                  Продовольча безпека
                   <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">Оцінка ООН (ФАО) показує, що інвестиції до $50 млрд на рік здатні повністю викорінити голод на планеті.</span></span>
                 </div>
                 <div class="pw2-item-note">Орієнтир: $50 млрд/рік для забезпечення їжею всіх, хто цього потребує.</div>
@@ -835,7 +835,7 @@
               <div class="pw2-item-content">
                 <div class="pw2-item-title">
                   <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
-                  Охорона здоров'я
+                  Системи охорони здоров'я
                   <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">ВООЗ оцінює створення базової системи загального медичного забезпечення в країнах, що розвиваються, приблизно у $250 млрд щорічно.</span></span>
                 </div>
                 <div class="pw2-item-note">Орієнтир: $250 млрд/рік для універсального доступу до медицини.</div>
@@ -848,7 +848,7 @@
               <div class="pw2-item-content">
                 <div class="pw2-item-title">
                   <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7c-2.4 2.4-7.2 6.8-7.2 11.4A7.1 7.1 0 0 0 12 21.2a7.1 7.1 0 0 0 7.2-7.1c0-4.6-4.8-9-7.2-11.4z"/></svg>
-                  Чиста вода та санітарія
+                  Водопостачання та санітарія
                   <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">Світовий банк оцінює витрати на забезпечення всього населення планети чистою питною водою та базовою санітарією у $150 млрд на рік.</span></span>
                 </div>
                 <div class="pw2-item-note">Орієнтир: $150 млрд/рік як фундаментальне суспільне благо.</div>
@@ -861,7 +861,7 @@
               <div class="pw2-item-content">
                 <div class="pw2-item-title">
                   <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                  Глобальна електрифікація
+                  Глобальна енергетична інфраструктура
                   <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">Міжнародне енергетичне агентство (МЕА) стверджує, що $35 млрд на рік забезпечать 100% доступ до електрики на планеті.</span></span>
                 </div>
                 <div class="pw2-item-note">Орієнтир: $35 млрд/рік для 100% глобального доступу до світла.</div>
@@ -874,7 +874,7 @@
               <div class="pw2-item-content">
                 <div class="pw2-item-title">
                   <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-                  Зв'язок для всієї планети
+                  Глобальне цифрове покриття
                   <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">За оцінками МСЕ (ITU), потрібно близько $43 млрд на рік для підключення до широкосмугового інтернету решти 3 млрд осіб.</span></span>
                 </div>
                 <div class="pw2-item-note">Орієнтир: $43 млрд/рік для підключення всієї планети до мережі.</div>
@@ -887,7 +887,7 @@
               <div class="pw2-item-content">
                 <div class="pw2-item-title">
                   <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></svg>
-                  Кліматична криза
+                  Енергетичний перехід
                   <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">$1.5–2 трлн щорічно необхідно для глобального переходу на відновлювані джерела енергії та досягнення вуглецевої нейтральності.</span></span>
                 </div>
                 <div class="pw2-item-note">Орієнтир: $1.5 трлн/рік на масштабну трансформацию.</div>
@@ -899,7 +899,7 @@
               <div class="pw2-item-content">
                 <div class="pw2-item-title">
                   <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l10 5v2H2V7l10-5z"/><path d="M6 9v11M10 9v11M14 9v11M18 9v11"/><path d="M2 20h20"/></svg>
-                  Нові сучасні школи
+                  Інфраструктура сучасної освіти
                   <span class="pw2-info-trigger" tabindex="0">i<span class="pw2-tooltip">Капітальні витрати на будівництво та оснащення однієї сучасної великої школи в країнах, що розвиваються (на ~1000 учнів).</span></span>
                 </div>
                 <div class="pw2-item-note">За середньої вартості оснащеної школи ≈ $5 млн.</div>
@@ -910,20 +910,20 @@
           </div>
           
           <div class="pw2-show-more-wrap pw2-embed-hidden" id="pw2-show-more-wrap">
-            <button id="pw2-show-more-btn" class="pw2-share-btn pw2-w-full">Показати ще 5 напрямків ↓</button>
+            <button id="pw2-show-more-btn" class="pw2-share-btn pw2-w-full">Розгорнути додаткові напрямки ↓</button>
           </div>
           
           <div class="pw2-peace-fund" id="pw2-mission-block">
             <div class="pw2-pf-header">
               <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-              Бюджет творення
+              Бюджет розвитку
             </div>
             <div class="pw2-pf-amount" id="pw2-impactTotalAmount"><span class="pw2-currency-sign">$</span>&nbsp;0</div>
-            <div class="pw2-pf-subtitle">Ресурси для розвитку в рамках обраного сценарію.</div>
+            <div class="pw2-pf-subtitle">Обсяг фінансування, доступний для перерозподілу в межах обраного сценарію.</div>
 
             <div class="pw2-pf-bar-labels">
-              <span class="pw2-pf-lbl-peace" id="pw2-viz-peace-lbl">На розвиток: 10%</span>
-              <span class="pw2-pf-lbl-war" id="pw2-viz-war-lbl" style="color: var(--danger-direct);">Залишок на оборону: 90%</span>
+              <span class="pw2-pf-lbl-peace" id="pw2-viz-peace-lbl">Сектор розвитку: 10%</span>
+              <span class="pw2-pf-lbl-war" id="pw2-viz-war-lbl" style="color: var(--danger-direct);">Оборонний сектор: 90%</span>
             </div>
             <div class="pw2-pf-bar-wrap">
               <div class="pw2-pf-bar-peace" id="pw2-viz-peace-bar" style="width: 10%;"></div>
@@ -933,32 +933,32 @@
             <div class="pw2-pf-mission">
               <div class="pw2-pf-m-header">
                 <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                Сила однієї секунди
+                Макроекономічний ефект інвестицій
               </div>
               <div class="pw2-pf-m-desc">
-                Навіть мікроскопічна частка від цих бюджетів здатна запустити системні зміни. Лише <strong>1 секунда</strong> глобальних оборонних витрат (≈$77 318) покриває базовий запуск платформи мирної освіти 
+                Мінімальний перерозподіл ресурсів здатний профінансувати системні зміни. Витрати, еквівалентні <strong>1 секунді</strong> глобальних оборонних бюджетів (≈$77 318), забезпечують створення базової інфраструктури мирної освіти 
                 на 16 мовах,&nbsp;<span class="pw2-info-trigger pw2-info-trigger-sm" tabindex="0">i<span class="pw2-tooltip">Етапи фінансування місії:<br><br>• <strong>1 сек.</strong> (≈$77k) — базовий фундамент (Seed) та 16 мов.<br>• <strong>3 сек.</strong> (≈$230k) — виробництво сенсів та курсів (Core).<br>• <strong>7 сек.</strong> (≈$540k) — річний цикл інституту та ШІ-масштабування (Growth).</span></span>
-                а <strong>7 секунд</strong> забезпечують її повний річний цикл.<br>
-                <span class="pw2-mission-note">Для старту змін достатньо (<span id="pw2-mission-percent-text" style="font-family: var(--font-body); font-variant-numeric: tabular-nums; font-weight: 800; color: #fff;">0.00%</span>) від доступного бюджету розвитку.</span>
+                а <strong>7 секунд</strong> покривають її повний річний операційний цикл.<br>
+                <span class="pw2-mission-note">Для ініціації програми потрібна частка (<span id="pw2-mission-percent-text" style="font-family: var(--font-body); font-variant-numeric: tabular-nums; font-weight: 800; color: #fff;">0.00%</span>) від доступного бюджету розвитку.</span>
               </div>
 
               <div class="pw2-micro-impact">
                 <div class="pw2-micro-title">
                   <svg class="pw2-icon pw2-impact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                   <div class="pw2-impact-text-wrap">
-                    Масштаб участі:<br>
+                    Ефективність розподілу:<br>
                     <div class="pw2-impact-highlight">
-                      1€ = 100+ контактів&nbsp;<span class="pw2-info-trigger pw2-info-trigger-sm" tabindex="0">i<span class="pw2-tooltip">Ми вимірюємо реальні торкання (TrueView) — коли людина сама натискає та знайомиться з матеріалом.<br><br>Середня вартість такого перегляду становить близько 15–20 українських копійок.<br><br>1€ ≈ 45 гривень.<br><br>Навіть за консервативного розподілу коштів між інфраструктурою та розповсюдженням, регулярний внесок у 1€ забезпечує понад 100 нових торкань.</span></span>
+                      1€ = 100+ інформаційних контактів&nbsp;<span class="pw2-info-trigger pw2-info-trigger-sm" tabindex="0">i<span class="pw2-tooltip">Оцінка ефективності базується на вартості цільового контакту (TrueView).<br><br>Середня вартість одного контакту становить 15–20 коп.<br><br>1€ ≈ 45 гривень.<br><br>Таким чином, інвестиція в 1€ конвертується у понад 100 результативних взаємодій з контентом.</span></span>
                     </div>
                   </div>
                 </div>
                 <div class="pw2-micro-text">
-                  Прозорий важіль: 1€ конвертується в інфраструктуру, що забезпечує понад 100 усвідомлених контактів (TrueView) з програмами мирної освіти.
+                  Показник рентабельності інвестицій (ROI): 1€ забезпечує фінансування інфраструктури для понад 100 верифікованих інформаційних контактів (TrueView) із програмами мирної освіти.
                 </div>
               </div>
               
-              <a href="https://peaceful-world.org/help" class="pw2-cta-main" target="_blank" rel="noopener noreferrer">
-                Допомогти
+              <a href="https://peaceful-world.org/help/ukr" class="pw2-cta-main" target="_blank" rel="noopener noreferrer">
+                Підтримати ініціативу
               </a>
             </div>
           </div>
@@ -968,9 +968,9 @@
       
       <div class="pw2-section pw2-embed-hidden" style="background: linear-gradient(135deg, rgba(52, 211, 153, 0.05) 0%, rgba(15, 31, 53, 0.4) 100%); border-color: rgba(52, 211, 153, 0.2);">
         <div class="pw2-philosophy-card" style="max-width: 840px; margin: 0 auto;">
-          <h2 class="pw2-h2" style="margin-bottom: 24px;">Навіщо ми рахуємо ці цифри</h2>
+          <h2 class="pw2-h2" style="margin-bottom: 24px;">Методологічне обґрунтування</h2>
           <div class="pw2-intro pw2-mb-0" style="max-width: 720px; text-align: center; margin: 0 auto; font-weight: 500;">
-            Ми перекладаємо абстрактне поняття конфлікту мовою точних даних. Військові бюджети — це не просто статистика, це ресурси, вилучені з реального життя: непобудовані школи, ненайдені ліки та вкрадений час.
+            Мета проєкту — конвертувати абстрактні макроекономічні показники конфліктів у конкретні дані. Військові бюджети розглядаються через призму альтернативної вартості: як ресурси, вилучені з секторів освіти, охорони здоров'я та глобального розвитку.
           </div>
           
           <div class="pw2-quote-block" style="margin: 40px auto;">
@@ -979,25 +979,25 @@
           </div>
           
           <div class="pw2-intro pw2-mb-0" style="max-width: 720px; text-align: center; margin: 0 auto;">
-            Тому <strong>Peaceful World</strong> створює глобальну платформу мирної освіти. Ми виходимо з прагматичної істини: превентивно змінювати мислення суспільства через культуру ненасильства завжди ефективніше, ніж десятиліттями оплачувати наслідки катастроф.
+            Організація <strong>Peaceful World</strong> розробляє глобальну платформу мирної освіти на засадах прагматичного підходу: превентивні інвестиції в трансформацію суспільного мислення є економічно доцільнішими за довгострокове фінансування наслідків збройних конфліктів.
           </div>
         </div>
       </div>
 
       <div class="pw2-section pw2-embed-hidden pw2-viral-section">
         <div style="text-align: center; max-width: 680px; margin: 0 auto 40px auto;">
-          <h2 class="pw2-h2" style="margin-bottom: 20px;">Сила розголосу</h2>
+          <h2 class="pw2-h2" style="margin-bottom: 20px;">Значення інформаційного поширення</h2>
           <div class="pw2-intro" style="margin: 0 auto 16px auto; font-weight: 500;">
-            Факти переконливіші за гасла. Сухі цифри здатні зруйнувати ілюзію того, що війна — це «природний» політичний інструмент.
+            Об'єктивна статистика є ключовим інструментом аналізу. Кількісні дані дозволяють раціонально оцінити економічну неефективність мілітаризації як інструменту міжнародної політики.
           </div>
           <div class="pw2-intro" style="margin: 0 auto;">
-            Поділіться цими даними: допоможіть іншим побачити масштаб втрат, яких людство зазнає прямо зараз. Іноді один наочний розрахунок працює сильніше за тисячі емоційних суперечок.
+            Поширення цих даних сприяє кращому розумінню альтернативної вартості збройних конфліктів та розширенню дискурсу щодо пріоритетів глобального фінансування.
           </div>
         </div>
         
         <div class="pw2-viral-card" id="pw2-viral-card">
-          <div class="pw2-viral-header">Масштаб проблеми</div>
-          <h3 class="pw2-viral-title">Скільки ресурсів людство втрачає безповоротно:</h3>
+          <div class="pw2-viral-header">Глобальні показники</div>
+          <h3 class="pw2-viral-title">Обсяг ресурсів, вилучених із макроекономічного обороту:</h3>
           <div class="pw2-viral-grid">
             <div class="pw2-viral-stat">
               <div class="pw2-v-lbl">За 1 день:</div>
@@ -1018,11 +1018,11 @@
           <div class="pw2-share-actions" style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
             <button id="pw2-generate-fact-btn" class="pw2-share-btn">
               <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>Текст: факт дня</span>
+              <span>Згенерувати текстовий звіт</span>
             </button>
             <button id="pw2-generate-card-btn" class="pw2-share-btn">
               <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <span>Інфографіка для соцмереж</span>
+              <span>Згенерувати інфографіку</span>
             </button>
           </div>
           
@@ -1038,7 +1038,7 @@
             <img id="pw2-card-preview" style="max-width: 100%; max-height: 500px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.15); display: block; margin-left: auto; margin-right: auto; object-fit: contain;">
             <a id="pw2-download-card-btn" href="#" class="pw2-share-btn pw2-w-full">
               <svg class="pw2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>Завантажити інфографіку</span>
+              <span>Завантажити зображення</span>
             </a>
             <div style="font-size:11px; color:var(--muted); text-align:center; margin-top:12px; line-height: 1.4;">Якщо завантаження не почалося автоматично, натисніть на картинку правою кнопкою миші та виберіть «Зберегти зображення».</div>
           </div>
@@ -1439,7 +1439,7 @@
           let bYear = parseInt(els.birthYear.value); 
           if (isNaN(bYear) || bYear < 1920) bYear = 1990;
           if (bYear > currentYear) bYear = currentYear;
-          fraction = (now - new Date(bYear, 0, 1).getTime()) / yearMs; label = `За ваше життя (з ${bYear} р.)`;
+          fraction = (now - new Date(bYear, 0, 1).getTime()) / yearMs; label = `За період мого життя (з ${bYear} р.)`;
         } else { fraction = (now - new Date(new Date().getFullYear(), 0, 1).getTime()) / yearMs; }
 
         const mil = MODEL.annualMilitarySpend * fraction;
@@ -1497,7 +1497,7 @@
           if(els.mobileImpactTotalAmount) setHtml(els.mobileImpactTotalAmount, formatMoneyHTML(redirected, true));
 
           els.vizPeaceBar.style.width = (share * 100) + '%'; els.vizWarBar.style.width = (100 - share * 100) + '%';
-          setTxt(els.vizPeaceLbl, `На розвиток: ${val}%`); setTxt(els.vizWarLbl, `Залишок на оборону: ${100 - val}%`);
+          setTxt(els.vizPeaceLbl, `Сектор розвитку: ${val}%`); setTxt(els.vizWarLbl, `Оборонний сектор: ${100 - val}%`);
 
           const mPerc = (spendPerSecVal / redirected) * 100;
           if (els.missionPercentText) setTxt(els.missionPercentText, `${mPerc < 0.0001 ? mPerc.toFixed(7) : mPerc.toFixed(5)}%`);
@@ -1551,12 +1551,12 @@
             };
             
             const cleanUrl = PUBLIC_PAGE_URL;
-            let fact = `Щодня світ витрачає на гонку озброєнь ${formatMoneyText(dailySpend, true)}.\n\n`;
-            fact += `Натомість ми могли б усього за один день:\n`;
-            fact += `• Врятувати від голоду ${formatMln(hunger)} людей\n`;
-            fact += `• Забезпечити базовою медициною ${formatMln(health)} людей\n`;
-            fact += `• Витягнути з бідності ${formatMln(poverty)} людей\n\n`;
-            fact += `Оцініть масштаб втрачених можливостей цивілізації:\n${cleanUrl}`;
+            let fact = `Щоденні глобальні витрати на оборонну сферу становлять ${formatMoneyText(dailySpend, true)}.\n\n`;
+            fact += `Альтернативний розподіл цих коштів дозволив би усього за один день:\n`;
+            fact += `• Забезпечити продовольством ${formatMln(hunger)} осіб\n`;
+            fact += `• Надати доступ до медичного обслуговування ${formatMln(health)} особам\n`;
+            fact += `• Вивести з крайньої бідності ${formatMln(poverty)} осіб\n\n`;
+            fact += `Ознайомтеся з повною аналітичною моделлю альтернативної вартості:\n${cleanUrl}`;
             
             setTxt(els.factText, fact);
             els.factOutputContainer.style.display = 'block';
@@ -1601,12 +1601,12 @@
 
         ctx.fillStyle = '#38bdf8';
         ctx.font = '800 28px Montserrat, sans-serif';
-        ctx.fillText('СПРАВЖНЯ ЦІНА ВІЙНИ', 80, 100);
+        ctx.fillText('РЕАЛЬНА ВАРТІСТЬ КОНФЛІКТІВ', 80, 100);
 
         ctx.fillStyle = '#ffffff';
         ctx.font = '800 50px Montserrat, sans-serif';
-        ctx.fillText('Щодня світ витрачає на', 80, 160);
-        ctx.fillText('глобальну гонку озброєнь:', 80, 220);
+        ctx.fillText('Щоденні глобальні витрати', 80, 160);
+        ctx.fillText('на оборонну сферу становлять:', 80, 220);
 
         ctx.fillStyle = '#f87171';
         ctx.font = '900 130px Montserrat, sans-serif';
@@ -1614,15 +1614,15 @@
 
         ctx.fillStyle = '#34d399';
         ctx.font = '800 32px Montserrat, sans-serif';
-        ctx.fillText('ОДИН ДЕНЬ ЦЬОГО БЮДЖЕТУ МІГ БИ:', 80, 500);
+        ctx.fillText('АЛЬТЕРНАТИВНИЙ РОЗПОДІЛ ЦИХ КОШТІВ:', 80, 500);
 
         ctx.fillStyle = '#f8fafc';
         ctx.font = '600 40px Inter, sans-serif';
         const lineH = 75;
-        ctx.fillText(`• Врятувати від гострого голоду ${formatMln(hunger)} людей`, 80, 580);
-        ctx.fillText(`• Надати базову медицину ${formatMln(health)} людей`, 80, 580 + lineH);
-        ctx.fillText(`• Витягнути з крайньої бідності ${formatMln(poverty)} людей`, 80, 580 + lineH*2);
-        ctx.fillText(`• Побудувати ${formatMln(schools)} нових сучасних шкіл`, 80, 580 + lineH*3);
+        ctx.fillText(`• Забезпечення продовольством ${formatMln(hunger)} осіб`, 80, 580);
+        ctx.fillText(`• Фінансування базової медицини для ${formatMln(health)} осіб`, 80, 580 + lineH);
+        ctx.fillText(`• Подолання крайньої бідності для ${formatMln(poverty)} осіб`, 80, 580 + lineH*2);
+        ctx.fillText(`• Будівництво ${formatMln(schools)} сучасних шкіл`, 80, 580 + lineH*3);
 
         ctx.fillStyle = '#94a3b8';
         ctx.font = '500 26px Inter, sans-serif';
