@@ -1,5 +1,3 @@
-# true-cost-of-war
-
 <div align="center"><p>The project aims to provide transparent visualizations of the economic and human cost of armed conflicts.</p><p>Organization: <b>Peaceful World</b> <a href="https://peaceful-world.org">https://peaceful-world.org</a></p><hr /><h1>⚖️ True Cost of War | Реальная цена войны</h1><p><i>Интерактивная модель, визуализирующая экономические и человеческие потери от военных конфликтов в режиме реального времени.</i></p><p>
 <a href="https://peaceful-world.org/true-cost-of-war" target="_blank">
 <b>🌐 Посмотреть демо (Live Demo)</b>
