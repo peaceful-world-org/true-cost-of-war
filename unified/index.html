@@ -18,6 +18,14 @@
       <div class="pw-eyebrow" id="eyebrow">Peaceful World</div>
       <h1 id="title">The True Cost of War</h1>
       <p class="pw-lead" id="lead">Loading locale…</p>
+
+      <div class="pw-live-strip" aria-live="polite">
+        <span class="pw-live-dot" aria-hidden="true"></span>
+        <span class="pw-live-label" id="liveMetricLabel">Military expenditure</span>
+        <strong class="pw-live-rate" id="liveRate">—</strong>
+        <span class="pw-live-separator" aria-hidden="true">·</span>
+        <span class="pw-live-period" id="currentPeriod">—</span>
+      </div>
     </section>
 
     <section class="pw-controls" aria-label="Calculator controls">
@@ -36,6 +44,7 @@
       <label class="pw-control pw-share-control">
         <span><span id="shareLabelText">Redirected share</span>: <b id="shareLabel">10%</b></span>
         <input id="share" type="range" min="0" max="100" step="1" value="10">
+        <span class="pw-share-track" aria-hidden="true"><i id="shareProgress"></i></span>
       </label>
     </section>
 
@@ -48,6 +57,24 @@
       </div>
       <div class="pw-grid pw-grid-opportunity" id="opportunityMetrics"></div>
     </section>
+
+    <details class="pw-method">
+      <summary>
+        <span>data/model.json</span>
+        <span class="pw-method-sources">SIPRI · UCDP</span>
+      </summary>
+      <div class="pw-method-body">
+        <div class="pw-method-grid">
+          <div><span id="methodMilitaryLabel">Military expenditure</span><strong id="methodMilitaryValue">—</strong></div>
+          <div><span id="methodDeathsLabel">Direct deaths</span><strong id="methodDeathsValue">—</strong></div>
+        </div>
+        <p>This preview still reproduces the legacy baseline. The evidence-aware v2 research candidate is intentionally not connected to runtime yet.</p>
+        <div class="pw-source-links">
+          <a href="https://www.sipri.org/databases/milex" target="_blank" rel="noopener noreferrer">SIPRI</a>
+          <a href="https://ucdp.uu.se/downloads/" target="_blank" rel="noopener noreferrer">UCDP</a>
+        </div>
+      </div>
+    </details>
 
     <section class="pw-compare">
       <a id="legacyLink" href="../parity/en/">Open current visual-parity version</a>
