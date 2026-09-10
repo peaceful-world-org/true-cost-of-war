@@ -37,6 +37,9 @@ jobs:
       - name: Validate widget routes
         run: python scripts/validate_routes.py
 
+      - name: Test shared calculation engine
+        run: node --test tests/*.test.mjs
+
       - name: Build reproducible widget bundle
         run: python scripts/build_widget_bundle.py
 
