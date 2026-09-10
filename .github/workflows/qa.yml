@@ -37,6 +37,9 @@ jobs:
       - name: Validate widget routes
         run: python scripts/validate_routes.py
 
+      - name: Validate legacy formula parity
+        run: python scripts/validate_legacy_formula_parity.py
+
       - name: Test shared calculation engine and runtime
         run: node --test tests/*.test.mjs
 
