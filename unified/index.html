@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>True Cost of War — Unified Candidate</title>
+  <link rel="stylesheet" href="./app.css">
+</head>
+<body>
+  <main class="pw-shell">
+    <div class="pw-preview-banner" role="status">
+      <strong>UNIFIED CANDIDATE · PREVIEW</strong>
+      <span>One template · one CSS · one JS runtime · locale files. Not production.</span>
+    </div>
+
+    <section class="pw-hero">
+      <div class="pw-eyebrow" id="eyebrow">Peaceful World</div>
+      <h1 id="title">The True Cost of War</h1>
+      <p class="pw-lead" id="lead">Loading locale…</p>
+    </section>
+
+    <section class="pw-controls" aria-label="Calculator controls">
+      <label class="pw-control">
+        <span id="languageLabel">Language</span>
+        <select id="language"></select>
+      </label>
+      <label class="pw-control">
+        <span id="timeframeLabel">Timeframe</span>
+        <select id="mode"></select>
+      </label>
+      <label class="pw-control">
+        <span id="birthYearLabel">Birth year</span>
+        <input id="birthYear" type="number" min="1920" value="1990" inputmode="numeric">
+      </label>
+      <label class="pw-control pw-share-control">
+        <span><span id="shareLabelText">Redirected share</span>: <b id="shareLabel">10%</b></span>
+        <input id="share" type="range" min="0" max="100" step="1" value="10">
+      </label>
+    </section>
+
+    <section class="pw-grid" id="headlineMetrics" aria-live="polite"></section>
+
+    <section class="pw-section">
+      <div class="pw-section-head">
+        <h2 id="opportunityTitle">Opportunity cost</h2>
+        <span class="pw-pill" id="redirectedPill">10%</span>
+      </div>
+      <div class="pw-grid pw-grid-opportunity" id="opportunityMetrics"></div>
+    </section>
+
+    <section class="pw-compare">
+      <a id="legacyLink" href="../parity/en/">Open current visual-parity version</a>
+      <p id="legacyNote">Use it side by side while this shared template is being rebuilt.</p>
+    </section>
+
+    <details class="pw-debug">
+      <summary>Architecture diagnostics</summary>
+      <pre id="debug">Loading…</pre>
+    </details>
+  </main>
+
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
