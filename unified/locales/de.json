@@ -1,0 +1,35 @@
+{
+  "pageTitle": "Die wahren Kosten des Krieges — Unified Candidate",
+  "eyebrow": "Peaceful World · Interaktives Modell",
+  "title": "Die wahren Kosten des Krieges",
+  "lead": "Eine Vorschau mit gemeinsamer Laufzeit für das Modell der wirtschaftlichen und menschlichen Kriegskosten. Diese Version dient zum Testen von Architektur und Verhalten vor Änderungen an der Produktion.",
+  "language": "Sprache",
+  "timeframe": "Zeitraum",
+  "birthYear": "Geburtsjahr",
+  "redirectedShare": "Umgeleiteter Anteil",
+  "opportunityTitle": "Was dieselben Ressourcen ermöglichen könnten",
+  "legacyLink": "Aktuelle Visual-Parity-Version öffnen",
+  "legacyNote": "Vergleiche beide Versionen parallel, während die gemeinsame Vorlage aufgebaut wird.",
+  "metrics": {
+    "militarySpend": "Militärausgaben",
+    "directDeaths": "Direkte Todesfälle",
+    "indirectDeaths": "Indirekte Todesfälle",
+    "lifeYearsLost": "Verlorene Lebensjahre",
+    "infrastructureDamage": "Infrastrukturschäden",
+    "economicSetback": "Bisheriger wirtschaftlicher Rückschlag",
+    "redirectedAmount": "Umgeleiteter Betrag",
+    "schoolsEquivalent": "Entsprechende Zahl von Schulen",
+    "educationMultiples": "Vielfaches des Bildungs-Benchmarks",
+    "healthMultiples": "Vielfaches des Primärversorgungs-Benchmarks"
+  },
+  "modes": {
+    "year": "Dieses Jahr bisher (Live)",
+    "1year": "Letzte 365 Tage",
+    "10years": "Letzte 10 Jahre",
+    "lifetime": "Während meines Lebens",
+    "day": "Ein Tag",
+    "hour": "Eine Stunde",
+    "minute": "Eine Minute",
+    "since1945": "Seit 1945"
+  }
+}
