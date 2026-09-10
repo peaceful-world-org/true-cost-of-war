@@ -34,6 +34,9 @@ jobs:
       - name: Validate v2 research candidate
         run: python scripts/validate_v2_candidate.py
 
+      - name: Validate widget routes
+        run: python scripts/validate_routes.py
+
       - name: Build reproducible widget bundle
         run: python scripts/build_widget_bundle.py
 
