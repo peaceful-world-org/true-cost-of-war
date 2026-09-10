@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "status": "legacy-baseline",
+  "capturedAt": "2026-09-10",
+  "capturedFrom": "en/calculator.html",
+  "purpose": "Canonical machine-readable baseline for the values currently embedded in the calculator. These values describe the legacy production model and are not a methodological endorsement. Evidence and historical-series review comes next.",
+  "values": {
+    "annualMilitarySpend": 2440000000000,
+    "annualDirectDeaths": 150000,
+    "indirectMultiplier": 4,
+    "annualInfraDamage": 730000000000,
+    "avgYearsLostPerDeath": 39,
+    "economicValuePerDeath": 500000,
+    "educationCost": 39000000000,
+    "hungerCost": 50000000000,
+    "healthCost": 250000000000,
+    "waterCost": 150000000000,
+    "electricityCost": 35000000000,
+    "internetCost": 43000000000,
+    "climateCost": 1500000000000,
+    "schoolCost": 5000000
+  },
+  "legacyOverrides": {
+    "ru/calculator.html": {
+      "annualInfraDamage": 732000000000
+    }
+  }
+}
