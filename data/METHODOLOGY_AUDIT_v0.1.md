@@ -109,37 +109,53 @@ Primary source:
 
 Decision for v2: do not simply replace USD 43 billion with USD 1.6 trillion; the time horizon and scope differ. Redesign the benchmark around a clearly stated target and period.
 
-### Hunger — SOURCE REVIEW REQUIRED
+### Hunger — LEGACY VALUE HAS A PLAUSIBLE SOURCE, BUT CLAIM SCOPE MUST BE NARROW
 
 Legacy runtime value: **USD 50 billion/year**.
 
-No canonical source/year/scope has yet been verified in this audit.
+FAO has cited modelling in which roughly **USD 39–50 billion per year** in targeted interventions through 2030 could address hunger at large scale. More recent FAO/CFS material stresses that published financing estimates differ radically with scope: lower estimates focus on targeted hunger/nutrition interventions, while structural food-system transformation costs far more.
 
-Decision for v2: retain only as legacy baseline until a primary-source benchmark is selected and reviewed.
+Primary sources:
+- FAO, statement citing USD 39–50 billion/year for targeted interventions: https://www.fao.org/new-york/fao-statements/detail/unga-76-second-committee-agriculture-development-food-security-and-nutrition-%28fao-statement%29/en
+- FAO/CFS HLPE-FSN financing synthesis (2025), showing the wide range and scope differences: https://www.fao.org/fileadmin/templates/cfs/CFS53/Plenary_documents/Inf.20_HLPE-FSN_Financing/compiled_EN.pdf
 
-### Water — SOURCE REVIEW REQUIRED
+Decision for v2: USD 50 billion may be usable only with the specific targeted-intervention scope and historical source date. Do not label it as the single universal 'cost to end hunger'.
+
+### Water and sanitation — UPDATE / DEFINE TIME HORIZON
 
 Legacy runtime value: **USD 150 billion/year**.
 
-No canonical source/year/scope has yet been verified in this audit.
+WHO cited a World Bank estimate of about **USD 114 billion/year** in infrastructure investment to meet water and sanitation targets, excluding operation and maintenance costs. Current World Bank material states that universal access to safe drinking water, sanitation and hygiene by 2030 requires an estimated **USD 1.04 trillion** in water and sanitation infrastructure, but that figure is a multi-year requirement rather than a directly interchangeable annual scalar.
 
-Decision for v2: retain only as legacy baseline until a primary-source benchmark is selected and reviewed.
+Primary sources:
+- WHO, 2018 summary of the USD 114 billion/year infrastructure estimate: https://www.who.int/news/item/01-10-2018-who-calls-for-increased-investment-to-reach-the-goal-of-a-toilet-for-all
+- World Bank water overview, current multi-year investment requirement: https://www.worldbank.org/ext/en/topic/water
 
-### Electricity — SOURCE REVIEW REQUIRED
+Decision for v2: retire the unsupported USD 150 billion scalar unless its original source is recovered. Choose one clearly scoped target and preserve its time horizon instead of converting different estimates into an apparently exact annual cost.
+
+### Electricity access — UPDATE REQUIRED
 
 Legacy runtime value: **USD 35 billion/year**.
 
-No canonical source/year/scope has yet been verified in this audit.
+An older IEA financing analysis did estimate **USD 35 billion/year** to enable universal electricity access by 2030, so the legacy number appears to have a credible provenance. However, the target date has moved and newer IEA scenarios differ. The World Energy Outlook 2025 ACCESS scenario estimates roughly **USD 23 billion/year for electricity access until 2035**, plus separate clean-cooking investment.
 
-Decision for v2: retain only as legacy baseline until a primary-source benchmark is selected and reviewed.
+Primary sources:
+- IEA, older analysis containing USD 35 billion/year: https://www.iea.org/reports/financing-clean-energy-transitions-in-emerging-and-developing-economies/financing-clean-power-efficiency-and-electrification
+- IEA, *World Energy Outlook 2025 — Achieving access for all*: https://www.iea.org/reports/world-energy-outlook-2025/achieving-access-for-all
 
-### Climate — SOURCE REVIEW REQUIRED
+Decision for v2: update the benchmark and label whether it represents electricity only or electricity plus clean cooking. Do not mix target years.
+
+### Climate — LEGACY NUMBER MAY MATCH A SPECIFIC ENERGY-TRANSITION SCOPE, NOT 'CLIMATE' GENERALLY
 
 Legacy runtime value: **USD 1.5 trillion/year**.
 
-No canonical source/year/scope has yet been verified in this audit.
+Current UNFCCC materials describe climate-finance needs in multiple, non-interchangeable ways. A UNFCCC 2025 report citing the Independent High-Level Expert Group notes approximately **USD 2.4 trillion/year** in climate- and nature-related investment needs in developing countries excluding China by 2030. Other UNFCCC material cites approximately **USD 1.5 trillion/year** specifically for transformation of energy systems within that broader investment requirement.
 
-Decision for v2: retain only as legacy baseline until a primary-source benchmark is selected and reviewed.
+Primary sources:
+- UNFCCC, proposals for the Baku to Belém Roadmap to 1.3T: https://unfccc.int/sites/default/files/resource/BB1.3T_CEEW-GFC_Sep.pdf
+- UNFCCC Standing Committee on Finance material citing the USD 1.5 trillion energy-system component: https://unfccc.int/sites/default/files/resource/UNFCCC_100bn_Apr2025_Web.pdf
+
+Decision for v2: do not use USD 1.5 trillion as a generic global 'climate cost'. If retained, tie it to the specific geography, target year and energy-system-transformation scope. A broader climate benchmark requires a different definition.
 
 ### School construction unit cost — SOURCE REVIEW REQUIRED
 
