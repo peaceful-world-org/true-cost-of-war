@@ -57,6 +57,9 @@ jobs:
       - name: Build isolated shadow runtime
         run: python scripts/build_shadow_runtime.py
 
+      - name: Build English visual-parity shadow
+        run: python scripts/build_shadow_parity.py
+
       - name: Upload shadow runtime artifact
         uses: actions/upload-artifact@v4
         with:
