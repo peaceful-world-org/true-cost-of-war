@@ -9,127 +9,70 @@
     :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; background: #07111f; color: #eef6ff; }
     * { box-sizing: border-box; }
     body { margin: 0; min-height: 100vh; padding: 24px; background: radial-gradient(circle at top, #10243c, #07111f 55%); }
-    main { max-width: 1100px; margin: 0 auto; }
-    .banner { border: 1px solid #f59e0b66; background: #f59e0b12; padding: 14px 16px; border-radius: 14px; margin-bottom: 20px; }
-    h1 { margin: 0 0 8px; font-size: clamp(30px, 5vw, 52px); line-height: 1; }
-    h2 { margin-top: 28px; }
-    p { color: #a9b9cc; line-height: 1.5; }
-    .languages { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 28px; }
-    .languages a { color: #eef6ff; text-decoration: none; border: 1px solid #ffffff24; background: #0d1c2f; padding: 10px 13px; border-radius: 999px; font-weight: 700; }
+    main { max-width: 1000px; margin: 0 auto; }
+    .banner { border: 1px solid #f59e0b66; background: #f59e0b12; padding: 14px 16px; border-radius: 14px; margin-bottom: 24px; }
+    h1 { margin: 0 0 8px; font-size: clamp(32px, 5vw, 54px); line-height: 1; }
+    h2 { margin: 30px 0 6px; }
+    p { color: #a9b9cc; line-height: 1.55; }
+    .panel { margin-top: 18px; padding: 18px; border: 1px solid #ffffff18; border-radius: 18px; background: #0d1c2f; }
+    .panel.primary { border-color: #38bdf844; background: linear-gradient(145deg, #102238, #0d1c2f); }
+    .tag { display: inline-block; margin-bottom: 8px; padding: 5px 9px; border: 1px solid #38bdf844; border-radius: 999px; color: #7dd3fc; font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+    .languages { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .languages a { color: #eef6ff; text-decoration: none; border: 1px solid #ffffff24; background: #091828; padding: 10px 13px; border-radius: 999px; font-weight: 700; }
     .languages a:hover, .languages a:focus { border-color: #38bdf8; outline: none; }
-    .controls, .grid { display: grid; gap: 14px; }
-    .controls { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin: 24px 0; }
-    label, .card { background: #0d1c2f; border: 1px solid #ffffff18; border-radius: 16px; padding: 16px; }
-    label span { display: block; color: #91a3b7; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
-    select, input { width: 100%; background: #07111f; color: #eef6ff; border: 1px solid #ffffff24; border-radius: 10px; padding: 10px; }
-    .grid { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
-    .card small { color: #91a3b7; display: block; margin-bottom: 7px; }
-    .value { font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-    .meta { margin-top: 22px; font: 12px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; color: #91a3b7; white-space: pre-wrap; }
+    .architecture { display: grid; gap: 8px; margin-top: 16px; color: #91a3b7; font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .architecture span { padding: 8px 10px; border-radius: 9px; background: #081421; }
   </style>
 </head>
 <body>
   <main>
-    <div class="banner"><strong>PREVIEW — NOT PRODUCTION.</strong> Use this site to test changes before they are merged into the production path.</div>
+    <div class="banner"><strong>PREVIEW — NOT PRODUCTION.</strong> Everything here is isolated from the live calculator and is used for testing before a production merge.</div>
     <h1>The True Cost of War</h1>
-    <p>Visual-parity builds below preserve each current localized UI while using the shared calculation runtime underneath.</p>
+    <p>This preview now exposes both the current visual-parity build and the first single-template multilingual candidate.</p>
 
-    <h2>Test localized calculators</h2>
-    <nav class="languages" aria-label="Preview languages">
-      <a href="./parity/en/">English</a>
-      <a href="./parity/de/">Deutsch</a>
-      <a href="./parity/es/">Español</a>
-      <a href="./parity/fr/">Français</a>
-      <a href="./parity/pt/">Português</a>
-      <a href="./parity/ar/">العربية</a>
-      <a href="./parity/fa/">فارسی</a>
-      <a href="./parity/ru/">Русский</a>
-      <a href="./parity/hi/">हिन्दी</a>
-      <a href="./parity/ukr/">Українська</a>
-      <a href="./parity/zh-CN/">中文</a>
-    </nav>
+    <section class="panel primary">
+      <span class="tag">New · unified v0.1</span>
+      <h2>Unified candidate</h2>
+      <p>One HTML template, one CSS file, one JavaScript app, one shared calculation runtime, and locale JSON files. Use this version to test the architecture that will eventually replace duplicated language apps.</p>
+      <nav class="languages" aria-label="Unified candidate languages">
+        <a href="./unified/?lang=en">English</a>
+        <a href="./unified/?lang=de">Deutsch</a>
+        <a href="./unified/?lang=es">Español</a>
+        <a href="./unified/?lang=fr">Français</a>
+        <a href="./unified/?lang=pt">Português</a>
+        <a href="./unified/?lang=ar">العربية</a>
+        <a href="./unified/?lang=fa">فارسی</a>
+        <a href="./unified/?lang=ru">Русский</a>
+        <a href="./unified/?lang=hi">हिन्दी</a>
+        <a href="./unified/?lang=ukr">Українська</a>
+        <a href="./unified/?lang=zh-CN">中文</a>
+      </nav>
+      <div class="architecture">
+        <span>template → unified/index.html</span>
+        <span>styles → unified/app.css</span>
+        <span>UI runtime → unified/app.mjs → src/runtime.mjs → src/legacy-engine.mjs</span>
+        <span>copy → unified/locales/&lt;lang&gt;.json · data → data/model.json</span>
+      </div>
+    </section>
 
-    <h2>Shared-runtime diagnostics</h2>
-    <div class="controls">
-      <label><span>Timeframe</span><select id="mode">
-        <option value="year">Year to date</option>
-        <option value="1year">Last 365 days</option>
-        <option value="10years">Last 10 years</option>
-        <option value="lifetime">During my lifetime</option>
-        <option value="day">One day</option>
-        <option value="hour">One hour</option>
-        <option value="minute">One minute</option>
-        <option value="since1945">Since 1945</option>
-      </select></label>
-      <label><span>Birth year</span><input id="birthYear" type="number" min="1920" value="1990"></label>
-      <label><span>Redirected share: <b id="shareLabel">10%</b></span><input id="share" type="range" min="0" max="100" value="10"></label>
-    </div>
-
-    <section class="grid" id="metrics"></section>
-    <div class="meta" id="meta">Loading canonical legacy model…</div>
+    <section class="panel">
+      <span class="tag">Reference</span>
+      <h2>Current visual-parity build</h2>
+      <p>These pages preserve each existing localized interface while routing the headline arithmetic through the shared calculation runtime. Keep them open beside the unified candidate when checking behavior and copy.</p>
+      <nav class="languages" aria-label="Visual parity languages">
+        <a href="./parity/en/">English</a>
+        <a href="./parity/de/">Deutsch</a>
+        <a href="./parity/es/">Español</a>
+        <a href="./parity/fr/">Français</a>
+        <a href="./parity/pt/">Português</a>
+        <a href="./parity/ar/">العربية</a>
+        <a href="./parity/fa/">فارسی</a>
+        <a href="./parity/ru/">Русский</a>
+        <a href="./parity/hi/">हिन्दी</a>
+        <a href="./parity/ukr/">Українська</a>
+        <a href="./parity/zh-CN/">中文</a>
+      </nav>
+    </section>
   </main>
-
-  <script type="module">
-    import { calculateLegacySnapshot } from './src/runtime.mjs';
-
-    const mode = document.querySelector('#mode');
-    const birthYear = document.querySelector('#birthYear');
-    const share = document.querySelector('#share');
-    const shareLabel = document.querySelector('#shareLabel');
-    const metrics = document.querySelector('#metrics');
-    const meta = document.querySelector('#meta');
-
-    const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
-    const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
-    const ratio = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
-
-    const modelDocument = await fetch('./data/model.json', { cache: 'no-store' }).then((response) => {
-      if (!response.ok) throw new Error(`model.json: HTTP ${response.status}`);
-      return response.json();
-    });
-    const model = modelDocument.values;
-
-    const cards = [
-      ['Military expenditure', (s) => money.format(s.totals.militarySpend)],
-      ['Direct deaths', (s) => number.format(s.totals.directDeaths)],
-      ['Indirect deaths', (s) => number.format(s.totals.indirectDeaths)],
-      ['Life-years lost', (s) => number.format(s.totals.lifeYearsLost)],
-      ['Infrastructure damage', (s) => money.format(s.totals.infrastructureDamage)],
-      ['Legacy economic setback', (s) => money.format(s.totals.economicSetback)],
-      ['Redirected amount', (s) => money.format(s.opportunityCosts.redirected)],
-      ['Schools equivalent', (s) => number.format(s.opportunityCosts.schools)],
-      ['Education gap multiples', (s) => ratio.format(s.opportunityCosts.education)],
-      ['Primary health care multiples', (s) => ratio.format(s.opportunityCosts.health)],
-      ['Water benchmark multiples', (s) => ratio.format(s.opportunityCosts.water)],
-      ['Climate benchmark multiples', (s) => ratio.format(s.opportunityCosts.climate)],
-    ];
-
-    function render() {
-      const snapshot = calculateLegacySnapshot({
-        model,
-        mode: mode.value,
-        birthYear: birthYear.value,
-        sharePercent: share.value,
-        now: new Date(),
-      });
-
-      birthYear.disabled = mode.value !== 'lifetime';
-      shareLabel.textContent = `${snapshot.sharePercent}%`;
-      metrics.innerHTML = cards.map(([label, formatter]) =>
-        `<article class="card"><small>${label}</small><div class="value">${formatter(snapshot)}</div></article>`
-      ).join('');
-      meta.textContent = [
-        `data: data/model.json (schemaVersion ${modelDocument.schemaVersion})`,
-        `runtime: src/runtime.mjs`,
-        `engine: src/legacy-engine.mjs`,
-        `mode: ${snapshot.period.mode}`,
-        `annual fraction: ${snapshot.period.fraction}`,
-        `v2 research candidate: intentionally not used by runtime`,
-      ].join('\n');
-    }
-
-    for (const element of [mode, birthYear, share]) element.addEventListener('input', render);
-    render();
-  </script>
 </body>
 </html>
