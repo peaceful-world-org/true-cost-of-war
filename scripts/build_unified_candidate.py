@@ -122,6 +122,17 @@ def validate() -> list[str]:
         raise SystemExit("unified/index.html must remain noindex")
     if '<script type="module" src="./app.mjs"></script>' not in index:
         raise SystemExit("unified/index.html must load the shared app module")
+    for marker in (
+        'id="mainCounterValue"',
+        'id="viewerSpend"',
+        'id="viewerElapsed"',
+        'id="share" class="pw-scenario-range"',
+        'data-share="10"',
+        'data-share="25"',
+        'data-share="50"',
+    ):
+        if marker not in index:
+            raise SystemExit(f"unified/index.html missing interaction-parity marker: {marker}")
 
     app = (SOURCE / "app.mjs").read_text(encoding="utf-8")
     if "calculateLegacySnapshot" not in app or "../src/runtime.mjs" not in app:
@@ -130,6 +141,13 @@ def validate() -> list[str]:
         raise SystemExit("unified/app.mjs must load the canonical legacy data file")
     if "./state.mjs" not in app or "readCandidateState" not in app or "writeCandidateState" not in app:
         raise SystemExit("unified/app.mjs must use the shareable preview state helper")
+    for marker in ("SESSION_STARTED_AT", "viewerSpend", "scenarioChips", "closeInfoPopovers"):
+        if marker not in app:
+            raise SystemExit(f"unified/app.mjs missing interaction-parity behavior: {marker}")
+
+    state = (SOURCE / "state.mjs").read_text(encoding="utf-8")
+    if "clampInteger(params.get('share'), 5, 50" not in state:
+        raise SystemExit("unified/state.mjs must keep preview share state in the legacy 5-50 range")
 
     return sorted(route_languages)
 
@@ -151,8 +169,15 @@ def main() -> None:
     manifest = {
         "schemaVersion": 1,
         "status": "preview-not-production",
-        "candidate": "unified-v0.2",
+        "candidate": "unified-v0.3",
         "architecture": "one HTML + one CSS + one JS app + one state helper + one locale JSON per language + shared data/runtime",
+        "interactionParity": [
+            "legacy-style hero counter",
+            "live session-spend counter",
+            "5-50 redistribution slider",
+            "10/25/50 scenario chips",
+            "metric formula popovers",
+        ],
         "languageCount": len(languages),
         "languages": languages,
         "outputs": outputs,
@@ -162,7 +187,7 @@ def main() -> None:
         encoding="utf-8",
     )
 
-    print(f"Built unified candidate v0.2 for {len(languages)} languages")
+    print(f"Built unified candidate v0.3 for {len(languages)} languages")
     print("Production files changed: 0")
     print("Preview entrypoint: unified/index.html?lang=<language>")
 
