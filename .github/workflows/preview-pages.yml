@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment:
-      name: github-pages
+      name: preview-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
