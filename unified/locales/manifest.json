@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "languages": {
+    "en": {"displayName": "English", "htmlLang": "en", "intlLocale": "en-US", "dir": "ltr"},
+    "de": {"displayName": "Deutsch", "htmlLang": "de", "intlLocale": "de-DE", "dir": "ltr"},
+    "es": {"displayName": "Español", "htmlLang": "es", "intlLocale": "es-ES", "dir": "ltr"},
+    "fr": {"displayName": "Français", "htmlLang": "fr", "intlLocale": "fr-FR", "dir": "ltr"},
+    "pt": {"displayName": "Português", "htmlLang": "pt", "intlLocale": "pt-PT", "dir": "ltr"},
+    "ar": {"displayName": "العربية", "htmlLang": "ar", "intlLocale": "ar", "dir": "rtl"},
+    "fa": {"displayName": "فارسی", "htmlLang": "fa", "intlLocale": "fa", "dir": "rtl"},
+    "ru": {"displayName": "Русский", "htmlLang": "ru", "intlLocale": "ru-RU", "dir": "ltr"},
+    "hi": {"displayName": "हिन्दी", "htmlLang": "hi", "intlLocale": "hi-IN", "dir": "ltr"},
+    "ukr": {"displayName": "Українська", "htmlLang": "uk", "intlLocale": "uk-UA", "dir": "ltr"},
+    "zh-CN": {"displayName": "中文", "htmlLang": "zh-CN", "intlLocale": "zh-CN", "dir": "ltr"}
+  }
+}
