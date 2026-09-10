@@ -108,15 +108,19 @@ def node_syntax_check(script: str, label: str) -> None:
 
 def basic_html_checks(text: str, label: str, *, calculator: bool) -> None:
     lowered = text.lower()
-    if "<!doctype html" not in lowered:
-        fail(f"{label}: missing HTML doctype")
-    if 'name="viewport"' not in lowered and "name='viewport'" not in lowered:
-        fail(f"{label}: missing viewport meta tag")
-    if "<title>" not in lowered:
-        fail(f"{label}: missing <title>")
     if any(marker in text for marker in ("<<<<<<<", ">>>>>>>")):
         fail(f"{label}: unresolved merge-conflict marker found")
+
+    # calculator.html files are standalone documents. embed.html files are
+    # intentionally embeddable HTML fragments, so document-level tags are not
+    # required there.
     if calculator:
+        if "<!doctype html" not in lowered:
+            fail(f"{label}: missing HTML doctype")
+        if 'name="viewport"' not in lowered and "name='viewport'" not in lowered:
+            fail(f"{label}: missing viewport meta tag")
+        if "<title>" not in lowered:
+            fail(f"{label}: missing <title>")
         if "pw2-widget-container" not in text:
             fail(f"{label}: widget container marker is missing")
         if "PUBLIC_PAGE_URL" not in text:
@@ -125,6 +129,9 @@ def basic_html_checks(text: str, label: str, *, calculator: bool) -> None:
             fail(f"{label}: SIPRI source link is missing")
         if "ucdp.uu.se" not in lowered:
             fail(f"{label}: UCDP source link is missing")
+    else:
+        if "pw-share-widget" not in text:
+            fail(f"{label}: embed widget marker is missing")
 
 
 print("True Cost of War — baseline QA")
