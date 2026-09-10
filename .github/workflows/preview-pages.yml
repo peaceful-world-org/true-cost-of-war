@@ -1,0 +1,71 @@
+name: Deploy preview to GitHub Pages
+
+on:
+  push:
+    branches:
+      - preview
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: true-cost-of-war-preview
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run baseline QA
+        run: python scripts/qa.py
+
+      - name: Validate v2 research candidate
+        run: python scripts/validate_v2_candidate.py
+
+      - name: Validate widget routes
+        run: python scripts/validate_routes.py
+
+      - name: Validate legacy formula parity
+        run: python scripts/validate_legacy_formula_parity.py
+
+      - name: Test shared calculation engine and runtime
+        run: node --test tests/*.test.mjs
+
+      - name: Build isolated shadow runtime
+        run: python scripts/build_shadow_runtime.py
+
+      - name: Build localized visual-parity shadows
+        run: python scripts/build_shadow_parity.py
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload preview site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/shadow-v2
+
+      - name: Deploy preview
+        id: deployment
+        uses: actions/deploy-pages@v4
