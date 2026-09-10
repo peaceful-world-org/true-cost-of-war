@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "basePath": "/true-cost-of-war",
+  "canonicalPattern": "/{lang}/index.html",
+  "languages": {
+    "en": {"source": "en/calculator.html", "canonical": "/index.html", "legacyAliases": []},
+    "de": {"source": "de/calculator.html", "canonical": "/de/index.html", "legacyAliases": []},
+    "es": {"source": "es/calculator.html", "canonical": "/es/index.html", "legacyAliases": ["/index-es.html"]},
+    "fr": {"source": "fr/calculator.html", "canonical": "/fr/index.html", "legacyAliases": ["/index-fr.html"]},
+    "pt": {"source": "pt/calculator.html", "canonical": "/pt/index.html", "legacyAliases": []},
+    "ar": {"source": "ar/calculator.html", "canonical": "/ar/index.html", "legacyAliases": []},
+    "fa": {"source": "fa/calculator.html", "canonical": "/fa/index.html", "legacyAliases": []},
+    "ru": {"source": "ru/calculator.html", "canonical": "/ru/index.html", "legacyAliases": []},
+    "hi": {"source": "hi/calculator.html", "canonical": "/hi/index.html", "legacyAliases": ["/index-hi.html"]},
+    "ukr": {"source": "ukr/calculator.html", "canonical": "/ukr/index.html", "legacyAliases": []},
+    "zh-CN": {"source": "zh-CN/calculator.html", "canonical": "/zh-cn/index.html", "legacyAliases": []}
+  },
+  "notes": {
+    "legacy": "Aliases mirror inconsistent iframe URLs currently embedded on Peaceful World pages and exist for compatibility only.",
+    "future": "After the production host is mapped and migrated, embed snippets should use canonical routes only."
+  }
+}
