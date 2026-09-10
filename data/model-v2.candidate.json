@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 2,
+  "status": "research-candidate-not-runtime",
+  "retrievedAt": "2026-09-10",
+  "purpose": "Candidate evidence-aware schema for methodology review. The production calculator does not read this file.",
+  "principles": {
+    "observedVsModelled": "Observed data, model assumptions and opportunity-cost benchmarks must remain distinct.",
+    "historicalPeriods": "Use annual observations where comparable series exist; never represent current annual rates multiplied backward through time as observed history.",
+    "uncertainty": "Ranges and coverage limits should remain visible rather than being collapsed into false precision.",
+    "currency": "Historical sums require an explicit nominal/constant/current-USD rule before production use."
+  },
+  "headlineMetrics": {
+    "globalMilitaryExpenditure": {
+      "kind": "observed",
+      "candidate": {
+        "value": 2887000000000,
+        "unit": "USD/year",
+        "period": 2025,
+        "scope": "world"
+      },
+      "legacy": {
+        "value": 2440000000000,
+        "unit": "USD/year"
+      },
+      "source": {
+        "publisher": "SIPRI",
+        "title": "Trends in World Military Expenditure, 2025",
+        "published": "2026-04",
+        "url": "https://www.sipri.org/publications/2026/sipri-fact-sheets/trends-world-military-expenditure-2025",
+        "doi": "10.55163/ZLHQ1057"
+      },
+      "reviewStatus": "primary-source-verified-candidate",
+      "nextAction": "Choose currency basis for historical series, ingest annual SIPRI data, then update runtime."
+    },
+    "directConflictDeaths": {
+      "kind": "observed-series-required",
+      "candidate": null,
+      "legacy": {
+        "value": 150000,
+        "unit": "deaths/year",
+        "treatment": "constant scalar"
+      },
+      "source": {
+        "publisher": "UCDP",
+        "datasetVersion": "26.1",
+        "coverageNote": "UCDP yearly armed-conflict datasets cover 1946-2025; multiple organized-violence and battle-related-death series have strongest consistent coverage from 1989 onward.",
+        "url": "https://ucdp.uu.se/downloads/"
+      },
+      "reviewStatus": "replace-scalar-with-series",
+      "nextAction": "Define exact death categories and a consistent pre-1989 coverage rule before ingesting annual observations."
+    },
+    "indirectDeathMultiplier": {
+      "kind": "model-assumption",
+      "candidate": null,
+      "legacy": {
+        "value": 4,
+        "unit": "indirect deaths per direct death"
+      },
+      "source": null,
+      "reviewStatus": "literature-review-required",
+      "nextAction": "Test whether a global multiplier is defensible. Prefer scenario ranges with uncertainty if retained."
+    },
+    "infrastructureDamage": {
+      "kind": "model-assumption",
+      "candidate": null,
+      "legacy": {
+        "value": 730000000000,
+        "unit": "USD/year",
+        "rule": "approximately 30% of legacy military-expenditure baseline"
+      },
+      "source": null,
+      "reviewStatus": "methodology-required",
+      "nextAction": "Either source a defensible global model with uncertainty or move this metric to an explicitly labelled scenario layer."
+    },
+    "averageYearsOfLifeLost": {
+      "kind": "model-assumption",
+      "candidate": null,
+      "legacy": {
+        "value": 39,
+        "unit": "years/death"
+      },
+      "source": null,
+      "reviewStatus": "source-and-scope-required",
+      "nextAction": "Define population, method and source; otherwise remove the universal scalar."
+    },
+    "economicValuePerDeath": {
+      "kind": "model-assumption",
+      "candidate": null,
+      "legacy": {
+        "value": 500000,
+        "unit": "USD/death"
+      },
+      "source": null,
+      "reviewStatus": "conceptual-review-required",
+      "nextAction": "Review whether monetised mortality should be aggregated with spending and infrastructure damage at all."
+    }
+  },
+  "opportunityCostBenchmarks": {
+    "education": {
+      "kind": "financing-gap",
+      "candidate": {
+        "value": 97000000000,
+        "unit": "USD/year",
+        "period": "average annual gap, 2023-2030",
+        "scope": "79 low- and lower-middle-income countries; national SDG 4 targets"
+      },
+      "legacy": {
+        "value": 39000000000,
+        "unit": "USD/year"
+      },
+      "source": {
+        "publisher": "UNESCO Global Education Monitoring Report",
+        "url": "https://www.unesco.org/gem-report/en/education-finance"
+      },
+      "reviewStatus": "primary-source-verified-candidate"
+    },
+    "primaryHealthCare": {
+      "kind": "additional-investment-range",
+      "candidate": {
+        "min": 200000000000,
+        "max": 328000000000,
+        "unit": "USD/year",
+        "scope": "low- and middle-income countries; more comprehensive PHC package"
+      },
+      "legacy": {
+        "value": 250000000000,
+        "unit": "USD/year"
+      },
+      "source": {
+        "publisher": "WHO",
+        "title": "Primary health care",
+        "updated": "2025-12-05",
+        "url": "https://www.who.int/news-room/fact-sheets/detail/primary-health-care"
+      },
+      "reviewStatus": "primary-source-verified-range",
+      "note": "The legacy scalar sits inside the published range but should not be presented as a uniquely correct cost."
+    },
+    "hunger": {
+      "kind": "targeted-intervention-range",
+      "candidate": {
+        "min": 39000000000,
+        "max": 50000000000,
+        "unit": "USD/year",
+        "target": "targeted interventions toward ending hunger by 2030",
+        "scopeCaveat": "Not a universal estimate for full food-system transformation."
+      },
+      "legacy": {
+        "value": 50000000000,
+        "unit": "USD/year"
+      },
+      "source": {
+        "publisher": "FAO",
+        "url": "https://www.fao.org/new-york/fao-statements/detail/unga-76-second-committee-agriculture-development-food-security-and-nutrition-%28fao-statement%29/en"
+      },
+      "reviewStatus": "credible-provenance-scope-review-required"
+    },
+    "waterAndSanitation": {
+      "kind": "multi-year-investment-requirement",
+      "candidate": {
+        "value": 1040000000000,
+        "unit": "USD total",
+        "targetYear": 2030,
+        "scope": "universal access to safe drinking water, sanitation and hygiene; infrastructure"
+      },
+      "legacy": {
+        "value": 150000000000,
+        "unit": "USD/year"
+      },
+      "source": {
+        "publisher": "World Bank Group",
+        "url": "https://www.worldbank.org/ext/en/topic/water"
+      },
+      "reviewStatus": "time-horizon-redesign-required",
+      "note": "Do not convert this multi-year total into an annual scalar without defining the interval and source methodology."
+    },
+    "electricityAccess": {
+      "kind": "annual-investment-scenario",
+      "candidate": {
+        "value": 23000000000,
+        "unit": "USD/year",
+        "horizon": "until 2035",
+        "scope": "electricity access in the IEA World Energy Outlook 2025 ACCESS scenario"
+      },
+      "legacy": {
+        "value": 35000000000,
+        "unit": "USD/year",
+        "provenanceNote": "An older IEA analysis used approximately USD 35 billion/year for universal electricity access by 2030."
+      },
+      "source": {
+        "publisher": "IEA",
+        "title": "World Energy Outlook 2025 — Achieving access for all",
+        "url": "https://www.iea.org/reports/world-energy-outlook-2025/achieving-access-for-all"
+      },
+      "reviewStatus": "primary-source-verified-candidate"
+    },
+    "internetConnectivity": {
+      "kind": "multi-year-financing-gap",
+      "candidate": {
+        "value": 1600000000000,
+        "unit": "USD total",
+        "targetYear": 2030,
+        "scope": "global connectivity gap; capital and operating expenditure in the ITU model"
+      },
+      "legacy": {
+        "value": 43000000000,
+        "unit": "USD/year"
+      },
+      "source": {
+        "publisher": "ITU",
+        "title": "Connectivity and financing gaps: Assessing the challenge",
+        "published": "2025-01",
+        "url": "https://www.itu.int/hub/2025/01/connectivity-and-financing-gaps-assessing-the-challenge/"
+      },
+      "reviewStatus": "time-horizon-redesign-required"
+    },
+    "climate": {
+      "kind": "investment-requirement-scope-review",
+      "candidate": {
+        "broaderClimateAndNatureInvestment": {
+          "value": 2400000000000,
+          "unit": "USD/year",
+          "targetYear": 2030,
+          "scope": "developing countries excluding China; climate- and nature-related investment requirements"
+        },
+        "energySystemsComponent": {
+          "value": 1500000000000,
+          "unit": "USD/year",
+          "targetYear": 2030,
+          "scope": "energy-system transformation component cited in UNFCCC material"
+        }
+      },
+      "legacy": {
+        "value": 1500000000000,
+        "unit": "USD/year",
+        "label": "climate"
+      },
+      "source": {
+        "publisher": "UNFCCC / cited IHLEG estimates",
+        "url": "https://unfccc.int/sites/default/files/resource/BB1.3T_CEEW-GFC_Sep.pdf"
+      },
+      "reviewStatus": "scope-relabel-or-replace-required",
+      "note": "The legacy value may align with a specific energy-transition component, not a generic total climate cost."
+    },
+    "schoolConstruction": {
+      "kind": "unit-cost-assumption",
+      "candidate": null,
+      "legacy": {
+        "value": 5000000,
+        "unit": "USD/school"
+      },
+      "source": null,
+      "reviewStatus": "reference-scenario-required"
+    }
+  }
+}
