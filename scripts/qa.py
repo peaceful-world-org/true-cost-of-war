@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Baseline QA for the True Cost of War static application.
 
-The goal is intentionally conservative: catch accidental regressions without
-changing the current product or freezing future data/model improvements.
-Known legacy inconsistencies are reported as warnings until the shared data
-layer is introduced.
+The checker protects the current product while the calculator is modernised.
+`data/model.json` is the machine-readable legacy baseline. It is deliberately
+not treated as a methodological endorsement: evidence review happens in a
+separate phase.
 """
 
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
@@ -16,6 +17,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+MODEL_PATH = ROOT / "data" / "model.json"
 LANGUAGES = ["ar", "de", "en", "es", "fa", "fr", "hi", "pt", "ru", "ukr", "zh-CN"]
 REQUIRED_MODEL_KEYS = {
     "annualMilitarySpend",
@@ -52,6 +54,66 @@ def read(path: Path) -> str:
     except Exception as exc:  # pragma: no cover - CI diagnostics
         fail(f"Cannot read {path.relative_to(ROOT)}: {exc}")
         return ""
+
+
+def load_canonical_model() -> tuple[dict[str, float], dict[str, dict[str, float]]]:
+    if not MODEL_PATH.is_file():
+        fail("data/model.json: canonical model file is missing")
+        return {}, {}
+
+    try:
+        document = json.loads(MODEL_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        fail(f"data/model.json: cannot parse canonical model: {exc}")
+        return {}, {}
+
+    if document.get("schemaVersion") != 1:
+        fail("data/model.json: schemaVersion must be 1")
+
+    values = document.get("values")
+    if not isinstance(values, dict):
+        fail("data/model.json: values must be an object")
+        values = {}
+
+    missing = sorted(REQUIRED_MODEL_KEYS - values.keys())
+    extra = sorted(values.keys() - REQUIRED_MODEL_KEYS)
+    if missing:
+        fail(f"data/model.json: missing canonical keys: {', '.join(missing)}")
+    if extra:
+        warn(f"data/model.json: unrecognised canonical keys: {', '.join(extra)}")
+
+    canonical: dict[str, float] = {}
+    for key, value in values.items():
+        if not isinstance(value, (int, float)) or isinstance(value, bool):
+            fail(f"data/model.json: {key} must be numeric")
+            continue
+        numeric = float(value)
+        if numeric <= 0:
+            fail(f"data/model.json: {key} must be positive, got {value}")
+        canonical[key] = numeric
+
+    raw_overrides = document.get("legacyOverrides", {})
+    if not isinstance(raw_overrides, dict):
+        fail("data/model.json: legacyOverrides must be an object")
+        raw_overrides = {}
+
+    overrides: dict[str, dict[str, float]] = {}
+    for path, patch in raw_overrides.items():
+        if not isinstance(path, str) or not isinstance(patch, dict):
+            fail("data/model.json: every legacy override must map a path to an object")
+            continue
+        parsed_patch: dict[str, float] = {}
+        for key, value in patch.items():
+            if key not in REQUIRED_MODEL_KEYS:
+                fail(f"data/model.json: override {path} uses unknown key {key}")
+                continue
+            if not isinstance(value, (int, float)) or isinstance(value, bool):
+                fail(f"data/model.json: override {path}.{key} must be numeric")
+                continue
+            parsed_patch[key] = float(value)
+        overrides[path] = parsed_patch
+
+    return canonical, overrides
 
 
 def extract_model(text: str, label: str) -> dict[str, float]:
@@ -138,9 +200,16 @@ def basic_html_checks(text: str, label: str, *, calculator: bool) -> None:
             fail(f"{label}: embed widget marker is missing")
 
 
-print("True Cost of War — baseline QA")
-print(f"Checking {len(LANGUAGES)} language variants...\n")
+def expected_model_for(path: str, canonical: dict[str, float], overrides: dict[str, dict[str, float]]) -> dict[str, float]:
+    expected = dict(canonical)
+    expected.update(overrides.get(path, {}))
+    return expected
 
+
+print("True Cost of War — baseline QA")
+print(f"Checking {len(LANGUAGES)} language variants against data/model.json...\n")
+
+canonical, legacy_overrides = load_canonical_model()
 models: dict[str, dict[str, float]] = {}
 
 for language in LANGUAGES:
@@ -159,44 +228,50 @@ for language in LANGUAGES:
             node_syntax_check(script, label)
 
         if filename == "calculator.html":
-            models[language] = extract_model(text, label)
+            models[label] = extract_model(text, label)
             if '<meta name="description"' not in text.lower():
                 warn(f"{label}: no meta description (SEO improvement candidate)")
         elif "@latest" in text:
             warn(f"{label}: external dependency uses @latest; pinning a version is recommended")
 
-# The current architecture duplicates model data across localized HTML files.
-# Existing divergences are technical debt, not a reason to disable all CI.
-# Report them clearly; after the shared data layer lands this becomes a hard
-# invariant by construction.
-if "en" in models and models["en"]:
-    baseline = models["en"]
-    for language, model in sorted(models.items()):
-        if not model or language == "en":
+# All duplicated runtime models must now match the explicit canonical baseline,
+# except for legacy differences documented by exact file path in model.json.
+if canonical:
+    for label, model in sorted(models.items()):
+        if not model:
             continue
-        if model != baseline:
-            differing = sorted(
-                key for key in set(baseline) | set(model) if baseline.get(key) != model.get(key)
-            )
-            warn(
-                f"{language}/calculator.html: MODEL differs from en/calculator.html "
-                f"for keys: {', '.join(differing)}"
+        expected = expected_model_for(label, canonical, legacy_overrides)
+        differing = sorted(
+            key for key in REQUIRED_MODEL_KEYS if model.get(key) != expected.get(key)
+        )
+        if differing:
+            fail(
+                f"{label}: MODEL drifted from data/model.json for keys: "
+                f"{', '.join(differing)}"
             )
 
+# Make stale override entries visible. Once a legacy difference is removed from
+# runtime code, its exception should be deleted from data/model.json too.
+for override_path in sorted(legacy_overrides):
+    if override_path not in models:
+        warn(f"data/model.json: legacy override points to unchecked path: {override_path}")
+    elif models[override_path] == canonical:
+        warn(f"data/model.json: legacy override for {override_path} is no longer needed")
+
 # Lightweight numerical guardrails catch accidental zeroes/order-of-magnitude
-# mistakes in every language while still allowing evidence-based updates.
-for language, model in sorted(models.items()):
+# mistakes while still allowing evidence-based updates to the canonical file.
+for label, model in sorted(models.items()):
     if not model:
         continue
     military = model.get("annualMilitarySpend", 0)
     if not 1e11 <= military <= 1e14:
-        fail(f"{language}/calculator.html: annualMilitarySpend outside guardrail: {military}")
+        fail(f"{label}: annualMilitarySpend outside guardrail: {military}")
     multiplier = model.get("indirectMultiplier", 0)
     if not 0 < multiplier <= 20:
-        fail(f"{language}/calculator.html: indirectMultiplier outside guardrail: {multiplier}")
+        fail(f"{label}: indirectMultiplier outside guardrail: {multiplier}")
     school = model.get("schoolCost", 0)
     if not 1e5 <= school <= 1e9:
-        fail(f"{language}/calculator.html: schoolCost outside guardrail: {school}")
+        fail(f"{label}: schoolCost outside guardrail: {school}")
 
 print(f"Warnings: {len(warnings)}")
 for item in warnings:
