@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>True Cost of War — Shadow Runtime</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; background: #07111f; color: #eef6ff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; padding: 24px; background: radial-gradient(circle at top, #10243c, #07111f 55%); }
+    main { max-width: 1100px; margin: 0 auto; }
+    .banner { border: 1px solid #f59e0b66; background: #f59e0b12; padding: 14px 16px; border-radius: 14px; margin-bottom: 20px; }
+    h1 { margin: 0 0 8px; font-size: clamp(30px, 5vw, 52px); line-height: 1; }
+    p { color: #a9b9cc; line-height: 1.5; }
+    .controls, .grid { display: grid; gap: 14px; }
+    .controls { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin: 24px 0; }
+    label, .card { background: #0d1c2f; border: 1px solid #ffffff18; border-radius: 16px; padding: 16px; }
+    label span { display: block; color: #91a3b7; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+    select, input { width: 100%; background: #07111f; color: #eef6ff; border: 1px solid #ffffff24; border-radius: 10px; padding: 10px; }
+    .grid { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+    .card small { color: #91a3b7; display: block; margin-bottom: 7px; }
+    .value { font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .meta { margin-top: 22px; font: 12px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; color: #91a3b7; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="banner"><strong>SHADOW RUNTIME — NOT PRODUCTION.</strong> This diagnostic page is built only as a GitHub Actions artifact. It deliberately uses the legacy baseline while the evidence-aware v2 model remains research-only.</div>
+    <h1>The True Cost of War</h1>
+    <p>One data source, one calculation engine, one runtime adapter. This page exists to prove calculation parity before any live widget is switched over.</p>
+
+    <div class="controls">
+      <label><span>Timeframe</span><select id="mode">
+        <option value="year">Year to date</option>
+        <option value="1year">Last 365 days</option>
+        <option value="10years">Last 10 years</option>
+        <option value="lifetime">During my lifetime</option>
+        <option value="day">One day</option>
+        <option value="hour">One hour</option>
+        <option value="minute">One minute</option>
+        <option value="since1945">Since 1945</option>
+      </select></label>
+      <label><span>Birth year</span><input id="birthYear" type="number" min="1920" value="1990"></label>
+      <label><span>Redirected share: <b id="shareLabel">10%</b></span><input id="share" type="range" min="0" max="100" value="10"></label>
+    </div>
+
+    <section class="grid" id="metrics"></section>
+    <div class="meta" id="meta">Loading canonical legacy model…</div>
+  </main>
+
+  <script type="module">
+    import { calculateLegacySnapshot } from './src/runtime.mjs';
+
+    const mode = document.querySelector('#mode');
+    const birthYear = document.querySelector('#birthYear');
+    const share = document.querySelector('#share');
+    const shareLabel = document.querySelector('#shareLabel');
+    const metrics = document.querySelector('#metrics');
+    const meta = document.querySelector('#meta');
+
+    const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+    const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+    const ratio = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
+
+    const modelDocument = await fetch('./data/model.json', { cache: 'no-store' }).then((response) => {
+      if (!response.ok) throw new Error(`model.json: HTTP ${response.status}`);
+      return response.json();
+    });
+    const model = modelDocument.values;
+
+    const cards = [
+      ['Military expenditure', (s) => money.format(s.totals.militarySpend)],
+      ['Direct deaths', (s) => number.format(s.totals.directDeaths)],
+      ['Indirect deaths', (s) => number.format(s.totals.indirectDeaths)],
+      ['Life-years lost', (s) => number.format(s.totals.lifeYearsLost)],
+      ['Infrastructure damage', (s) => money.format(s.totals.infrastructureDamage)],
+      ['Legacy economic setback', (s) => money.format(s.totals.economicSetback)],
+      ['Redirected amount', (s) => money.format(s.opportunityCosts.redirected)],
+      ['Schools equivalent', (s) => number.format(s.opportunityCosts.schools)],
+      ['Education gap multiples', (s) => ratio.format(s.opportunityCosts.education)],
+      ['Primary health care multiples', (s) => ratio.format(s.opportunityCosts.health)],
+      ['Water benchmark multiples', (s) => ratio.format(s.opportunityCosts.water)],
+      ['Climate benchmark multiples', (s) => ratio.format(s.opportunityCosts.climate)],
+    ];
+
+    function render() {
+      const snapshot = calculateLegacySnapshot({
+        model,
+        mode: mode.value,
+        birthYear: birthYear.value,
+        sharePercent: share.value,
+        now: new Date(),
+      });
+
+      birthYear.disabled = mode.value !== 'lifetime';
+      shareLabel.textContent = `${snapshot.sharePercent}%`;
+      metrics.innerHTML = cards.map(([label, formatter]) =>
+        `<article class="card"><small>${label}</small><div class="value">${formatter(snapshot)}</div></article>`
+      ).join('');
+      meta.textContent = [
+        `data: data/model.json (schemaVersion ${modelDocument.schemaVersion})`,
+        `runtime: src/runtime.mjs`,
+        `engine: src/legacy-engine.mjs`,
+        `mode: ${snapshot.period.mode}`,
+        `annual fraction: ${snapshot.period.fraction}`,
+        `v2 research candidate: intentionally not used by runtime`,
+      ].join('\n');
+    }
+
+    for (const element of [mode, birthYear, share]) element.addEventListener('input', render);
+    render();
+  </script>
+</body>
+</html>
