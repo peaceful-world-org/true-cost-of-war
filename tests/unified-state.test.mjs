@@ -12,11 +12,14 @@ test('preview state reads supported query parameters', () => {
   );
 });
 
-test('preview state falls back and clamps unsafe numeric values', () => {
-  const state = readCandidateState('?lang=xx&share=999&birth=1800', languages, 'ar');
-  assert.equal(state.language, 'ar');
-  assert.equal(state.share, '100');
-  assert.equal(state.birthYear, '1920');
+test('preview state falls back and clamps unsafe numeric values to the legacy scenario range', () => {
+  const high = readCandidateState('?lang=xx&share=999&birth=1800', languages, 'ar');
+  assert.equal(high.language, 'ar');
+  assert.equal(high.share, '50');
+  assert.equal(high.birthYear, '1920');
+
+  const low = readCandidateState('?lang=en&share=0', languages, 'en');
+  assert.equal(low.share, '5');
 });
 
 test('preview state serializes a shareable stable URL', () => {

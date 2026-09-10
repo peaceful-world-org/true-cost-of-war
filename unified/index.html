@@ -10,51 +10,88 @@
 <body>
   <main class="pw-shell">
     <div class="pw-preview-banner" role="status">
-      <strong>UNIFIED CANDIDATE · PREVIEW</strong>
-      <span>One template · one CSS · one JS runtime · locale files. Not production.</span>
+      <div>
+        <strong>UNIFIED CANDIDATE · PREVIEW</strong>
+        <span>v0.3 · interaction parity pass · not production</span>
+      </div>
+      <label class="pw-preview-language">
+        <span id="languageLabel">Language</span>
+        <select id="language"></select>
+      </label>
     </div>
 
     <section class="pw-hero">
       <div class="pw-eyebrow" id="eyebrow">Peaceful World</div>
       <h1 id="title">The True Cost of War</h1>
-      <p class="pw-lead" id="lead">Loading locale…</p>
 
-      <div class="pw-live-strip" aria-live="polite">
+      <div class="pw-live-fact" aria-live="polite">
         <span class="pw-live-dot" aria-hidden="true"></span>
-        <span class="pw-live-label" id="liveMetricLabel">Military expenditure</span>
-        <strong class="pw-live-rate" id="liveRate">—</strong>
-        <span class="pw-live-separator" aria-hidden="true">·</span>
-        <span class="pw-live-period" id="currentPeriod">—</span>
+        <span id="liveMetricLabel">Military expenditure</span>
+        <strong id="liveRate">—</strong>
       </div>
+
+      <p class="pw-lead" id="lead">Loading locale…</p>
     </section>
 
-    <section class="pw-controls" aria-label="Calculator controls">
-      <label class="pw-control">
-        <span id="languageLabel">Language</span>
-        <select id="language"></select>
-      </label>
-      <label class="pw-control">
+    <section class="pw-time-controls" aria-label="Calculator controls">
+      <label class="pw-time-control">
         <span id="timeframeLabel">Timeframe</span>
         <select id="mode"></select>
       </label>
-      <label class="pw-control">
+      <label class="pw-time-control pw-birth-control" id="birthControl" hidden>
         <span id="birthYearLabel">Birth year</span>
         <input id="birthYear" type="number" min="1920" value="1990" inputmode="numeric">
       </label>
-      <label class="pw-control pw-share-control">
-        <span><span id="shareLabelText">Redirected share</span>: <b id="shareLabel">10%</b></span>
-        <input id="share" type="range" min="0" max="100" step="1" value="10">
-        <span class="pw-share-track" aria-hidden="true"><i id="shareProgress"></i></span>
-      </label>
     </section>
 
-    <section class="pw-grid" id="headlineMetrics" aria-live="polite"></section>
+    <section class="pw-hero-counter pw-glow" aria-live="polite">
+      <div class="pw-counter-main">
+        <div class="pw-counter-kicker">
+          <span class="pw-live-dot" aria-hidden="true"></span>
+          <span id="currentPeriod">—</span>
+        </div>
+        <div class="pw-counter-value" id="mainCounterValue">—</div>
+        <div class="pw-counter-caption" id="mainCounterLabel">Military expenditure</div>
+      </div>
 
-    <section class="pw-section">
+      <aside class="pw-session-card">
+        <div class="pw-session-head">
+          <span id="sessionMetricLabel">Military expenditure</span>
+          <time id="viewerElapsed">00:00</time>
+        </div>
+        <div class="pw-session-value" id="viewerSpend">—</div>
+        <div class="pw-session-divider"></div>
+        <div class="pw-session-row">
+          <span id="shareLabelText">Redirected share</span>
+          <strong id="viewerRedirected">—</strong>
+        </div>
+      </aside>
+    </section>
+
+    <section class="pw-grid pw-grid-headline" id="headlineMetrics"></section>
+
+    <section class="pw-section pw-opportunity-section">
       <div class="pw-section-head">
         <h2 id="opportunityTitle">Opportunity cost</h2>
-        <span class="pw-pill" id="redirectedPill">10%</span>
       </div>
+
+      <div class="pw-scenario-panel pw-glow">
+        <div class="pw-scenario-head">
+          <span id="scenarioTitle">Redirected share</span>
+          <strong id="shareLabel">10%</strong>
+        </div>
+        <input id="share" class="pw-scenario-range" type="range" min="5" max="50" step="1" value="10">
+        <div class="pw-share-track" aria-hidden="true"><i id="shareProgress"></i></div>
+        <div class="pw-scenario-bottom">
+          <span class="pw-scenario-scale">5% ··· 50%</span>
+          <div class="pw-scenario-pills" role="group" aria-label="Preset redistribution scenarios">
+            <button type="button" class="pw-scenario-chip" data-share="10">10%</button>
+            <button type="button" class="pw-scenario-chip" data-share="25">25%</button>
+            <button type="button" class="pw-scenario-chip" data-share="50">50%</button>
+          </div>
+        </div>
+      </div>
+
       <div class="pw-grid pw-grid-opportunity" id="opportunityMetrics"></div>
     </section>
 

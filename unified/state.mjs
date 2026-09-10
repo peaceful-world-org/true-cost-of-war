@@ -11,7 +11,7 @@ export function readCandidateState(search, supportedLanguages, defaultLanguage =
   const requestedLanguage = params.get('lang');
   const language = supportedLanguages.includes(requestedLanguage) ? requestedLanguage : defaultLanguage;
   const mode = params.get('mode') || DEFAULTS.mode;
-  const share = clampInteger(params.get('share'), 0, 100, DEFAULTS.share);
+  const share = clampInteger(params.get('share'), 5, 50, DEFAULTS.share);
   const birthYear = clampInteger(params.get('birth'), 1920, new Date().getFullYear(), DEFAULTS.birthYear);
   return { language, mode, share, birthYear };
 }
