@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>True Cost of War — Shadow Runtime</title>
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>True Cost of War — Preview</title>
   <style>
     :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; background: #07111f; color: #eef6ff; }
     * { box-sizing: border-box; }
@@ -11,7 +12,11 @@
     main { max-width: 1100px; margin: 0 auto; }
     .banner { border: 1px solid #f59e0b66; background: #f59e0b12; padding: 14px 16px; border-radius: 14px; margin-bottom: 20px; }
     h1 { margin: 0 0 8px; font-size: clamp(30px, 5vw, 52px); line-height: 1; }
+    h2 { margin-top: 28px; }
     p { color: #a9b9cc; line-height: 1.5; }
+    .languages { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 28px; }
+    .languages a { color: #eef6ff; text-decoration: none; border: 1px solid #ffffff24; background: #0d1c2f; padding: 10px 13px; border-radius: 999px; font-weight: 700; }
+    .languages a:hover, .languages a:focus { border-color: #38bdf8; outline: none; }
     .controls, .grid { display: grid; gap: 14px; }
     .controls { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin: 24px 0; }
     label, .card { background: #0d1c2f; border: 1px solid #ffffff18; border-radius: 16px; padding: 16px; }
@@ -25,10 +30,26 @@
 </head>
 <body>
   <main>
-    <div class="banner"><strong>SHADOW RUNTIME — NOT PRODUCTION.</strong> This diagnostic page is built only as a GitHub Actions artifact. It deliberately uses the legacy baseline while the evidence-aware v2 model remains research-only.</div>
+    <div class="banner"><strong>PREVIEW — NOT PRODUCTION.</strong> Use this site to test changes before they are merged into the production path.</div>
     <h1>The True Cost of War</h1>
-    <p>One data source, one calculation engine, one runtime adapter. This page exists to prove calculation parity before any live widget is switched over.</p>
+    <p>Visual-parity builds below preserve each current localized UI while using the shared calculation runtime underneath.</p>
 
+    <h2>Test localized calculators</h2>
+    <nav class="languages" aria-label="Preview languages">
+      <a href="./parity/en/">English</a>
+      <a href="./parity/de/">Deutsch</a>
+      <a href="./parity/es/">Español</a>
+      <a href="./parity/fr/">Français</a>
+      <a href="./parity/pt/">Português</a>
+      <a href="./parity/ar/">العربية</a>
+      <a href="./parity/fa/">فارسی</a>
+      <a href="./parity/ru/">Русский</a>
+      <a href="./parity/hi/">हिन्दी</a>
+      <a href="./parity/ukr/">Українська</a>
+      <a href="./parity/zh-CN/">中文</a>
+    </nav>
+
+    <h2>Shared-runtime diagnostics</h2>
     <div class="controls">
       <label><span>Timeframe</span><select id="mode">
         <option value="year">Year to date</option>
