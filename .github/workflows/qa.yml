@@ -37,7 +37,7 @@ jobs:
       - name: Validate widget routes
         run: python scripts/validate_routes.py
 
-      - name: Test shared calculation engine
+      - name: Test shared calculation engine and runtime
         run: node --test tests/*.test.mjs
 
       - name: Build reproducible widget bundle
@@ -48,5 +48,16 @@ jobs:
         with:
           name: true-cost-of-war-widget-bundle
           path: dist/true-cost-of-war
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Build isolated shadow runtime
+        run: python scripts/build_shadow_runtime.py
+
+      - name: Upload shadow runtime artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: true-cost-of-war-shadow-v2
+          path: dist/shadow-v2
           if-no-files-found: error
           retention-days: 7
