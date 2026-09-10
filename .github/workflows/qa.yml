@@ -30,3 +30,6 @@ jobs:
 
       - name: Run baseline QA
         run: python scripts/qa.py
+
+      - name: Validate v2 research candidate
+        run: python scripts/validate_v2_candidate.py
