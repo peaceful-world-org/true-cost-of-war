@@ -1,0 +1,35 @@
+{
+  "pageTitle": "The True Cost of War — Unified Candidate",
+  "eyebrow": "Peaceful World · Interactive model",
+  "title": "The True Cost of War",
+  "lead": "A shared-runtime preview of the economic and human cost model. This candidate is for architecture and behavior testing before any production change.",
+  "language": "Language",
+  "timeframe": "Timeframe",
+  "birthYear": "Birth year",
+  "redirectedShare": "Redirected share",
+  "opportunityTitle": "What the same resources could support",
+  "legacyLink": "Open current visual-parity version",
+  "legacyNote": "Compare the two versions side by side while the shared template is being rebuilt.",
+  "metrics": {
+    "militarySpend": "Military expenditure",
+    "directDeaths": "Direct deaths",
+    "indirectDeaths": "Indirect deaths",
+    "lifeYearsLost": "Life-years lost",
+    "infrastructureDamage": "Infrastructure damage",
+    "economicSetback": "Legacy economic setback",
+    "redirectedAmount": "Redirected amount",
+    "schoolsEquivalent": "Schools equivalent",
+    "educationMultiples": "Education benchmark multiples",
+    "healthMultiples": "Primary health care benchmark multiples"
+  },
+  "modes": {
+    "year": "Year to date (Live)",
+    "1year": "Last 365 days",
+    "10years": "Last 10 years",
+    "lifetime": "During my lifetime",
+    "day": "One day",
+    "hour": "One hour",
+    "minute": "One minute",
+    "since1945": "Since 1945"
+  }
+}
