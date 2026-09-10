@@ -3,7 +3,8 @@
 
 The candidate is intentionally isolated from production. It uses one HTML
 shell, one CSS file, one JavaScript application, the shared calculation
-runtime, and one JSON locale file per supported language.
+runtime, a small shareable-state helper, and one JSON locale file per supported
+language.
 """
 
 from __future__ import annotations
@@ -63,7 +64,13 @@ def load_json(path: Path) -> dict:
 
 
 def validate() -> list[str]:
-    for required in (SOURCE / "index.html", SOURCE / "app.css", SOURCE / "app.mjs", SOURCE / "locales" / "manifest.json"):
+    for required in (
+        SOURCE / "index.html",
+        SOURCE / "app.css",
+        SOURCE / "app.mjs",
+        SOURCE / "state.mjs",
+        SOURCE / "locales" / "manifest.json",
+    ):
         if not required.is_file():
             raise SystemExit(f"Missing unified candidate source: {required.relative_to(ROOT)}")
 
@@ -121,6 +128,8 @@ def validate() -> list[str]:
         raise SystemExit("unified/app.mjs must use the shared calculation runtime")
     if "../data/model.json" not in app:
         raise SystemExit("unified/app.mjs must load the canonical legacy data file")
+    if "./state.mjs" not in app or "readCandidateState" not in app or "writeCandidateState" not in app:
+        raise SystemExit("unified/app.mjs must use the shareable preview state helper")
 
     return sorted(route_languages)
 
@@ -142,8 +151,8 @@ def main() -> None:
     manifest = {
         "schemaVersion": 1,
         "status": "preview-not-production",
-        "candidate": "unified-v0.1",
-        "architecture": "one HTML + one CSS + one JS app + one locale JSON per language + shared data/runtime",
+        "candidate": "unified-v0.2",
+        "architecture": "one HTML + one CSS + one JS app + one state helper + one locale JSON per language + shared data/runtime",
         "languageCount": len(languages),
         "languages": languages,
         "outputs": outputs,
@@ -153,7 +162,7 @@ def main() -> None:
         encoding="utf-8",
     )
 
-    print(f"Built unified candidate for {len(languages)} languages")
+    print(f"Built unified candidate v0.2 for {len(languages)} languages")
     print("Production files changed: 0")
     print("Preview entrypoint: unified/index.html?lang=<language>")
 
