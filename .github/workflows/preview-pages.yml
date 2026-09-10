@@ -58,6 +58,9 @@ jobs:
       - name: Build localized visual-parity shadows
         run: python scripts/build_shadow_parity.py
 
+      - name: Build unified multilingual candidate
+        run: python scripts/build_unified_candidate.py
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
