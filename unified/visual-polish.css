@@ -119,19 +119,16 @@
   top: -1px;
 }
 
-/* Live values should feel like a stream rather than discrete DOM jumps. The
-   actual arithmetic remains untouched; visual interpolation is progressive
-   enhancement and disabled for reduced-motion users. */
+/* Live numeric text is deliberately motionless as an element. The numbers
+   themselves advance on every animation frame in visual-polish.mjs. This
+   prevents the whole value from bobbing vertically while keeping digit widths
+   stable as the counter changes. */
 .pw-flow-value {
-  transform-origin: 50% 50%;
-  will-change: transform, opacity, filter;
-  backface-visibility: hidden;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pw-flow-value {
-    will-change: auto;
-  }
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
 }
 
 @media (max-width: 600px) {
