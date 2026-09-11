@@ -52,6 +52,10 @@
 .pw-hero-info-row .pw-lead { flex: 1; }
 @media (max-width: 600px) {
   .pw-parity-popover { display: none !important; }
-  .pw-hero-info-row { gap: 6px; }
+  .pw-hero-info-row { gap: 6px; flex-wrap: wrap; }
   .pw-parity-info { flex: 0 0 22px; }
+  .pw-hero-info-row > .pw-parity-inline-popover,
+  .pw-counter-value-row > .pw-parity-inline-popover {
+    flex: 0 0 100%;
+  }
 }
