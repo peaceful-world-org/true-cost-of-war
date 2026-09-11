@@ -260,6 +260,8 @@ def extract(language: str, source: Path) -> dict:
     share_range = find_id(root, "pw2-shareRange")
     opportunity_section = ancestor(share_range, "pw2-section")
     scenario_spectrum = find_class(opportunity_section, "pw2-range-subtitle")
+    scenario_title = find_class(opportunity_section, "pw2-range-title")
+    scenario_tooltip = find_class(scenario_title, "pw2-tooltip")
 
     programmes = {
         "education": programme(root, language, "pw2-educationEquivalent", "education"),
@@ -283,6 +285,8 @@ def extract(language: str, source: Path) -> dict:
     year_label = node_text(previous_element(scale_year), exclude_classes={"pw2-tooltip"})
 
     mission_block = find_id(root, "pw2-mission-block")
+    fund_heading = find_class(mission_block, "pw2-pf-header")
+    fund_subtitle = find_class(mission_block, "pw2-pf-subtitle")
     cta = find_class(mission_block, "pw2-cta-main")
     philosophy = find_class(root, "pw2-philosophy-card")
     philosophy_intros = find_all_class(philosophy, "pw2-intro")
@@ -332,7 +336,11 @@ def extract(language: str, source: Path) -> dict:
         "opportunity": {
             "title": require(node_text(find_class(opportunity_section, "pw2-h2"), exclude_classes={"pw2-tooltip"}), language, "opportunity.title"),
             "intro": require(node_text(find_class(opportunity_section, "pw2-intro"), exclude_classes={"pw2-tooltip"}), language, "opportunity.intro"),
+            "scenarioTitle": require(node_text(scenario_title, exclude_classes={"pw2-info-trigger", "pw2-tooltip"}), language, "opportunity.scenarioTitle"),
+            "scenarioTooltip": require(node_text(scenario_tooltip), language, "opportunity.scenarioTooltip"),
             "scenarioSpectrum": require(node_text(scenario_spectrum, exclude_classes={"pw2-tooltip"}), language, "opportunity.scenarioSpectrum"),
+            "fundHeading": require(node_text(fund_heading, exclude_classes={"pw2-tooltip"}), language, "opportunity.fundHeading"),
+            "fundSubtitle": require(node_text(fund_subtitle, exclude_classes={"pw2-tooltip"}), language, "opportunity.fundSubtitle"),
             "showMore": require(node_text(show_more, exclude_classes={"pw2-tooltip"}), language, "opportunity.showMore"),
             "programmes": programmes,
         },
