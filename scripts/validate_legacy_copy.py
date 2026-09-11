@@ -18,7 +18,7 @@ HERO = {"subtitle", "livePrefix", "liveSuffix", "liveTemplate", "lead", "tooltip
 SESSION = {"title", "note", "alternatives", "foodTemplate", "healthTemplate", "povertyTemplate"}
 OPPORTUNITY = {
     "title", "intro", "scenarioTitle", "scenarioTooltip", "scenarioSpectrum",
-    "fundHeading", "fundSubtitle", "showMore", "programmes",
+    "fundHeading", "fundSubtitle", "mobileFundSubtitle", "showMore", "programmes",
 }
 NARRATIVE = {
     "scaleHeading", "scaleTitle", "day", "month", "year", "missionHeading", "missionCopy",
