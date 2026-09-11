@@ -85,6 +85,12 @@
       await delay(320);
       assert(new URL(win.location.href).searchParams.get('mode') === 'lifetime', 'timeframe interaction persists to URL state');
 
+      const birthYear = doc.querySelector('#birthYear');
+      birthYear.value = '1985';
+      birthYear.dispatchEvent(new Event('input', { bubbles: true }));
+      await delay(320);
+      assert(new URL(win.location.href).searchParams.get('year') === '1985', 'birth-year interaction persists to URL state');
+
       const toggle = doc.querySelector('#programmeToggle');
       assert(toggle.hidden === false, 'mobile-width programme disclosure control is available');
       assert(doc.querySelectorAll('.pw-programme[data-mobile-extra="true"][hidden]').length === 5, 'five extra programmes start collapsed on mobile');
@@ -96,22 +102,44 @@
       heroInfo.click();
       await waitFor(() => heroInfo.getAttribute('aria-expanded') === 'true', 'mobile tooltip open state');
       assert(Boolean(doc.querySelector('.pw-parity-inline-popover')), 'mobile methodology tooltip renders inline');
+      doc.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await waitFor(() => heroInfo.getAttribute('aria-expanded') === 'false', 'Escape closes methodology tooltip');
+      assert(!doc.querySelector('.pw-parity-inline-popover'), 'closed mobile tooltip is removed from layout');
 
       doc.querySelector('#buildText').click();
       await waitFor(() => !doc.querySelector('#shareTextWrap').hidden, 'text summary visibility');
-      const summary = doc.querySelector('#shareTextOutput').textContent;
-      assert(summary.includes('Peaceful World') && summary.length > 100, 'text summary is populated with shareable content');
+      const englishSummary = doc.querySelector('#shareTextOutput').textContent;
+      assert(englishSummary.includes('Peaceful World') && englishSummary.length > 100, 'text summary is populated with shareable content');
+
+      doc.querySelector('#copyText').click();
+      await waitFor(() => doc.querySelector('#copyState').textContent.trim().length > 0, 'copy feedback');
+      assert(doc.querySelector('#copyState').textContent.trim().length > 0, 'copy action reports success or fallback guidance');
 
       doc.querySelector('#buildCard').click();
       await waitFor(() => doc.querySelector('#shareCardPreview').src.startsWith('data:image/png'), 'infographic generation');
+      const card = doc.querySelector('#shareCardPreview');
+      await waitFor(() => card.naturalWidth > 0 && card.naturalHeight > 0, 'infographic image decode');
       assert(!doc.querySelector('#shareCardWrap').hidden, 'generated infographic preview becomes visible');
+      assert(card.naturalWidth === 1080 && card.naturalHeight === 1080, 'generated infographic is exactly 1080×1080');
+      const englishCardSrc = card.src;
 
       const language = doc.querySelector('#language');
       language.value = 'ar';
       language.dispatchEvent(new Event('change', { bubbles: true }));
       await waitFor(() => doc.documentElement.lang === 'ar' && doc.documentElement.dir === 'rtl', 'Arabic RTL language switch');
-      assert(doc.querySelector('#title').textContent.trim() !== 'The True Cost of War', 'Arabic title replaces English copy');
+      const arabicTitle = doc.querySelector('#title').textContent.trim();
+      assert(arabicTitle && arabicTitle !== 'The True Cost of War', 'Arabic title replaces English copy');
 
+      doc.querySelector('#buildText').click();
+      await waitFor(() => doc.querySelector('#shareTextOutput').textContent.startsWith(arabicTitle), 'Arabic summary regeneration');
+      assert(doc.querySelector('#shareTextOutput').textContent !== englishSummary, 'shareable text regenerates after language switch');
+
+      doc.querySelector('#buildCard').click();
+      await waitFor(() => card.src.startsWith('data:image/png') && card.src !== englishCardSrc, 'Arabic infographic regeneration');
+      await waitFor(() => card.naturalWidth === 1080 && card.naturalHeight === 1080, 'Arabic infographic image decode');
+      assert(card.naturalWidth === 1080 && card.naturalHeight === 1080, 'RTL infographic preserves 1080×1080 output');
+
+      resizeHeight = 0;
       win.postMessage({ type: 'pw2-request-resize' }, '*');
       await waitFor(() => resizeHeight > 0, 'iframe resize response');
       assert(resizeHeight > 300, 'embed resize contract returns a useful height');
