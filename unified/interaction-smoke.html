@@ -70,8 +70,10 @@
       await waitFor(() => doc.querySelector('#personalBurden')?.textContent.trim() !== '—', 'financial KPI rendering');
       await waitFor(() => doc.querySelector('#impactTotalAmount')?.textContent.trim() !== '—', 'development fund rendering');
 
+      const language = doc.querySelector('#language');
       assert(doc.documentElement.classList.contains('pw-embed-mode'), 'embed mode bootstraps inside iframe');
       assert(doc.documentElement.dir === 'ltr', 'English starts in LTR mode');
+      assert(language?.selectedOptions[0]?.textContent.trim() === 'EN', 'mobile language selector uses compact labels');
       assert(doc.querySelector('#shareLabel')?.textContent.trim() === '10%', 'initial redistribution share is 10%');
       assert(doc.querySelector('#mainCounterValue')?.textContent.trim() !== '—', 'main counter renders a calculated value');
 
@@ -118,11 +120,32 @@
 
       const heroInfo = doc.querySelector('.pw-parity-info[data-tooltip-key="hero"]');
       heroInfo.click();
-      await waitFor(() => heroInfo.getAttribute('aria-expanded') === 'true', 'mobile tooltip open state');
-      assert(Boolean(doc.querySelector('.pw-parity-inline-popover')), 'mobile methodology tooltip renders inline');
+      await waitFor(() => heroInfo.getAttribute('aria-expanded') === 'true', 'mobile hero tooltip open state');
+      let inlinePopover = doc.querySelector('.pw-parity-inline-popover');
+      assert(Boolean(inlinePopover), 'mobile methodology tooltip renders inline');
+      assert(heroInfo.closest('.pw-hero-info-row')?.contains(inlinePopover), 'hero tooltip stays beside the lead on mobile');
       doc.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await waitFor(() => heroInfo.getAttribute('aria-expanded') === 'false', 'Escape closes methodology tooltip');
       assert(!doc.querySelector('.pw-parity-inline-popover'), 'closed mobile tooltip is removed from layout');
+
+      const mainInfo = doc.querySelector('.pw-parity-info[data-tooltip-key="main"]');
+      assert(Boolean(mainInfo), 'main period info control is restored');
+      mainInfo.click();
+      await waitFor(() => mainInfo.getAttribute('aria-expanded') === 'true', 'mobile main period tooltip opens');
+      inlinePopover = doc.querySelector('.pw-parity-inline-popover');
+      assert(mainInfo.closest('.pw-counter-value-row')?.contains(inlinePopover), 'main period tooltip stays beside the large value on mobile');
+      doc.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+      const scenarioInfo = doc.querySelector('.pw-parity-info[data-tooltip-key="scenario"]');
+      assert(Boolean(scenarioInfo), 'scenario info control is restored');
+      scenarioInfo.click();
+      await waitFor(() => scenarioInfo.getAttribute('aria-expanded') === 'true', 'mobile scenario tooltip opens');
+      inlinePopover = doc.querySelector('.pw-parity-inline-popover');
+      assert(
+        inlinePopover?.previousElementSibling?.classList.contains('pw-scenario-head'),
+        'scenario tooltip appears directly below the scenario heading on mobile',
+      );
+      doc.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 
       const missionInfo = doc.querySelector('.pw-parity-info[data-tooltip-key="missionFunding"]');
       const missionPercent = doc.querySelector('#missionPercentText');
@@ -131,7 +154,9 @@
       assert(doc.querySelectorAll('.pw-mission-primary-copy strong').length >= 2, 'mission copy restores emphasized 1-second and 7-second spans');
       missionInfo.click();
       await waitFor(() => missionInfo.getAttribute('aria-expanded') === 'true', 'mission funding tooltip opens');
-      assert((doc.querySelector('.pw-parity-inline-popover')?.textContent || '').length > 60, 'mission funding tooltip uses extracted source copy');
+      inlinePopover = doc.querySelector('.pw-parity-inline-popover');
+      assert((inlinePopover?.textContent || '').length > 60, 'mission funding tooltip uses extracted source copy');
+      assert(missionInfo.closest('.pw-mission-primary-copy')?.contains(inlinePopover), 'mission funding tooltip stays with its paragraph on mobile');
       doc.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await waitFor(() => missionInfo.getAttribute('aria-expanded') === 'false', 'Escape closes mission funding tooltip');
 
@@ -167,10 +192,10 @@
       assert(card.naturalWidth === 1080 && card.naturalHeight === 1080, 'generated infographic is exactly 1080×1080');
       const englishCardSrc = card.src;
 
-      const language = doc.querySelector('#language');
       language.value = 'ar';
       language.dispatchEvent(new Event('change', { bubbles: true }));
       await waitFor(() => doc.documentElement.lang === 'ar' && doc.documentElement.dir === 'rtl', 'Arabic RTL language switch');
+      await waitFor(() => language.selectedOptions[0]?.textContent.trim() === 'AR', 'Arabic compact language label');
       const arabicTitle = doc.querySelector('#title').textContent.trim();
       assert(arabicTitle && arabicTitle !== 'The True Cost of War', 'Arabic title replaces English copy');
       await waitFor(() => doc.querySelector('.pw-parity-info[data-tooltip-key="missionFunding"]'), 'Arabic mission parity rebuild');
