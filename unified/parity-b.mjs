@@ -220,12 +220,13 @@ function renderDynamic() {
 
   const share = snap.sharePercent;
   const development = snap.opportunityCosts.redirected;
-  const defence = Math.max(0, snap.totals.militarySpend - development);
   const developmentShort = formatMoney(development, m, { short: true });
-  setText(el.developmentAllocationValue, `${share}% · ${developmentShort}`);
-  setText(el.defenceAllocationValue, `${100 - share}% · ${formatMoney(defence, m, { short: true })}`);
+  setText(el.developmentAllocationValue, `${share}%`);
+  setText(el.defenceAllocationValue, `${100 - share}%`);
   setText(document.querySelector('#impactTotalAmount'), developmentShort);
   setText(document.querySelector('#mobileImpactTotalAmount'), developmentShort);
+  const allocation = document.querySelector('.pw-allocation');
+  if (allocation) allocation.style.setProperty('--development-share', `${share}%`);
   if (el.developmentAllocationBar) el.developmentAllocationBar.style.width = `${share}%`;
   if (el.defenceAllocationBar) el.defenceAllocationBar.style.width = `${100 - share}%`;
 
