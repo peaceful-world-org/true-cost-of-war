@@ -8,8 +8,6 @@
   <style>
     body { margin: 0; font: 13px/1.4 system-ui, sans-serif; background: #111827; color: #e5e7eb; }
     #smokeResults { margin: 0; padding: 12px; white-space: pre-wrap; }
-    /* Keep frames transparent but inside the rendered viewport so Chromium
-       performs real layout and getBoundingClientRect remains meaningful. */
     iframe { position: absolute; left: 0; top: 80px; opacity: 0; pointer-events: none; border: 0; }
     #desktopFrame { width: 1180px; height: 900px; }
     #mobileFrame { width: 390px; height: 844px; }
@@ -110,7 +108,8 @@
       assert(ms(mobileShell).borderRadius === '0px', 'mobile shell becomes edge-to-edge');
       assert(Math.abs(px(ms(mobileShell).paddingLeft) - 16) < 0.5, 'mobile shell keeps 16px production gutter');
       assert(ms(mobileHero).display === 'flex', 'mobile hero uses deterministic flex ordering');
-      assert(ms(mobileCounter).order === '3' && ms(mobileLead).order === '4' && ms(mobileTime).order === '5', 'mobile hero order contract matches production');
+      const orderValues = `${ms(mobileCounter).order}/${ms(mobileLead).order}/${ms(mobileTime).order}`;
+      assert(ms(mobileCounter).order === '3' && ms(mobileLead).order === '4' && ms(mobileTime).order === '5', `mobile hero order contract matches production (${orderValues})`);
       assert(mobileCounter.getBoundingClientRect().top < mobileLead.getBoundingClientRect().top, 'mobile hero counter appears before long explanatory lead');
       assert(mobileLead.getBoundingClientRect().top < mobileTime.getBoundingClientRect().top, 'mobile lead appears before timeframe controls');
       assert(mobileTime.getBoundingClientRect().top < mobileGrid.getBoundingClientRect().top, 'mobile timeframe controls appear before impact cards');
