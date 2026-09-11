@@ -79,14 +79,27 @@ Goal: migrate the proven product into the unified architecture without redesigni
 - [x] Generated infographic decodes as exactly 1080×1080
 - [x] Language switching to Arabic updates `lang`, `dir`, visible copy, text summary and generated infographic
 - [x] Embed request/response returns a useful `pw2-resize` height inside a real iframe
+- [x] Production-derived desktop geometry is regression-tested for shell, hero, counter, sections, slider and opportunity split
+- [x] Production-derived mobile geometry is regression-tested for edge-to-edge shell, hero order, flattened scenario/programme surfaces and collapsed opportunity split
 
 These checks run against the built preview bundle before GitHub Pages deployment. They are regression gates, not a substitute for final human visual comparison on real desktop and mobile devices.
+
+## Visual parity calibration
+
+- [x] Production visual tokens are mapped from the existing calculator source rather than recreated by eye
+- [x] Desktop shell, typography scale, hero counter, cards, sections and redistribution controls use production-derived values
+- [x] Opportunity programmes and Peaceful World fund restore the reference desktop split layout
+- [x] Mobile hero narrative order follows the reference sequence despite the runtime methodology wrapper
+- [x] Mobile surfaces flatten to the reference edge-to-edge hierarchy
+- [ ] Human RU/EN desktop comparison complete
+- [ ] Human RU/EN mobile comparison complete
+- [ ] Human AR/FA RTL comparison complete
 
 ## Current migration note
 
 The unified preview now carries the major reference interaction and narrative surfaces and no longer relies on an RU/EN-only parity layer. During CI, the wording already published in each localized calculator is extracted into a generated, validated copy corpus and consumed by the shared runtime. Small labels that exist only in the new unified shell live in one explicit 11-language UI-copy module.
 
-Automated browser smoke is now complete across all 11 locales, with interaction-level coverage for URL state, lifetime controls, mobile disclosure, tooltips, sharing, 1080×1080 image generation, Arabic RTL switching and iframe resizing. The remaining work is deliberately concentrated in human device/visual testing, AR/FA visual RTL validation, RU/EN visual calibration against the reference, real-host embed verification, and the final independent parity council review. Detailed visual tuning remains deferred until those gates are stable. Production remains untouched.
+The first production-derived visual calibration is also in place. It maps the reference shell, typography, counters, cards, scenario controls, opportunity split and mobile flattening onto the unified DOM without changing calculations or production routes. Automated Chromium now checks both behavioural parity and key visual geometry before Pages deployment. Remaining visual work is deliberately human-reviewed: RU/EN desktop/mobile comparison, AR/FA RTL comparison, real-host embed verification and the final independent parity council review. Production remains untouched.
 
 ## Promotion gates
 
