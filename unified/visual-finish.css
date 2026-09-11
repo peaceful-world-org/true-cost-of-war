@@ -1,7 +1,7 @@
 /* Final-stage parity refinements for the current RU/EN review pass. */
 
-/* Preview-only engineering panels stay available through ?debug=1, but do not
-   participate in the normal visual comparison against production. */
+/* Preview-only engineering panels do not participate in the normal visual
+   comparison against production. */
 .pw-method,
 .pw-compare,
 .pw-debug {
@@ -12,6 +12,35 @@ html[data-preview-debug="true"] .pw-compare,
 html[data-preview-debug="true"] .pw-debug {
   display: block;
   opacity: .72;
+}
+
+/* Production places the main methodology control directly beside the large
+   period total, not inside the period kicker. */
+.pw-counter-value-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.pw-counter-value-row .pw-counter-value {
+  min-width: 0;
+}
+.pw-counter-value-row .pw-parity-info {
+  flex: 0 0 22px;
+}
+
+/* The reference session box measures active time but does not expose a timer. */
+#viewerElapsed {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* The production dissemination/share section is a softer green surface rather
@@ -53,14 +82,15 @@ html[data-preview-debug="true"] .pw-debug {
 }
 
 /* Keep production label/value hierarchy once icons are restored. */
-.pw-reference-card-label {
-  align-items: center;
-}
+.pw-reference-card-label,
 .pw-programme-name {
   align-items: center;
 }
 
 @media (max-width: 600px) {
+  .pw-counter-value-row {
+    gap: 10px;
+  }
   .pw-share-section {
     margin-top: 32px;
     padding: 32px 0 0;
