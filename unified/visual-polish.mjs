@@ -1,38 +1,37 @@
-// UX-only presentation layer for the first-screen live counters.
+// Final presentation ownership for the first-screen session-spend counter.
 //
-// Goal: preserve the calm scale-aware behaviour of the original calculator,
-// while removing the visible 80 ms stepping that made the sub-million counter
-// feel jerky in the unified build.
+// Important: this is a literal port of the production calculator behaviour,
+// not a new animation. The reference implementation uses active visible time,
+// a requestAnimationFrame loop, an 80 ms live gate after the initial 1200 ms
+// transition window, and the legacy short-money formatter. We preserve those
+// mechanics here exactly while keeping the unified calculation architecture.
 //
-// Below $1m the monetary counter follows active time on every animation frame,
-// so the count-up reads as one continuous flow. At $1m+ visible precision drops
-// sharply: one decimal in millions, then progressively coarser billion/trillion
-// notation. The number element itself never moves, fades or blurs.
+// app.mjs already holds a reference to #viewerSpend. At window load we replace
+// that one visible node with a clone. The old app reference then points to the
+// detached node and cannot flash a competing formatter into the live UI. This
+// module becomes the sole writer of the visible session-spend value.
 
-import { formatInteger, formattingProfile } from '../src/format.mjs';
+import { formattingProfile } from '../src/format.mjs';
 
-const REFERENCE_SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
-const MILLION_THRESHOLD = 1e6;
-const DERIVED_CADENCE_MS = 250;
-const SESSION_EQUIVALENTS = Object.freeze({ food: 62.5, health: 125, poverty: 1000 });
+const ORIGINAL_SECONDS_PER_YEAR = 31557600;
+const ORIGINAL_LIVE_CADENCE_MS = 80;
+const ORIGINAL_TRANSITION_MS = 1200;
 
 const [manifest, modelDocument] = await Promise.all([
   fetch('./locales/manifest.json', { cache: 'no-store' }).then((response) => response.json()),
   fetch('../data/model.json', { cache: 'no-store' }).then((response) => response.json()),
 ]);
 
-const perSecond = modelDocument.values.annualMilitarySpend / REFERENCE_SECONDS_PER_YEAR;
-const viewerSpend = document.querySelector('#viewerSpend');
-const sessionFood = document.querySelector('#sessionFood');
-const sessionHealth = document.querySelector('#sessionHealth');
-const sessionPoverty = document.querySelector('#sessionPoverty');
-const ownedNodes = [viewerSpend, sessionFood, sessionHealth, sessionPoverty].filter(Boolean);
-const lastRendered = new Map();
+const annualMilitarySpend = modelDocument.values.annualMilitarySpend;
+const spendPerSecond = annualMilitarySpend / ORIGINAL_SECONDS_PER_YEAR;
 
-let accumulatedMs = 0;
-let activeSince = document.hidden ? null : performance.now();
-let frameId = null;
-let lastDerivedPaintAt = 0;
+let viewerSpend = null;
+let activeTimeMs = 0;
+let lastVisibleTime = Date.now();
+let lastModeChangeTime = Date.now();
+let animationFrameId = null;
+let lastRenderTime = 0;
+let initialized = false;
 
 function languageKey() {
   return document.querySelector('#language')?.value || new URLSearchParams(location.search).get('lang') || 'en';
@@ -42,147 +41,178 @@ function currentMeta() {
   return manifest.languages[languageKey()] || manifest.languages.en;
 }
 
-function elapsedActiveMs(now = performance.now()) {
-  return accumulatedMs + (activeSince === null ? 0 : Math.max(0, now - activeSince));
+function currentMode() {
+  return document.querySelector('#mode')?.value || 'year';
 }
 
-function setActive(active, now = performance.now()) {
-  if (active) {
-    if (activeSince === null) activeSince = now;
-    return;
-  }
-  if (activeSince !== null) {
-    accumulatedMs += Math.max(0, now - activeSince);
-    activeSince = null;
-  }
+function isLiveMode(mode = currentMode()) {
+  return mode === 'year' || mode === 'since1945' || mode === 'lifetime';
 }
 
-// Scale-aware display strategy tuned for perceptual flow:
-//   < $1m   -> whole dollars, updated every animation frame
-//   $1m+    -> one decimal million (calm, but still visibly alive)
-//   $1b+    -> up to three decimals in billions
-//   $1t+    -> up to three decimals in trillions
-// This keeps the early count-up fluid, then progressively reduces the number
-// of changing digits as the magnitude grows.
-function formatFlowMoney(value, meta) {
+function cleanNumber(value) {
+  return String(value).replace(/[\s\u202F\u00A0]/g, '\u00A0');
+}
+
+// Exact `formatMoneyHTML(value, true)` thresholds used by the production RU
+// calculator. Locale metadata only supplies the already-established unified
+// number locale / unit labels; the precision rules are the legacy rules.
+function originalShortMoneyParts(value, meta) {
   const profile = formattingProfile(meta);
   const original = Number.isFinite(Number(value)) ? Number(value) : 0;
   const absolute = Math.abs(original);
   let scaled = absolute;
   let unit = '';
-  let minimumFractionDigits = 0;
-  let maximumFractionDigits = 0;
+  let options = {};
 
   if (absolute >= 1e12) {
     scaled = absolute / 1e12;
     unit = profile.units.trillion;
-    maximumFractionDigits = 3;
+    options = { minimumFractionDigits: 1, maximumFractionDigits: 1 };
   } else if (absolute >= 1e9) {
     scaled = absolute / 1e9;
     unit = profile.units.billion;
-    maximumFractionDigits = 3;
-  } else if (absolute >= MILLION_THRESHOLD) {
+    options = { minimumFractionDigits: 1, maximumFractionDigits: 2 };
+  } else if (absolute >= 1e6) {
     scaled = absolute / 1e6;
     unit = profile.units.million;
-    minimumFractionDigits = 1;
-    maximumFractionDigits = 1;
+    options = { maximumFractionDigits: 0 };
   } else {
     scaled = Math.round(absolute);
+    options = { maximumFractionDigits: 0 };
   }
 
-  const number = scaled.toLocaleString(profile.numberLocale || 'en-US', {
-    minimumFractionDigits,
-    maximumFractionDigits,
-  });
-  const signed = original < 0 ? `-${number}` : number;
-  const currency = profile.currencySymbol || '$';
-  const currencyGap = profile.currencyGap ?? '\u00a0';
-  const unitText = unit ? `${profile.unitGap ?? '\u00a0'}${unit}` : '';
-
-  return profile.currencyPosition === 'after'
-    ? `${signed}${unitText}${currencyGap}${currency}`
-    : `${currency}${currencyGap}${signed}${unitText}`;
-}
-
-function writeOwned(node, value) {
-  if (!node) return;
-  const text = String(value);
-  lastRendered.set(node, text);
-  if (node.textContent !== text) node.textContent = text;
-}
-
-function currentSession(now = performance.now()) {
-  const seconds = elapsedActiveMs(now) / 1000;
+  const localized = cleanNumber(scaled.toLocaleString(profile.numberLocale || 'en-US', options));
   return {
-    seconds,
-    spend: perSecond * seconds,
-    meta: currentMeta(),
+    number: original < 0 ? `-${localized}` : localized,
+    unit,
+    currency: profile.currencySymbol || '$',
+    currencyPosition: profile.currencyPosition || 'before',
   };
 }
 
-function renderViewer(now = performance.now()) {
-  const { spend, meta } = currentSession(now);
-  writeOwned(viewerSpend, formatFlowMoney(spend, meta));
+// Reproduce the production DOM structure too: currency sign is its own smaller
+// span, the number itself is nowrap, and the unit is a separate smaller span.
+function writeOriginalMoney(node, value, meta) {
+  if (!node) return;
+  const parts = originalShortMoneyParts(value, meta);
+  const numberWrap = document.createElement('span');
+  numberWrap.style.whiteSpace = 'nowrap';
+
+  const currency = document.createElement('span');
+  currency.className = 'pw2-currency-sign';
+  currency.textContent = parts.currency;
+
+  if (parts.currencyPosition === 'after') {
+    numberWrap.append(document.createTextNode(parts.number));
+  } else {
+    numberWrap.append(currency, document.createTextNode(`\u00a0${parts.number}`));
+  }
+
+  const children = [numberWrap];
+  if (parts.unit) {
+    const unit = document.createElement('span');
+    unit.className = 'pw2-val-unit';
+    unit.textContent = parts.unit;
+    children.push(unit);
+  }
+  if (parts.currencyPosition === 'after') {
+    children.push(document.createTextNode('\u00a0'), currency);
+  }
+
+  node.replaceChildren(...children);
 }
 
-function renderDerived(now = performance.now()) {
-  const { spend, meta } = currentSession(now);
-  writeOwned(sessionFood, formatInteger(Math.floor(spend / SESSION_EQUIVALENTS.food), meta));
-  writeOwned(sessionHealth, formatInteger(Math.floor(spend / SESSION_EQUIVALENTS.health), meta));
-  writeOwned(sessionPoverty, formatInteger(Math.floor(spend / SESSION_EQUIVALENTS.poverty), meta));
+function requestUpdate() {
+  if (!document.hidden && animationFrameId === null) {
+    animationFrameId = requestAnimationFrame(render);
+  }
 }
 
-function frame(now) {
-  frameId = null;
-  if (!document.hidden) {
-    // The dominant money counter follows the browser's display cadence. This is
-    // what removes the visible 80 ms staircase below $1m. Because formatFlowMoney
-    // reduces precision at larger scales, DOM text stops changing every frame
-    // once the total reaches the million range.
-    renderViewer(now);
+function render() {
+  animationFrameId = null;
+  if (!viewerSpend || document.hidden) return;
 
-    if (now - lastDerivedPaintAt >= DERIVED_CADENCE_MS) {
-      renderDerived(now);
-      lastDerivedPaintAt = now;
+  const mode = currentMode();
+  const live = isLiveMode(mode);
+  const timeSinceChange = Date.now() - lastModeChangeTime;
+  const isAnimating = Math.min(timeSinceChange / ORIGINAL_TRANSITION_MS, 1) < 1;
+  const now = Date.now();
+
+  // This line intentionally mirrors production: after the 1200 ms transition
+  // window, live modes paint at most once every 80 ms. During the transition
+  // window the same rAF loop is allowed to paint every frame.
+  if (!isAnimating && live && now - lastRenderTime < ORIGINAL_LIVE_CADENCE_MS) {
+    animationFrameId = requestAnimationFrame(render);
+    return;
+  }
+  lastRenderTime = now;
+
+  const currentActiveTime = document.hidden
+    ? activeTimeMs
+    : activeTimeMs + (Date.now() - lastVisibleTime);
+  const visitSpend = spendPerSecond * (currentActiveTime / 1000);
+  writeOriginalMoney(viewerSpend, visitSpend, currentMeta());
+
+  if (live || isAnimating) animationFrameId = requestAnimationFrame(render);
+}
+
+function takeExclusiveViewerOwnership() {
+  const existing = document.querySelector('#viewerSpend');
+  if (!existing) return null;
+  const clone = existing.cloneNode(true);
+  clone.classList.add('pw-flow-value');
+  existing.replaceWith(clone);
+  return clone;
+}
+
+function initialize() {
+  if (initialized) return;
+  initialized = true;
+  viewerSpend = takeExclusiveViewerOwnership();
+  if (!viewerSpend) return;
+
+  // Start from the same active-time origin and immediately enter the reference
+  // render loop. No MutationObserver and no second visible formatter remain.
+  lastVisibleTime = Date.now();
+  lastModeChangeTime = Date.now();
+  lastRenderTime = 0;
+  requestUpdate();
+
+  const mode = document.querySelector('#mode');
+  const handleModeChange = () => {
+    lastModeChangeTime = Date.now();
+    requestUpdate();
+  };
+  mode?.addEventListener('input', handleModeChange);
+  mode?.addEventListener('change', handleModeChange);
+
+  document.querySelector('#language')?.addEventListener('change', requestUpdate);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      activeTimeMs += Date.now() - lastVisibleTime;
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+    } else {
+      lastVisibleTime = Date.now();
+      const modeValue = currentMode();
+      if (isLiveMode(modeValue) || Date.now() - lastModeChangeTime < ORIGINAL_TRANSITION_MS) {
+        lastRenderTime = Date.now();
+        requestUpdate();
+      }
     }
-  }
-  frameId = requestAnimationFrame(frame);
+  });
+
+  document.documentElement.dataset.motionPolish = 'production-live-port';
 }
 
-// app.mjs / parity-b.mjs still calculate canonical values for the rest of the
-// interface. If either writes into a presentation node owned here, restore the
-// most recent polished value in the same microtask checkpoint. This prevents
-// competing formatters from flashing between frames.
-const observer = new MutationObserver(() => {
-  for (const node of ownedNodes) {
-    const expected = lastRendered.get(node);
-    if (expected !== undefined && node.textContent !== expected) node.textContent = expected;
-  }
-});
-for (const node of ownedNodes) {
-  node.classList.add('pw-flow-value');
-  observer.observe(node, { childList: true, characterData: true, subtree: true });
+// Waiting for load is deliberate: all earlier module scripts have captured
+// their DOM references by then, so replacing #viewerSpend cleanly isolates the
+// visible value without changing the rest of the unified runtime.
+if (document.readyState === 'complete') {
+  queueMicrotask(initialize);
+} else {
+  window.addEventListener('load', initialize, { once: true });
 }
-
-document.addEventListener('visibilitychange', () => {
-  const now = performance.now();
-  setActive(!document.hidden, now);
-  lastDerivedPaintAt = 0;
-  if (!document.hidden) {
-    renderViewer(now);
-    renderDerived(now);
-  }
-});
-
-const language = document.querySelector('#language');
-language?.addEventListener('change', () => {
-  const now = performance.now();
-  lastDerivedPaintAt = 0;
-  renderViewer(now);
-  renderDerived(now);
-});
-
-document.documentElement.dataset.motionPolish = 'smooth-scale-aware-flow';
-renderViewer(performance.now());
-renderDerived(performance.now());
-frameId = requestAnimationFrame(frame);
