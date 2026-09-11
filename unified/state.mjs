@@ -1,3 +1,5 @@
+import { LEGACY_TIME_MODES } from '../src/runtime.mjs';
+
 const DEFAULTS = Object.freeze({ mode: 'year', birthYear: '1990', share: '10' });
 
 function clampInteger(raw, min, max, fallback) {
@@ -10,7 +12,8 @@ export function readCandidateState(search, supportedLanguages, defaultLanguage =
   const params = new URLSearchParams(search || '');
   const requestedLanguage = params.get('lang');
   const language = supportedLanguages.includes(requestedLanguage) ? requestedLanguage : defaultLanguage;
-  const mode = params.get('mode') || DEFAULTS.mode;
+  const requestedMode = params.get('mode') || DEFAULTS.mode;
+  const mode = LEGACY_TIME_MODES.includes(requestedMode) ? requestedMode : DEFAULTS.mode;
   const share = clampInteger(params.get('share'), 5, 50, DEFAULTS.share);
   // Reference links historically use `year`; v0.2/v0.3 preview links used
   // `birth`. Read both during migration and write only the reference name.
