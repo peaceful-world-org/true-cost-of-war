@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>True Cost of War — Embed Smoke Harness</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; font: 14px/1.5 system-ui, sans-serif; background: #eef2f7; color: #172033; }
+    main { width: min(1240px, 100%); margin: 0 auto; }
+    header { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 18px; }
+    h1 { margin: 0; font-size: 20px; }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+    button { padding: 8px 12px; border: 1px solid #b7c0cc; border-radius: 8px; background: white; cursor: pointer; }
+    button[aria-pressed="true"] { border-color: #1e6da8; box-shadow: 0 0 0 2px rgba(30,109,168,.12); }
+    .status { margin: 0 0 12px; color: #526173; }
+    iframe { display: block; width: 100%; height: 900px; border: 1px solid #cbd5e1; border-radius: 12px; background: white; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Unified embed smoke harness</h1>
+        <div>Preview only · verifies <code>?embed=1</code>, <code>pw2-resize</code>, and RTL switching.</div>
+      </div>
+      <div class="controls" role="group" aria-label="Smoke-test language">
+        <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        <button type="button" data-lang="ar" aria-pressed="false">AR · RTL</button>
+        <button type="button" data-lang="fa" aria-pressed="false">FA · RTL</button>
+      </div>
+    </header>
+    <p class="status" id="status">Waiting for iframe resize message…</p>
+    <iframe id="calculator" title="True Cost of War unified embed preview" src="./?lang=ru&amp;embed=1"></iframe>
+  </main>
+  <script>
+    const frame = document.querySelector('#calculator');
+    const status = document.querySelector('#status');
+    const buttons = [...document.querySelectorAll('[data-lang]')];
+
+    function loadLanguage(language) {
+      for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.lang === language));
+      status.textContent = `Loading ${language}…`;
+      frame.src = `./?lang=${encodeURIComponent(language)}&embed=1`;
+    }
+
+    for (const button of buttons) button.addEventListener('click', () => loadLanguage(button.dataset.lang));
+
+    window.addEventListener('message', (event) => {
+      if (event.source !== frame.contentWindow) return;
+      if (!event.data || event.data.type !== 'pw2-resize') return;
+      const height = Math.ceil(Number(event.data.height));
+      if (!Number.isFinite(height) || height < 200 || height > 20000) return;
+      frame.style.height = `${height}px`;
+      const language = new URL(frame.src).searchParams.get('lang');
+      status.textContent = `PASS · ${language} · pw2-resize received · iframe height ${height}px`;
+    });
+
+    frame.addEventListener('load', () => {
+      frame.contentWindow?.postMessage({ type: 'pw2-request-resize' }, '*');
+    });
+  </script>
+</body>
+</html>
