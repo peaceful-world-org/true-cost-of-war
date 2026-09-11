@@ -76,6 +76,9 @@ jobs:
       - name: Validate built unified bundle
         run: python scripts/validate_unified_bundle.py
 
+      - name: Run real-browser smoke tests
+        run: python scripts/browser_smoke.py
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
