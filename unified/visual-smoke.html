@@ -56,6 +56,7 @@
       await waitFor(() => doc.querySelector('#debug')?.textContent.includes('language: en'), 'visual target runtime');
       await waitFor(() => doc.querySelectorAll('.pw-programme').length === 8, 'visual target programmes');
       await waitFor(() => doc.querySelector('#impactTotalAmount')?.textContent.trim() && doc.querySelector('#impactTotalAmount')?.textContent.trim() !== '—', 'fund summary amount');
+      await waitFor(() => doc.querySelector('#missionPercentText')?.textContent.includes('%'), 'mission percentage');
       return { win: frame.contentWindow, doc };
     }
 
@@ -79,6 +80,8 @@
       const range = d.querySelector('.pw-scenario-range');
       const split = d.querySelector('.pw-opportunity-split');
       const fund = d.querySelector('.pw-opportunity-fund');
+      const fundBar = d.querySelector('.pw-fund-bar-wrap');
+      const missionCard = d.querySelector('.pw-opportunity-fund .pw-mission-card');
       const philosophy = d.querySelector('.pw-philosophy-section');
       const scaleCard = d.querySelector('.pw-share-section .pw-scale-card');
 
@@ -93,11 +96,22 @@
       assert(Math.abs(px(ds(range).height) - 12) < 0.5, 'redistribution slider keeps 12px production track height');
       assert(hasTwoGridTracks(ds(split).gridTemplateColumns), 'desktop opportunity area keeps 1.1/0.9 split layout');
       assert(ds(fund).position === 'sticky', 'desktop opportunity fund keeps sticky production behaviour');
-      assert(Math.abs(px(ds(fund).paddingLeft) - 40) < 0.5, 'desktop development fund keeps 40px production padding');
+      assert(Math.abs(px(ds(fund).paddingLeft) - 40) < 0.5 && ds(fund).borderRadius === '24px', 'desktop development fund keeps single 40px / 24px production surface');
       assert(ds(fund).backgroundImage.includes('linear-gradient'), 'desktop development fund restores production gradient surface');
       assert(d.querySelector('.pw-fund-header') && d.querySelector('#impactTotalAmount'), 'desktop development fund restores reference summary');
+      assert(ds(fundBar).display === 'flex' && Math.abs(px(ds(fundBar).height) - 8) < 0.5, 'desktop development fund uses one composite 8px allocation bar');
+      assert(px(ds(missionCard).borderTopWidth) >= 1, 'desktop mission is the lower section of the same fund card');
       assert(Math.abs(px(ds(philosophy).paddingLeft) - 48) < 0.5 && ds(philosophy).borderRadius === '32px', 'desktop methodology section restores production section geometry');
       assert(Math.abs(px(ds(scaleCard).paddingLeft) - 40) < 0.5 && ds(scaleCard).borderRadius === '24px', 'desktop dissemination scale restores production viral-card geometry');
+
+      const missionPercentBefore = d.querySelector('#missionPercentText').textContent;
+      const shareControl = d.querySelector('#share');
+      shareControl.value = '25';
+      shareControl.dispatchEvent(new Event('input', { bubbles: true }));
+      await waitFor(() => d.querySelector('#developmentAllocationValue')?.textContent.trim() === '25%', '25 percent development label');
+      await waitFor(() => d.querySelector('#missionPercentText')?.textContent !== missionPercentBefore, 'mission percentage response');
+      assert(d.querySelector('#defenceAllocationValue')?.textContent.trim() === '75%', 'composite fund labels respond to redistribution slider');
+      assert(d.querySelector('#developmentAllocationBar')?.style.width === '25%' && d.querySelector('#defenceAllocationBar')?.style.width === '75%', 'composite fund bar responds to redistribution slider');
 
       const mobile = await load(mobileFrame, 'lang=en&mode=1year&share=10&year=1990');
       const m = mobile.doc;

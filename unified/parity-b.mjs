@@ -124,6 +124,12 @@ function snapshot() {
   });
 }
 
+function formatMissionPercent(redirected) {
+  if (!Number.isFinite(redirected) || redirected <= 0) return '0.00%';
+  const value = (perSecond / redirected) * 100;
+  return `${value < 0.0001 ? value.toFixed(7) : value.toFixed(5)}%`;
+}
+
 function renderStatic() {
   const t = copy();
   setText(el.heroSubtitle, t.subtitle);
@@ -225,6 +231,7 @@ function renderDynamic() {
   setText(el.defenceAllocationValue, `${100 - share}%`);
   setText(document.querySelector('#impactTotalAmount'), developmentShort);
   setText(document.querySelector('#mobileImpactTotalAmount'), developmentShort);
+  setText(document.querySelector('#missionPercentText'), formatMissionPercent(development));
   const allocation = document.querySelector('.pw-allocation');
   if (allocation) allocation.style.setProperty('--development-share', `${share}%`);
   if (el.developmentAllocationBar) el.developmentAllocationBar.style.width = `${share}%`;
@@ -251,6 +258,8 @@ function renderDynamic() {
         ? (numeric > 0 ? 100 : 0)
         : Math.min(100, Math.max(0, numeric * 100));
       row.style.setProperty('--progress', `${progress}%`);
+      row.classList.toggle('pw-overflow', key !== 'schools' && numeric >= 1 && numeric < 5);
+      row.classList.toggle('pw-overflow-massive', key !== 'schools' && numeric >= 5);
     }
   }
 }
