@@ -1,43 +1,5 @@
 import { formatMoney } from '../src/format.mjs';
-
-const REFERENCE_SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
-
-const COPY = Object.freeze({
-  ru: {
-    scaleHeading: 'Масштаб отвлечения ресурсов',
-    scaleTitle: 'Объем безвозвратно потерянных финансовых средств:',
-    day: 'В сутки:',
-    month: 'В месяц:',
-    year: 'В год:',
-    missionHeading: 'Потенциал микроперераспределения',
-    missionCopy: 'Даже незначительная реаллокация средств способна обеспечить реализацию масштабных программ. Объем глобальных военных расходов за 1 секунду эквивалентен бюджету, достаточному для запуска международной инфраструктуры мирного образования.',
-    missionMetricPrefix: '1 секунда глобальных военных расходов ≈',
-    impact: 'Модель демонстрирует высокую рентабельность социальных инвестиций: небольшие доли глобальных расходов могут превращаться в инфраструктуру для масштабного мирного просвещения.',
-    cta: 'Поддержать программу',
-    philosophyTitle: 'Методологическое обоснование проекта',
-    philosophyCopy: 'Цель данной макромодели — перевод экономических последствий вооруженных конфликтов в измеримые показатели. Оборонные бюджеты рассматриваются как ресурсы, отвлеченные от программ глобального развития: строительства инфраструктуры, медицинских исследований и повышения качества жизни.',
-    quote: '«Поскольку войны начинаются в умах людей, именно в умах людей должны строиться защитные силы мира.»',
-    quoteSource: '— Устав ЮНЕСКО',
-    closing: 'Институциональная деятельность Peaceful World сфокусирована на развитии глобальной архитектуры мирного образования. Превентивное формирование культуры ненасилия требует значительно меньших инвестиций по сравнению с затратами на преодоление последствий вооруженных конфликтов.',
-  },
-  en: {
-    scaleHeading: 'Scale of diverted resources',
-    scaleTitle: 'Financial resources irreversibly diverted:',
-    day: 'Per day:',
-    month: 'Per month:',
-    year: 'Per year:',
-    missionHeading: 'The potential of micro-redistribution',
-    missionCopy: 'Even a very small reallocation can support substantial programmes. One second of global military expenditure is comparable to a budget capable of launching international infrastructure for peace education.',
-    missionMetricPrefix: '1 second of global military expenditure ≈',
-    impact: 'The model illustrates the leverage of social investment: very small fractions of global expenditure can finance infrastructure for peace education at scale.',
-    cta: 'Support the programme',
-    philosophyTitle: 'Methodological rationale',
-    philosophyCopy: 'The purpose of this macro model is to translate the economic consequences of armed conflict into measurable indicators. Military budgets are treated as resources diverted from global development, including infrastructure, medical research and quality of life.',
-    quote: '“Since wars begin in the minds of men, it is in the minds of men that the defences of peace must be constructed.”',
-    quoteSource: '— Constitution of UNESCO',
-    closing: 'Peaceful World focuses on building a global architecture for peace education. Preventive investment in a culture of nonviolence requires far fewer resources than responding to the consequences of armed conflict.',
-  },
-});
+import { legacyCopy } from './legacy-copy.mjs';
 
 const [manifest, modelDocument] = await Promise.all([
   fetch('./locales/manifest.json', { cache: 'no-store' }).then((r) => r.json()),
@@ -46,16 +8,15 @@ const [manifest, modelDocument] = await Promise.all([
 const model = modelDocument.values;
 
 function language() {
-  return document.querySelector('#language')?.value === 'ru' ? 'ru' : 'en';
+  return document.querySelector('#language')?.value || 'en';
 }
 
-function copy() {
-  return COPY[language()];
+function narrative() {
+  return legacyCopy(language()).narrative;
 }
 
 function meta() {
-  const key = document.querySelector('#language')?.value || 'en';
-  return manifest.languages[key] || manifest.languages.en;
+  return manifest.languages[language()] || manifest.languages.en;
 }
 
 function section(tag, className) {
@@ -69,7 +30,7 @@ function build() {
   const anchor = document.querySelector('.pw-share-section') || document.querySelector('.pw-method');
   if (!anchor) return;
 
-  const t = copy();
+  const t = narrative();
   const m = meta();
   const wrapper = section('div', 'pw-parity-narrative');
   wrapper.id = 'parityNarrative';
@@ -102,24 +63,22 @@ function build() {
   const missionCard = section('div', 'pw-mission-card');
   const missionHeading = section('div', 'pw-mission-heading');
   missionHeading.textContent = t.missionHeading;
-  const missionTitle = section('div', 'pw-mission-title');
-  missionTitle.textContent = t.missionCopy;
+  const missionCopy = section('div', 'pw-mission-title');
+  missionCopy.textContent = t.missionCopy;
   const missionHighlight = section('div', 'pw-mission-highlight');
-  const metricLabel = document.createElement('strong');
-  metricLabel.textContent = `${t.missionMetricPrefix} `;
-  const metric = section('span', 'pw-mission-metric');
-  metric.textContent = formatMoney(model.annualMilitarySpend / REFERENCE_SECONDS_PER_YEAR, m);
+  const impactTitle = document.createElement('strong');
+  impactTitle.textContent = t.impactTitle;
   const impact = section('div', 'pw-mission-copy');
   impact.style.marginTop = '12px';
   impact.textContent = t.impact;
-  missionHighlight.append(metricLabel, metric, impact);
+  missionHighlight.append(impactTitle, impact);
   const cta = document.createElement('a');
   cta.className = 'pw-mission-cta';
-  cta.href = language() === 'ru' ? 'https://peaceful-world.org/help/ru' : 'https://peaceful-world.org/help/';
+  cta.href = t.ctaHref || 'https://peaceful-world.org/help/';
   cta.target = '_blank';
   cta.rel = 'noopener noreferrer';
   cta.textContent = t.cta;
-  missionCard.append(missionHeading, missionTitle, missionHighlight, cta);
+  missionCard.append(missionHeading, missionCopy, missionHighlight, cta);
   mission.append(missionCard);
 
   const philosophy = section('section', 'pw-philosophy-section');
@@ -129,7 +88,7 @@ function build() {
   const rationale = section('div', 'pw-philosophy-copy');
   rationale.textContent = t.philosophyCopy;
   const quote = section('blockquote', 'pw-philosophy-quote');
-  quote.textContent = t.quote;
+  quote.append(document.createTextNode(t.quote));
   const source = section('span', 'pw-philosophy-source');
   source.textContent = t.quoteSource;
   quote.append(source);
@@ -143,6 +102,6 @@ function build() {
 }
 
 const observer = new MutationObserver(build);
-observer.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+observer.observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir'] });
 
 build();
