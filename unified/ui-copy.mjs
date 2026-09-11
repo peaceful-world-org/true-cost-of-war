@@ -1,7 +1,7 @@
 export const SHELL_UI_COPY = Object.freeze({
   en: Object.freeze({
     developmentAllocation: 'Redirected to development', defenceAllocation: 'Remaining military expenditure', showLess: 'Show fewer programmes',
-    shareTitle: 'SHARE THE RESULT', shareIntro: 'Generate a text summary or a 1080×1080 square card from the calculator’s current state.', shareText: 'Generate text', shareCard: 'Generate infographic', copy: 'Copy data', copied: 'Copied ✓', download: 'Download PNG', period: 'Period', military: 'Military expenditure', redirected: 'Redirected', copyFallback: 'Text selected — use the browser copy command.',
+    shareTitle: 'THE IMPERATIVE OF DATA DISSEMINATION', shareIntro: 'Empirical data provides an objective counter-narrative to the normalization of armed conflict as a standard geopolitical instrument. Distributing these metrics illustrates the macroeconomic opportunity costs currently incurred. Objective quantification frequently offers more analytical clarity than qualitative debate.', shareText: 'Text: Fact of the day', shareCard: 'Infographic for Social Media', copy: 'Copy Text', copied: 'Copied ✓', download: 'Download Infographic', period: 'Period', military: 'Military expenditure', redirected: 'Redirected', copyFallback: 'Text selected — use the browser copy command.',
   }),
   de: Object.freeze({
     developmentAllocation: 'Für Entwicklung umgeleitet', defenceAllocation: 'Verbleibende Militärausgaben', showLess: 'Weniger Programme anzeigen',
@@ -29,7 +29,7 @@ export const SHELL_UI_COPY = Object.freeze({
   }),
   ru: Object.freeze({
     developmentAllocation: 'Перенаправлено на развитие', defenceAllocation: 'Остается в военных расходах', showLess: 'Скрыть дополнительные направления ↑',
-    shareTitle: 'ПОДЕЛИТЬСЯ РЕЗУЛЬТАТОМ', shareIntro: 'Сформируйте текстовую сводку или квадратную карточку 1080×1080 из текущего состояния калькулятора.', shareText: 'Создать текст', shareCard: 'Создать инфографику', copy: 'Скопировать данные', copied: 'Скопировано ✓', download: 'Скачать PNG', period: 'Период', military: 'Военные расходы', redirected: 'Перенаправлено', copyFallback: 'Текст выделен — используйте копирование браузера.',
+    shareTitle: 'РАСПРОСТРАНЕНИЕ ДАННЫХ', shareIntro: 'Объективные статистические данные являются наиболее эффективным инструментом анализа. Опора на экономические показатели способствует переосмыслению восприятия вооруженных конфликтов как оправданного политического инструмента. Представленные макроэкономические расчеты могут быть использованы для повышения осведомленности о реальных издержках милитаризации в публичном дискурсе.', shareText: 'Сводка данных (текст)', shareCard: 'Инфографика (изображение)', copy: 'Скопировать данные', copied: 'Скопировано ✓', download: 'Скачать инфографику', period: 'Период', military: 'Военные расходы', redirected: 'Перенаправлено', copyFallback: 'Текст выделен — используйте копирование браузера.',
   }),
   hi: Object.freeze({
     developmentAllocation: 'विकास के लिए पुनर्निर्देशित', defenceAllocation: 'शेष सैन्य व्यय', showLess: 'कम कार्यक्रम दिखाएँ',
