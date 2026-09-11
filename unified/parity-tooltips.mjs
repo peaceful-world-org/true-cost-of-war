@@ -41,10 +41,24 @@ function descriptionFor(key) {
 }
 
 function titleFor(trigger) {
+  const key = trigger.dataset.tooltipKey;
+  if (key === 'hero') return document.querySelector('#title')?.textContent?.trim() || trigger.dataset.tooltipTitle || '';
+  if (key === 'main') return document.querySelector('#currentPeriod')?.textContent?.trim() || trigger.dataset.tooltipTitle || '';
+  const liveLabel = trigger.closest('.pw-parity-label-row')
+    ?.querySelector('.pw-reference-card-label, .pw-programme-name')
+    ?.textContent?.trim();
+  if (liveLabel) return liveLabel;
   return trigger.dataset.tooltipTitle || trigger
     .closest('.pw-reference-card, .pw-programme, .pw-hero-counter, .pw-hero')
     ?.querySelector('.pw-reference-card-label, .pw-programme-name, .pw-counter-kicker, h1')
     ?.textContent?.trim() || '';
+}
+
+function syncAccessibleLabels() {
+  for (const button of document.querySelectorAll('.pw-parity-info')) {
+    const title = titleFor(button);
+    button.setAttribute('aria-label', title ? `${title}: info` : 'Information');
+  }
 }
 
 function closeTooltip() {
@@ -183,6 +197,7 @@ function install() {
     attachToLabel(programme.querySelector('.pw-programme-name'), programme.dataset.programme);
   }
   attachDescriptions();
+  syncAccessibleLabels();
 }
 
 const programmeObserver = new MutationObserver(install);
