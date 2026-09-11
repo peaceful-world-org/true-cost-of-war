@@ -55,6 +55,7 @@
       const doc = frame.contentDocument;
       await waitFor(() => doc.querySelector('#debug')?.textContent.includes('language: en'), 'visual target runtime');
       await waitFor(() => doc.querySelectorAll('.pw-programme').length === 8, 'visual target programmes');
+      await waitFor(() => doc.querySelector('#impactTotalAmount')?.textContent.trim() && doc.querySelector('#impactTotalAmount')?.textContent.trim() !== '—', 'fund summary amount');
       return { win: frame.contentWindow, doc };
     }
 
@@ -78,6 +79,8 @@
       const range = d.querySelector('.pw-scenario-range');
       const split = d.querySelector('.pw-opportunity-split');
       const fund = d.querySelector('.pw-opportunity-fund');
+      const philosophy = d.querySelector('.pw-philosophy-section');
+      const scaleCard = d.querySelector('.pw-share-section .pw-scale-card');
 
       assert(ds(shell).borderRadius === '32px', 'desktop shell keeps 32px production radius');
       assert(Math.abs(px(ds(shell).paddingLeft) - 40) < 0.5, 'desktop shell keeps 40px horizontal padding');
@@ -90,6 +93,11 @@
       assert(Math.abs(px(ds(range).height) - 12) < 0.5, 'redistribution slider keeps 12px production track height');
       assert(hasTwoGridTracks(ds(split).gridTemplateColumns), 'desktop opportunity area keeps 1.1/0.9 split layout');
       assert(ds(fund).position === 'sticky', 'desktop opportunity fund keeps sticky production behaviour');
+      assert(Math.abs(px(ds(fund).paddingLeft) - 40) < 0.5, 'desktop development fund keeps 40px production padding');
+      assert(ds(fund).backgroundImage.includes('linear-gradient'), 'desktop development fund restores production gradient surface');
+      assert(d.querySelector('.pw-fund-header') && d.querySelector('#impactTotalAmount'), 'desktop development fund restores reference summary');
+      assert(Math.abs(px(ds(philosophy).paddingLeft) - 48) < 0.5 && ds(philosophy).borderRadius === '32px', 'desktop methodology section restores production section geometry');
+      assert(Math.abs(px(ds(scaleCard).paddingLeft) - 40) < 0.5 && ds(scaleCard).borderRadius === '24px', 'desktop dissemination scale restores production viral-card geometry');
 
       const mobile = await load(mobileFrame, 'lang=en&mode=1year&share=10&year=1990');
       const m = mobile.doc;
@@ -103,8 +111,11 @@
       const mobileGrid = m.querySelector('.pw-hero > .pw-reference-grid');
       const mobileProgramme = m.querySelector('.pw-programme');
       const mobileScenario = m.querySelector('.pw-scenario-panel');
+      const mobileSummary = m.querySelector('.pw-mobile-summary');
       const mobileSplit = m.querySelector('.pw-opportunity-split');
       const mobileFund = m.querySelector('.pw-opportunity-fund');
+      const mobilePhilosophy = m.querySelector('.pw-philosophy-section');
+      const mobileScaleCard = m.querySelector('.pw-share-section .pw-scale-card');
 
       assert(ms(mobileShell).borderRadius === '0px', 'mobile shell becomes edge-to-edge');
       assert(Math.abs(px(ms(mobileShell).paddingLeft) - 16) < 0.5, 'mobile shell keeps 16px production gutter');
@@ -119,8 +130,12 @@
       assert(ms(mobileScenario).backgroundColor === 'rgba(0, 0, 0, 0)', 'mobile scenario panel flattens to transparent production surface');
       assert(ms(mobileProgramme).display === 'flex', 'mobile programme row uses stacked production layout');
       assert(ms(mobileProgramme).borderRadius === '0px', 'mobile programme rows flatten instead of looking like dashboard cards');
+      assert(ms(mobileSummary).display !== 'none' && m.querySelector('#mobileImpactTotalAmount')?.textContent.trim() !== '—', 'mobile development summary is visible and live');
       assert(!hasTwoGridTracks(ms(mobileSplit).gridTemplateColumns), 'mobile opportunity split collapses to one column');
       assert(ms(mobileFund).position === 'static', 'mobile opportunity fund is no longer sticky');
+      assert(ms(mobileFund).borderRadius === '0px' && Math.abs(px(ms(mobileFund).paddingLeft)) < 0.5, 'mobile development fund flattens to production hierarchy');
+      assert(ms(mobilePhilosophy).borderRadius === '0px' && Math.abs(px(ms(mobilePhilosophy).paddingLeft)) < 0.5, 'mobile methodology section flattens to production hierarchy');
+      assert(ms(mobileScaleCard).borderRadius === '0px' && Math.abs(px(ms(mobileScaleCard).paddingLeft)) < 0.5, 'mobile dissemination scale flattens to production rows');
 
       root.dataset.smoke = 'pass';
       output.textContent = `${notes.join('\n')}\nPASS: visual parity smoke complete`;
