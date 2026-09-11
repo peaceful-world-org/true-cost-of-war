@@ -29,18 +29,20 @@ test('info placement distinguishes hero, metric cards and programme titles', () 
   assert.match(css, /\.pw-programme \.pw-parity-label-row[\s\S]*?justify-content:\s*flex-start/);
 });
 
-test('live-flow renders changing session values without bouncing the number element', () => {
+test('live counters use the original calm cadence and adaptive precision without bounce', () => {
   for (const selector of ['#viewerSpend', '#sessionFood', '#sessionHealth', '#sessionPoverty']) {
     assert.ok(motion.includes(`'${selector}'`), `live presentation target missing: ${selector}`);
   }
   assert.doesNotMatch(motion, /#mainCounterValue/);
   assert.doesNotMatch(motion, /\.animate\s*\(/);
   assert.doesNotMatch(motion, /translateY\s*\(/);
-  assert.match(motion, /requestAnimationFrame/);
-  assert.match(motion, /formatLiveSessionMoney/);
-  assert.match(motion, /decimals\s*=\s*3/);
-  assert.match(motion, /visibilitychange/);
-  assert.match(motion, /dataset\.motionPolish\s*=\s*'continuous-live'/);
+  assert.match(motion, /const LIVE_CADENCE_MS = 80/);
+  assert.match(motion, /now - lastPaintAt >= LIVE_CADENCE_MS/);
+  assert.match(motion, /formatLegacyLiveMoney/);
+  assert.match(motion, /absolute >= 1e6/);
+  assert.match(motion, /maximumFractionDigits = 0/);
+  assert.doesNotMatch(motion, /decimals\s*=\s*3/);
+  assert.match(motion, /dataset\.motionPolish\s*=\s*'legacy-live-cadence'/);
   assert.match(css, /\.pw-flow-value[\s\S]*?transform:\s*none\s*!important/);
   assert.match(css, /font-variant-numeric:\s*tabular-nums/);
 });
