@@ -1,4 +1,5 @@
 import './app.mjs';
+import './parity-tooltips.mjs';
 import { calculateLegacySnapshot } from '../src/runtime.mjs';
 import { formatInteger, formatMoney, formatRatio } from '../src/format.mjs';
 import { parityCopy } from './parity-b-copy.mjs';
