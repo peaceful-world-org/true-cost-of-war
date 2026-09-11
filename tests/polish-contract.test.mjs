@@ -29,20 +29,39 @@ test('info placement distinguishes hero, metric cards and programme titles', () 
   assert.match(css, /\.pw-programme \.pw-parity-label-row[\s\S]*?justify-content:\s*flex-start/);
 });
 
-test('live counter flows frame-by-frame below one million and calms at larger scales', () => {
-  for (const selector of ['#viewerSpend', '#sessionFood', '#sessionHealth', '#sessionPoverty']) {
-    assert.ok(motion.includes(`'${selector}'`), `live presentation target missing: ${selector}`);
-  }
+test('visible session-spend counter is a literal production timing port with one DOM owner', () => {
+  assert.match(motion, /const ORIGINAL_SECONDS_PER_YEAR = 31557600/);
+  assert.match(motion, /const ORIGINAL_LIVE_CADENCE_MS = 80/);
+  assert.match(motion, /const ORIGINAL_TRANSITION_MS = 1200/);
+  assert.match(motion, /annualMilitarySpend \/ ORIGINAL_SECONDS_PER_YEAR/);
+  assert.match(motion, /activeTimeMs \+ \(Date\.now\(\) - lastVisibleTime\)/);
+  assert.match(motion, /now - lastRenderTime < ORIGINAL_LIVE_CADENCE_MS/);
+  assert.match(motion, /requestAnimationFrame\(render\)/);
+
+  assert.match(motion, /takeExclusiveViewerOwnership/);
+  assert.match(motion, /cloneNode\(true\)/);
+  assert.match(motion, /existing\.replaceWith\(clone\)/);
+  assert.doesNotMatch(motion, /MutationObserver/);
   assert.doesNotMatch(motion, /#mainCounterValue/);
   assert.doesNotMatch(motion, /\.animate\s*\(/);
   assert.doesNotMatch(motion, /translateY\s*\(/);
-  assert.match(motion, /const MILLION_THRESHOLD = 1e6/);
-  assert.match(motion, /const DERIVED_CADENCE_MS = 250/);
-  assert.match(motion, /renderViewer\(now\)/);
-  assert.match(motion, /requestAnimationFrame\(frame\)/);
-  assert.match(motion, /minimumFractionDigits = 1/);
-  assert.match(motion, /maximumFractionDigits = 1/);
-  assert.match(motion, /dataset\.motionPolish\s*=\s*'smooth-scale-aware-flow'/);
+  assert.doesNotMatch(motion, /DERIVED_CADENCE_MS/);
+});
+
+test('session-spend formatter uses the exact production short-money precision thresholds', () => {
+  assert.match(motion, /absolute >= 1e12[\s\S]*?minimumFractionDigits: 1, maximumFractionDigits: 1/);
+  assert.match(motion, /absolute >= 1e9[\s\S]*?minimumFractionDigits: 1, maximumFractionDigits: 2/);
+  assert.match(motion, /absolute >= 1e6[\s\S]*?maximumFractionDigits: 0/);
+  assert.match(motion, /Math\.round\(absolute\)/);
+  assert.match(motion, /pw2-currency-sign/);
+  assert.match(motion, /pw2-val-unit/);
+  assert.match(motion, /dataset\.motionPolish\s*=\s*'production-live-port'/);
+});
+
+test('production numeric typography remains stable and anchored', () => {
+  assert.match(css, /\.pw-flow-value[\s\S]*?font-variant-numeric:\s*tabular-nums\s*!important/);
+  assert.match(css, /font-feature-settings:\s*"tnum" 1, "lnum" 1\s*!important/);
+  assert.match(css, /\.pw-flow-value \.pw2-currency-sign[\s\S]*?font-size:\s*\.85em/);
+  assert.match(css, /\.pw-flow-value \.pw2-val-unit[\s\S]*?font-size:\s*\.55em/);
   assert.match(css, /\.pw-flow-value[\s\S]*?transform:\s*none\s*!important/);
-  assert.match(css, /font-variant-numeric:\s*tabular-nums/);
 });
