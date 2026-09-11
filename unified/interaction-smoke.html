@@ -146,7 +146,14 @@
       doc.querySelector('#buildText').click();
       await waitFor(() => !doc.querySelector('#shareTextWrap').hidden, 'text summary visibility');
       const englishSummary = doc.querySelector('#shareTextOutput').textContent;
-      assert(englishSummary.includes('Peaceful World') && englishSummary.length > 100, 'text summary is populated with shareable content');
+      assert(
+        englishSummary.startsWith('Daily global military expenditure amounts to ') &&
+          englishSummary.includes('106.9M') &&
+          englishSummary.includes('53.4M') &&
+          englishSummary.includes('6.7M') &&
+          englishSummary.includes('peaceful-world.org/true-cost-of-war'),
+        'text summary uses the canonical one-day dissemination fact',
+      );
 
       doc.querySelector('#copyText').click();
       await waitFor(() => doc.querySelector('#copyState').textContent.trim().length > 0, 'copy feedback');
@@ -170,8 +177,12 @@
       assert(doc.querySelectorAll('.pw-mission-primary-copy strong').length >= 2, 'RTL mission emphasis survives language switch');
 
       doc.querySelector('#buildText').click();
-      await waitFor(() => doc.querySelector('#shareTextOutput').textContent.startsWith(arabicTitle), 'Arabic summary regeneration');
+      await waitFor(
+        () => doc.querySelector('#shareTextOutput').textContent.startsWith('يبلغ الإنفاق العسكري العالمي اليومي'),
+        'Arabic daily summary regeneration',
+      );
       assert(doc.querySelector('#shareTextOutput').textContent !== englishSummary, 'shareable text regenerates after language switch');
+      assert(doc.querySelector('#shareTextOutput').textContent.includes('peaceful-world.org/true-cost-of-war/ar'), 'Arabic summary points to the localized public route');
 
       doc.querySelector('#buildCard').click();
       await waitFor(() => card.src.startsWith('data:image/png') && card.src !== englishCardSrc, 'Arabic infographic regeneration');
