@@ -40,3 +40,13 @@ test('every shell UI locale has the complete non-empty key set', () => {
     }
   }
 });
+
+test('Arabic and Persian are the explicit RTL locales', () => {
+  const rtl = Object.entries(manifest.languages)
+    .filter(([, value]) => value.dir === 'rtl')
+    .map(([language]) => language)
+    .sort();
+  assert.deepEqual(rtl, ['ar', 'fa']);
+  assert.equal(manifest.languages.ar.htmlLang, 'ar');
+  assert.equal(manifest.languages.fa.htmlLang, 'fa');
+});
