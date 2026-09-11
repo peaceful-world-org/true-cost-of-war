@@ -17,7 +17,7 @@ export const SHELL_UI_COPY = Object.freeze({
   }),
   pt: Object.freeze({
     developmentAllocation: 'Redirecionado para o desenvolvimento', defenceAllocation: 'Despesa militar restante', showLess: 'Mostrar menos programas',
-    shareTitle: 'PARTILHAR O RESULTADO', shareIntro: 'Gere um resumo em texto ou um cartão quadrado de 1080×1080 a partir do estado atual da calculadora.', shareText: 'Gerar texto', shareCard: 'Gerar infografia', copy: 'Copiar dados', copied: 'Copiado ✓', download: 'Transferir PNG', period: 'Período', military: 'Despesa militar', redirected: 'Redirecionado', copyFallback: 'Texto selecionado — use o comando de copiar navegador.',
+    shareTitle: 'PARTILHAR O RESULTADO', shareIntro: 'Gere um resumo em texto ou um cartão quadrado de 1080×1080 a partir do estado atual da calculadora.', shareText: 'Gerar texto', shareCard: 'Gerar infografia', copy: 'Copiar dados', copied: 'Copiado ✓', download: 'Transferir PNG', period: 'Período', military: 'Despesa militar', redirected: 'Redirecionado', copyFallback: 'Texto selecionado — use o comando de copiar do navegador.',
   }),
   ar: Object.freeze({
     developmentAllocation: 'معاد توجيهه إلى التنمية', defenceAllocation: 'الإنفاق العسكري المتبقي', showLess: 'عرض برامج أقل',
