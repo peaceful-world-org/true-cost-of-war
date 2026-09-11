@@ -119,9 +119,9 @@
   top: -1px;
 }
 
-/* Exact live-number typography from the production calculator. The smaller
-   currency and unit spans are part of the perceived calmness of the counter:
-   only the numeric run changes while its surrounding visual anchors stay put. */
+/* The session counter now advances at display refresh cadence. The surrounding
+   DOM is persistent: only the numeric text node changes. Tabular lining digits
+   keep the baseline and digit widths anchored while the number runs. */
 .pw-flow-value {
   transform: none !important;
   filter: none !important;
@@ -130,26 +130,28 @@
   font-feature-settings: "tnum" 1, "lnum" 1 !important;
 }
 
+.pw-flow-money {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.pw-flow-number {
+  display: inline-block;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums !important;
+  font-feature-settings: "tnum" 1, "lnum" 1 !important;
+  text-rendering: geometricPrecision;
+}
+
 .pw-flow-value .pw2-currency-sign {
   display: inline-block;
   font-family: var(--font-heading, Montserrat, system-ui, sans-serif);
   font-size: .85em;
   font-weight: 700;
   opacity: .7;
-}
-
-.pw-flow-value .pw2-val-unit {
-  display: inline-block;
-  margin-left: .2em;
-  font-family: var(--font-heading, Montserrat, system-ui, sans-serif);
-  font-size: .55em;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0;
-  text-transform: lowercase;
-  vertical-align: baseline;
-  opacity: .8;
-  white-space: nowrap;
 }
 
 @media (max-width: 600px) {
