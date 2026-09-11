@@ -107,7 +107,8 @@ function build() {
     wrapper.append(mission);
   }
 
-  wrapper.append(scale, philosophy);
+  /* Production presents methodology/philosophy before the dissemination scale. */
+  wrapper.append(philosophy, scale);
   anchor.before(wrapper);
 }
 
