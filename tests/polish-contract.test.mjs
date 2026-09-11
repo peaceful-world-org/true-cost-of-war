@@ -29,14 +29,13 @@ test('info placement distinguishes hero, metric cards and programme titles', () 
   assert.match(css, /\.pw-programme \.pw-parity-label-row[\s\S]*?justify-content:\s*flex-start/);
 });
 
-test('live session values follow requestAnimationFrame with no legacy 80 ms gate', () => {
+test('live session values use production-style 80 ms presentation cadence', () => {
   assert.match(motion, /const SECONDS_PER_YEAR = 31557600/);
+  assert.match(motion, /const ORIGINAL_LIVE_CADENCE_MS = 80/);
   assert.match(motion, /annualMilitarySpend \/ SECONDS_PER_YEAR/);
   assert.match(motion, /performance\.now\(\)/);
+  assert.match(motion, /now - lastVisiblePaintAt >= ORIGINAL_LIVE_CADENCE_MS/);
   assert.match(motion, /requestAnimationFrame\(render\)/);
-  assert.doesNotMatch(motion, /ORIGINAL_LIVE_CADENCE_MS/);
-  assert.doesNotMatch(motion, /lastRenderTime/);
-  assert.doesNotMatch(motion, /< 80/);
 });
 
 test('live session values have exclusive visible DOM ownership', () => {
@@ -55,7 +54,7 @@ test('session-spend display keeps a full running integer instead of compact mill
   assert.match(motion, /pw-flow-number/);
   assert.doesNotMatch(motion, /pw2-val-unit/);
   assert.doesNotMatch(motion, /absolute >= 1e6/);
-  assert.match(motion, /dataset\.motionPolish\s*=\s*'continuous-live-flow'/);
+  assert.match(motion, /dataset\.motionPolish\s*=\s*'original-cadence-continuous-value'/);
 });
 
 test('continuous numeric typography remains stable and anchored', () => {
