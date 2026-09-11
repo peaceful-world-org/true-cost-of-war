@@ -67,11 +67,28 @@
       );
       await waitFor(() => doc.querySelectorAll('.pw-programme').length === 8, 'programme rendering');
       await waitFor(() => doc.querySelector('.pw-parity-info[data-tooltip-key="missionFunding"]'), 'mission parity rendering');
+      await waitFor(() => doc.querySelector('#personalBurden')?.textContent.trim() !== '—', 'financial KPI rendering');
+      await waitFor(() => doc.querySelector('#impactTotalAmount')?.textContent.trim() !== '—', 'development fund rendering');
 
       assert(doc.documentElement.classList.contains('pw-embed-mode'), 'embed mode bootstraps inside iframe');
       assert(doc.documentElement.dir === 'ltr', 'English starts in LTR mode');
       assert(doc.querySelector('#shareLabel')?.textContent.trim() === '10%', 'initial redistribution share is 10%');
       assert(doc.querySelector('#mainCounterValue')?.textContent.trim() !== '—', 'main counter renders a calculated value');
+
+      const financialValues = [
+        ['#personalBurden', 'personal burden'],
+        ['#infrastructureValue', 'infrastructure damage'],
+        ['#economicLossValue', 'aggregate economic loss'],
+      ];
+      for (const [selector, label] of financialValues) {
+        const node = doc.querySelector(selector);
+        const style = win.getComputedStyle(node);
+        assert(style.color === 'rgb(255, 255, 255)', `${label} value keeps production white hierarchy`);
+        assert(style.whiteSpace === 'nowrap', `${label} value is protected from unit fragmentation`);
+      }
+      const fundAmount = doc.querySelector('#impactTotalAmount');
+      assert(win.getComputedStyle(fundAmount).whiteSpace === 'nowrap', 'development fund amount is protected from unit fragmentation');
+      assert(fundAmount.scrollWidth <= fundAmount.clientWidth + 1, 'development fund amount fits without horizontal spill at mobile width');
 
       const chip25 = doc.querySelector('.pw-scenario-chip[data-share="25"]');
       chip25.click();
