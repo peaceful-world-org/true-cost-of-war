@@ -28,41 +28,43 @@ Goal: migrate the proven product into the unified architecture without redesigni
 - [x] Main metrics update continuously in live modes
 - [x] Mode changes use a 1200 ms ease-out count-up
 - [ ] Published hero subtitle and opening lead ported exactly for every locale (RU/EN migration copy is in place)
-- [ ] Reference metric descriptions ported to locale schema
-- [ ] Reference methodology tooltip corpus ported to locale schema
+- [ ] Reference metric descriptions ported to the final locale schema (RU/EN visible descriptions are now restored)
+- [ ] Reference methodology tooltip corpus ported to the final locale schema (RU/EN parity tooltip layer is now active)
 
 ## Reference surfaces still to port
 
-- [ ] Hero-level methodology info control
-- [ ] Main period-total info control and caption (caption restored; info control pending)
+- [x] Hero-level methodology info control
+- [x] Main period-total info control and caption
 - [x] Session human equivalents: food / basic healthcare / extreme poverty
 - [x] Per-person indirect financial burden card
-- [ ] Direct / indirect death cards with descriptions and distinct colour roles (cards/colour roles restored; descriptions pending)
+- [x] Direct / indirect death cards with descriptions and distinct colour roles (RU/EN)
 - [x] Economic-impact section title + intro (RU/EN migration copy)
-- [ ] Infrastructure / YPLL / aggregate cards with reference descriptions (cards restored; descriptions pending)
+- [x] Infrastructure / YPLL / aggregate cards with reference descriptions (RU/EN)
 - [x] Opportunity-cost section title + intro (RU/EN migration copy)
 - [x] All 8 opportunity-cost programme rows
 - [x] Programme need notes and xN progress bars
 - [x] Extra-programme expand/collapse interaction on mobile
 - [x] Conservative → Moderate → Systemic slider labels
 - [x] Development / remaining-defence allocation bars
-- [ ] Micro-redistribution mission block
-- [ ] Peaceful World support CTA
-- [ ] Philosophy / UNESCO quote block
-- [ ] Day / month / year scale tiles
+- [x] Micro-redistribution mission block
+- [x] Peaceful World support CTA
+- [x] Philosophy / UNESCO quote block
+- [x] Day / month / year scale tiles
 - [x] Text summary generation
 - [x] Copy-to-clipboard feedback state
 - [x] 1080×1080 infographic generation and download
 - [x] Mobile summary and progressive disclosure
-- [ ] Desktop tooltip collision protection
-- [ ] Mobile inline tooltip container
+- [x] Desktop tooltip collision protection
+- [x] Mobile inline tooltip container
 - [x] Embed mode (`?embed=1`)
 - [x] iframe resize contract (`pw2-resize`, `ResizeObserver`, request/response)
 - [ ] Full RTL validation after restored reference layout is present
 
 ## Current migration note
 
-Unified v0.7 now carries most of the reference interaction skeleton. The next pass is intentionally about parity details rather than redesign: tooltips/descriptions, remaining reference narrative blocks, full-locale copy, RTL/mobile validation, and visual calibration against the production reference.
+The unified preview now carries the major reference interaction and narrative surfaces: live/session behaviour, demographic/economic blocks, all opportunity programmes, scenario allocation, sharing/infographic generation, responsive disclosure, collision-safe tooltips, embed resizing, scale tiles, the micro-redistribution mission block, Peaceful World CTA and the UNESCO methodology block.
+
+The remaining parity work is deliberately concentrated in final localisation/schema consolidation, RU/EN visual calibration, AR/FA RTL validation, browser/mobile smoke testing, and the independent parity council review. Production remains untouched.
 
 ## Promotion gates
 
