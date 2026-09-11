@@ -47,6 +47,26 @@
 .pw-economic-section { margin-top: 44px; }
 .pw-section-intro { max-width: 900px; margin: 8px 0 18px; color: var(--muted); font-size: 15px; line-height: 1.6; }
 
+.pw-scenario-spectrum { color: var(--muted); font-size: 12px; }
+.pw-allocation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+.pw-allocation-card {
+  padding: 13px 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 13px;
+  background: rgba(4,12,24,.35);
+}
+.pw-allocation-head { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 11px; line-height: 1.35; }
+.pw-allocation-head strong { color: #f8fafc; text-align: end; font-variant-numeric: tabular-nums; }
+.pw-allocation-track { height: 6px; margin-top: 10px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.07); }
+.pw-allocation-track i { display: block; height: 100%; width: 0; border-radius: inherit; transition: width .16s ease-out; }
+.pw-allocation-card[data-allocation="development"] i { background: linear-gradient(90deg, var(--accent), var(--peace)); }
+.pw-allocation-card[data-allocation="defence"] i { background: linear-gradient(90deg, var(--danger-direct), var(--gold)); }
+
 .pw-programmes { display: grid; gap: 10px; margin-top: 18px; }
 .pw-programme {
   position: relative;
@@ -74,6 +94,18 @@
 .pw-programme-name { color: #f8fafc; font-size: 15px; font-weight: 800; line-height: 1.35; }
 .pw-programme-note { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.4; }
 .pw-programme-value { color: var(--peace); font-family: Montserrat, Inter, sans-serif; font-size: clamp(22px,3vw,30px); font-weight: 900; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pw-programme-toggle {
+  display: none;
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px 14px;
+  border: 1px solid rgba(56,189,248,.18);
+  border-radius: 12px;
+  background: rgba(56,189,248,.05);
+  color: var(--accent);
+  font-weight: 800;
+  cursor: pointer;
+}
 
 html[dir="rtl"] .pw-programme::before { inset: 0 0 0 auto; }
 
@@ -85,6 +117,8 @@ html[dir="rtl"] .pw-programme::before { inset: 0 0 0 auto; }
 @media (max-width: 600px) {
   .pw-reference-grid { grid-template-columns: 1fr; }
   .pw-reference-grid .pw-reference-card:first-child { grid-column: auto; }
+  .pw-allocation { grid-template-columns: 1fr; }
   .pw-programme { grid-template-columns: 1fr; gap: 9px; align-items: start; }
   .pw-programme-value { font-size: 24px; }
+  .pw-programme-toggle:not([hidden]) { display: block; }
 }
