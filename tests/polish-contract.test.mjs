@@ -29,13 +29,27 @@ test('info placement distinguishes hero, metric cards and programme titles', () 
   assert.match(css, /\.pw-programme \.pw-parity-label-row[\s\S]*?justify-content:\s*flex-start/);
 });
 
-test('live session values use production-style 80 ms presentation cadence', () => {
+test('money counter keeps a calm 80 ms presentation cadence', () => {
   assert.match(motion, /const SECONDS_PER_YEAR = 31557600/);
-  assert.match(motion, /const ORIGINAL_LIVE_CADENCE_MS = 80/);
+  assert.match(motion, /const MONEY_CADENCE_MS = 80/);
   assert.match(motion, /annualMilitarySpend \/ SECONDS_PER_YEAR/);
   assert.match(motion, /performance\.now\(\)/);
-  assert.match(motion, /now - lastVisiblePaintAt >= ORIGINAL_LIVE_CADENCE_MS/);
+  assert.match(motion, /now - lastMoneyPaintAt >= MONEY_CADENCE_MS/);
   assert.match(motion, /requestAnimationFrame\(render\)/);
+});
+
+test('derived equivalents render every animation frame instead of inheriting the money gate', () => {
+  assert.match(motion, /function paintDerived\(spend, meta\)/);
+  assert.match(motion, /paintDerived\(spend, meta\);/);
+  assert.match(motion, /sessionFoodNode/);
+  assert.match(motion, /sessionHealthNode/);
+  assert.match(motion, /sessionPovertyNode/);
+  assert.match(motion, /persistentNumberNode\(sessionFood\)/);
+  assert.match(motion, /persistentNumberNode\(sessionHealth\)/);
+  assert.match(motion, /persistentNumberNode\(sessionPoverty\)/);
+  assert.doesNotMatch(motion, /sessionFood\.textContent\s*=/);
+  assert.doesNotMatch(motion, /sessionHealth\.textContent\s*=/);
+  assert.doesNotMatch(motion, /sessionPoverty\.textContent\s*=/);
 });
 
 test('live session values have exclusive visible DOM ownership', () => {
@@ -49,12 +63,16 @@ test('live session values have exclusive visible DOM ownership', () => {
 });
 
 test('session-spend display keeps a full running integer instead of compact million steps', () => {
-  assert.match(motion, /const moneyText = formatInteger\(spend, meta\)/);
-  assert.match(motion, /viewerNumberNode\.nodeValue = moneyText/);
+  assert.match(motion, /formatInteger\(spend, meta\)/);
+  assert.match(motion, /viewerNumberNode/);
   assert.match(motion, /pw-flow-number/);
   assert.doesNotMatch(motion, /pw2-val-unit/);
   assert.doesNotMatch(motion, /absolute >= 1e6/);
-  assert.match(motion, /dataset\.motionPolish\s*=\s*'original-cadence-continuous-value'/);
+  assert.match(motion, /dataset\.motionPolish\s*=\s*'split-cadence-live-flow'/);
+});
+
+test('integer presentation follows the legacy round-to-nearest convention', () => {
+  assert.match(motion, /Math\.round\(Number\(value\) \|\| 0\)/);
 });
 
 test('continuous numeric typography remains stable and anchored', () => {
