@@ -36,6 +36,22 @@ TARGET_IDS = {
     "debug",
     "programmeToggle",
 }
+VOID_TAGS = {
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
+}
 
 
 class SnapshotParser(HTMLParser):
@@ -56,9 +72,10 @@ class SnapshotParser(HTMLParser):
             self.html_attrs = values
 
         target = values.get("id") if values.get("id") in TARGET_IDS else None
-        self._tag_targets.append(target)
-        if target:
-            self._active.append(target)
+        if tag not in VOID_TAGS:
+            self._tag_targets.append(target)
+            if target:
+                self._active.append(target)
 
         classes = set((values.get("class") or "").split())
         if "pw-programme" in classes and values.get("data-programme"):
@@ -168,7 +185,8 @@ def assert_case(case: Case, page: SnapshotParser, manifest: dict) -> None:
     if f"mode: {case.mode}" not in debug:
         fail(f"{case.name}: diagnostics did not initialise requested mode")
 
-    if not page.value("title") or page.value("title") == "The True Cost of War" and case.language != "en":
+    title = page.value("title")
+    if not title or (title == "The True Cost of War" and case.language != "en"):
         fail(f"{case.name}: localized title did not render")
     if page.value("mainCounterValue") in {"", "—"}:
         fail(f"{case.name}: main counter remained at placeholder")
