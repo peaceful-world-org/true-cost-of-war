@@ -58,6 +58,9 @@ jobs:
       - name: Build localized visual-parity shadows
         run: python scripts/build_shadow_parity.py
 
+      - name: Extract localized migration copy
+        run: python scripts/extract_legacy_locale_copy.py --output unified/legacy-copy.json
+
       - name: Build unified multilingual candidate
         run: python scripts/build_unified_candidate.py
 
