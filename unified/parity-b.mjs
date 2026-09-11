@@ -23,6 +23,8 @@ const [manifest, modelDocument] = await Promise.all([
 ]);
 const model = modelDocument.values;
 const perSecond = model.annualMilitarySpend / REFERENCE_SECONDS_PER_YEAR;
+const mobileQuery = window.matchMedia('(max-width: 600px)');
+let programmesExpanded = false;
 
 const controls = {
   language: document.querySelector('#language'),
@@ -64,7 +66,15 @@ const el = {
   economicLossValue: document.querySelector('#economicLossValue'),
   opportunityTitle: document.querySelector('#opportunityTitle'),
   opportunityIntro: document.querySelector('#opportunityIntro'),
+  scenarioSpectrum: document.querySelector('#scenarioSpectrum'),
+  developmentAllocationLabel: document.querySelector('#developmentAllocationLabel'),
+  developmentAllocationValue: document.querySelector('#developmentAllocationValue'),
+  developmentAllocationBar: document.querySelector('#developmentAllocationBar'),
+  defenceAllocationLabel: document.querySelector('#defenceAllocationLabel'),
+  defenceAllocationValue: document.querySelector('#defenceAllocationValue'),
+  defenceAllocationBar: document.querySelector('#defenceAllocationBar'),
   programmes: document.querySelector('#programmes'),
+  programmeToggle: document.querySelector('#programmeToggle'),
 };
 
 function languageKey() {
@@ -125,17 +135,22 @@ function renderStatic() {
   setText(el.economicLossLabel, t.economicLoss);
   setText(el.opportunityTitle, t.opportunityTitle);
   setText(el.opportunityIntro, t.opportunityIntro);
+  setText(el.scenarioSpectrum, t.scenarioSpectrum);
+  setText(el.developmentAllocationLabel, t.developmentAllocation);
+  setText(el.defenceAllocationLabel, t.defenceAllocation);
   buildProgrammes();
+  updateProgrammeVisibility();
 }
 
 function buildProgrammes() {
   if (!el.programmes) return;
   const t = copy();
   el.programmes.replaceChildren();
-  for (const [key, label] of t.programmes) {
+  t.programmes.forEach(([key, label], index) => {
     const row = document.createElement('article');
     row.className = 'pw-programme pw-glow';
     row.dataset.programme = key;
+    if (index >= 3) row.dataset.mobileExtra = 'true';
 
     const content = document.createElement('div');
     const name = document.createElement('div');
@@ -156,7 +171,22 @@ function buildProgrammes() {
     value.textContent = '—';
     row.append(content, value);
     el.programmes.append(row);
+  });
+}
+
+function updateProgrammeVisibility() {
+  if (!el.programmes || !el.programmeToggle) return;
+  const extras = [...el.programmes.querySelectorAll('[data-mobile-extra="true"]')];
+  if (!mobileQuery.matches) {
+    extras.forEach((row) => { row.hidden = false; });
+    el.programmeToggle.hidden = true;
+    el.programmeToggle.setAttribute('aria-expanded', 'true');
+    return;
   }
+  extras.forEach((row) => { row.hidden = !programmesExpanded; });
+  el.programmeToggle.hidden = false;
+  el.programmeToggle.setAttribute('aria-expanded', String(programmesExpanded));
+  setText(el.programmeToggle, programmesExpanded ? copy().showLess : copy().showMore);
 }
 
 function renderDynamic() {
@@ -176,6 +206,14 @@ function renderDynamic() {
   setText(el.infrastructureValue, formatMoney(snap.totals.infrastructureDamage, m, { short: true }));
   setText(el.lifeYearsValue, formatInteger(snap.totals.lifeYearsLost, m));
   setText(el.economicLossValue, formatMoney(snap.totals.economicSetback, m, { short: true }));
+
+  const share = snap.sharePercent;
+  const development = snap.opportunityCosts.redirected;
+  const defence = Math.max(0, snap.totals.militarySpend - development);
+  setText(el.developmentAllocationValue, `${share}% · ${formatMoney(development, m, { short: true })}`);
+  setText(el.defenceAllocationValue, `${100 - share}% · ${formatMoney(defence, m, { short: true })}`);
+  if (el.developmentAllocationBar) el.developmentAllocationBar.style.width = `${share}%`;
+  if (el.defenceAllocationBar) el.defenceAllocationBar.style.width = `${100 - share}%`;
 
   const values = snap.opportunityCosts;
   const programmeValues = {
@@ -227,6 +265,12 @@ for (const control of [controls.mode, controls.birthYear, controls.share]) {
   control?.addEventListener('input', renderDynamic);
   control?.addEventListener('change', renderDynamic);
 }
+
+el.programmeToggle?.addEventListener('click', () => {
+  programmesExpanded = !programmesExpanded;
+  updateProgrammeVisibility();
+});
+mobileQuery.addEventListener?.('change', updateProgrammeVisibility);
 
 renderStatic();
 renderDynamic();
