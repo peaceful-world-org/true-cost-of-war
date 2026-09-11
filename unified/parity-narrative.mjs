@@ -27,6 +27,7 @@ function section(tag, className) {
 
 function build() {
   document.querySelector('#parityNarrative')?.remove();
+  document.querySelector('#parityScale')?.remove();
   const anchor = document.querySelector('.pw-share-section') || document.querySelector('.pw-method');
   if (!anchor) return;
 
@@ -36,6 +37,7 @@ function build() {
   wrapper.id = 'parityNarrative';
 
   const scale = section('section', 'pw-scale-section');
+  scale.id = 'parityScale';
   const scaleCard = section('div', 'pw-scale-card');
   const scaleHeading = section('div', 'pw-scale-heading');
   scaleHeading.textContent = t.scaleHeading;
@@ -107,9 +109,14 @@ function build() {
     wrapper.append(mission);
   }
 
-  /* Production presents methodology/philosophy before the dissemination scale. */
-  wrapper.append(philosophy, scale);
+  /* Production order: methodology/philosophy first, then one dissemination
+     section containing the day/month/year scale and the sharing controls. */
+  wrapper.append(philosophy);
   anchor.before(wrapper);
+
+  const shareActions = anchor.querySelector?.('.pw-share-actions');
+  if (shareActions) anchor.insertBefore(scale, shareActions);
+  else anchor.append(scale);
 }
 
 const observer = new MutationObserver(build);
