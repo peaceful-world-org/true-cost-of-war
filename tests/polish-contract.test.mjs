@@ -29,27 +29,33 @@ test('info placement distinguishes hero, metric cards and programme titles', () 
   assert.match(css, /\.pw-programme \.pw-parity-label-row[\s\S]*?justify-content:\s*flex-start/);
 });
 
-test('money counter keeps a calm 80 ms presentation cadence', () => {
-  assert.match(motion, /const SECONDS_PER_YEAR = 31557600/);
-  assert.match(motion, /const MONEY_CADENCE_MS = 80/);
-  assert.match(motion, /annualMilitarySpend \/ SECONDS_PER_YEAR/);
-  assert.match(motion, /performance\.now\(\)/);
-  assert.match(motion, /now - lastMoneyPaintAt >= MONEY_CADENCE_MS/);
-  assert.match(motion, /requestAnimationFrame\(render\)/);
+test('live session loop preserves the production timing constants and clock', () => {
+  assert.match(motion, /const ORIGINAL_SECONDS_PER_YEAR = 31557600/);
+  assert.match(motion, /const ORIGINAL_LIVE_CADENCE_MS = 80/);
+  assert.match(motion, /const ORIGINAL_TRANSITION_MS = 1200/);
+  assert.match(motion, /let activeTimeMs = 0/);
+  assert.match(motion, /let lastVisibleTime = Date\.now\(\)/);
+  assert.match(motion, /let lastModeChangeTime = Date\.now\(\)/);
+  assert.match(motion, /let lastRenderTime = 0/);
+  assert.doesNotMatch(motion, /performance\.now\(\)/);
 });
 
-test('derived equivalents render every animation frame instead of inheriting the money gate', () => {
-  assert.match(motion, /function paintDerived\(spend, meta\)/);
-  assert.match(motion, /paintDerived\(spend, meta\);/);
-  assert.match(motion, /sessionFoodNode/);
-  assert.match(motion, /sessionHealthNode/);
-  assert.match(motion, /sessionPovertyNode/);
-  assert.match(motion, /persistentNumberNode\(sessionFood\)/);
-  assert.match(motion, /persistentNumberNode\(sessionHealth\)/);
-  assert.match(motion, /persistentNumberNode\(sessionPoverty\)/);
-  assert.doesNotMatch(motion, /sessionFood\.textContent\s*=/);
-  assert.doesNotMatch(motion, /sessionHealth\.textContent\s*=/);
-  assert.doesNotMatch(motion, /sessionPoverty\.textContent\s*=/);
+test('all four live values share the same production render gate', () => {
+  assert.match(motion, /now - lastRenderTime < ORIGINAL_LIVE_CADENCE_MS/);
+  assert.match(motion, /animationFrameId = requestAnimationFrame\(render\)/);
+  assert.match(motion, /activeTimeMs \+ \(Date\.now\(\) - lastVisibleTime\)/);
+  assert.match(motion, /\(annualMilitarySpend \/ ORIGINAL_SECONDS_PER_YEAR\) \* \(currentActiveTime \/ 1000\)/);
+
+  const money = motion.indexOf('setHtml(viewerSpend, formatMoneyHTML(visitSpend, true));');
+  const food = motion.indexOf('setTxt(sessionFood, formatInt(Math.floor(visitSpend / 62.5)));');
+  const health = motion.indexOf('setTxt(sessionHealth, formatInt(Math.floor(visitSpend / 125)));');
+  const poverty = motion.indexOf('setTxt(sessionPoverty, formatInt(Math.floor(visitSpend / 1000)));');
+  assert.ok(money >= 0 && food > money && health > food && poverty > health, 'four production writes remain together and ordered');
+
+  assert.doesNotMatch(motion, /paintMoney/);
+  assert.doesNotMatch(motion, /paintDerived/);
+  assert.doesNotMatch(motion, /persistentNumberNode/);
+  assert.doesNotMatch(motion, /MONEY_CADENCE_MS/);
 });
 
 test('live session values have exclusive visible DOM ownership', () => {
@@ -62,24 +68,27 @@ test('live session values have exclusive visible DOM ownership', () => {
   assert.doesNotMatch(motion, /#mainCounterValue/);
 });
 
-test('session-spend display keeps a full running integer instead of compact million steps', () => {
-  assert.match(motion, /formatInteger\(spend, meta\)/);
-  assert.match(motion, /viewerNumberNode/);
-  assert.match(motion, /pw-flow-number/);
-  assert.doesNotMatch(motion, /pw2-val-unit/);
-  assert.doesNotMatch(motion, /absolute >= 1e6/);
-  assert.match(motion, /dataset\.motionPolish\s*=\s*'split-cadence-live-flow'/);
+test('session money uses the production compact-money thresholds', () => {
+  assert.match(motion, /absolute >= 1e12[\s\S]*?minimumFractionDigits: short \? 1 : 2[\s\S]*?maximumFractionDigits: short \? 1 : 3/);
+  assert.match(motion, /absolute >= 1e9[\s\S]*?minimumFractionDigits: short \? 1 : 2[\s\S]*?maximumFractionDigits: 2/);
+  assert.match(motion, /absolute >= 1e6[\s\S]*?maximumFractionDigits: 0/);
+  assert.match(motion, /Math\.round\(absolute\)\.toLocaleString/);
+  assert.match(motion, /pw2-currency-sign/);
+  assert.match(motion, /pw2-val-unit/);
 });
 
-test('integer presentation follows the legacy round-to-nearest convention', () => {
-  assert.match(motion, /Math\.round\(Number\(value\) \|\| 0\)/);
+test('derived integer formatting and visibility behavior match production', () => {
+  assert.match(motion, /Math\.round\(value\)\.toString\(\)\.replace/);
+  assert.match(motion, /activeTimeMs \+= Date\.now\(\) - lastVisibleTime/);
+  assert.match(motion, /lastVisibleTime = Date\.now\(\)/);
+  assert.match(motion, /lastModeChangeTime = Date\.now\(\)/);
+  assert.match(motion, /dataset\.motionPolish = 'strict-production-live-port'/);
 });
 
-test('continuous numeric typography remains stable and anchored', () => {
+test('production numeric typography remains anchored', () => {
   assert.match(css, /\.pw-flow-value[\s\S]*?font-variant-numeric:\s*tabular-nums\s*!important/);
   assert.match(css, /font-feature-settings:\s*"tnum" 1, "lnum" 1\s*!important/);
-  assert.match(css, /\.pw-flow-money[\s\S]*?white-space:\s*nowrap/);
-  assert.match(css, /\.pw-flow-number[\s\S]*?font-variant-numeric:\s*tabular-nums\s*!important/);
   assert.match(css, /\.pw-flow-value \.pw2-currency-sign[\s\S]*?font-size:\s*\.85em/);
+  assert.match(css, /\.pw-flow-value \.pw2-val-unit[\s\S]*?font-size:\s*\.55em/);
   assert.match(css, /\.pw-flow-value[\s\S]*?transform:\s*none\s*!important/);
 });
