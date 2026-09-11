@@ -3,9 +3,9 @@
 
 This intentionally uses the Chrome/Chromium already present on GitHub-hosted
 Ubuntu runners, so the project does not gain a browser-test dependency. The
-checks are behavioural enough to catch broken module loading, locale/RTL
-initialisation, URL-state regressions, mobile disclosure regressions and embed
-bootstrap failures before the preview is deployed.
+checks catch broken module loading, locale/RTL initialisation, URL-state
+regressions, mobile disclosure regressions, embed bootstrap failures and core
+user interactions before the preview is deployed.
 """
 
 from __future__ import annotations
@@ -35,6 +35,7 @@ TARGET_IDS = {
     "currentPeriod",
     "debug",
     "programmeToggle",
+    "smokeResults",
 }
 VOID_TAGS = {
     "area",
@@ -137,7 +138,7 @@ def browser_binary() -> str:
     raise SystemExit("Browser smoke: Chrome/Chromium binary not found on runner")
 
 
-def dump_dom(browser: str, url: str, width: int, height: int) -> str:
+def dump_dom(browser: str, url: str, width: int, height: int, budget_ms: int = 2200) -> str:
     command = [
         browser,
         "--headless=new",
@@ -147,11 +148,11 @@ def dump_dom(browser: str, url: str, width: int, height: int) -> str:
         "--disable-background-networking",
         "--hide-scrollbars",
         f"--window-size={width},{height}",
-        "--virtual-time-budget=2200",
+        f"--virtual-time-budget={budget_ms}",
         "--dump-dom",
         url,
     ]
-    result = subprocess.run(command, capture_output=True, text=True, timeout=35, check=False)
+    result = subprocess.run(command, capture_output=True, text=True, timeout=40, check=False)
     if result.returncode != 0:
         stderr = result.stderr.strip()[-2000:]
         raise SystemExit(f"Browser smoke: Chrome failed for {url}: exit={result.returncode}\n{stderr}")
@@ -213,6 +214,17 @@ def assert_case(case: Case, page: SnapshotParser, manifest: dict) -> None:
             fail(f"{case.name}: desktop programme toggle should stay hidden")
 
 
+def assert_interaction_harness(browser: str, base: str) -> None:
+    url = f"{base}interaction-smoke.html"
+    page = parse(dump_dom(browser, url, 900, 900, budget_ms=7500))
+    result = page.value("smokeResults")
+    if page.html_attrs.get("data-smoke") != "pass":
+        fail(f"interaction harness failed:\n{result or 'no result output'}")
+    if "PASS: interaction smoke complete" not in result:
+        fail(f"interaction harness did not reach completion:\n{result}")
+    print("PASS: interaction harness")
+
+
 def main() -> None:
     if not MANIFEST.is_file():
         raise SystemExit("Browser smoke: built unified manifest is missing; build the candidate first")
@@ -251,12 +263,13 @@ def main() -> None:
             page = parse(dump_dom(browser, url, case.width, case.height))
             assert_case(case, page, manifest)
             print(f"PASS: {case.name}")
+        assert_interaction_harness(browser, base)
     finally:
         server.shutdown()
         server.server_close()
         thread.join(timeout=2)
 
-    print(f"PASS: browser smoke succeeded for {len(cases)} real-browser cases")
+    print(f"PASS: browser smoke succeeded for {len(cases)} page-load cases plus the interaction harness")
 
 
 if __name__ == "__main__":
