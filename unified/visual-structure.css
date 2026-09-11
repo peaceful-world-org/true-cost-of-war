@@ -1,17 +1,24 @@
 /* Structural parity overrides after the production-derived visual layers. */
 
-@media (max-width: 600px) {
-  /* In production the title, live fact, counter, lead, timeframe and top cards
-     are siblings inside one hero. Keep that exact responsive ordering here. */
-  .pw-hero {
-    display: flex;
-    flex-direction: column;
-    max-width: none;
-  }
+/* Production keeps all hero surfaces in one vertical flow. Making that flow
+   explicitly flex-based gives us deterministic order changes on mobile. */
+.pw-hero {
+  display: flex;
+  flex-direction: column;
+  max-width: none;
+}
 
-  .pw-hero > h1 { order: 1; }
-  .pw-hero > .pw-hero-subtitle { order: 1; }
-  .pw-hero > .pw-live-fact { order: 2; }
+.pw-hero > h1 { order: 1; }
+.pw-hero > .pw-hero-subtitle { order: 1; }
+.pw-hero > .pw-live-fact { order: 2; }
+.pw-hero > .pw-lead { order: 3; }
+.pw-hero > .pw-time-controls { order: 4; }
+.pw-hero > .pw-hero-counter { order: 5; }
+.pw-hero > .pw-reference-grid { order: 6; }
+
+@media (max-width: 600px) {
+  /* Production mobile deliberately moves the live counter ahead of the long
+     explanatory paragraph, then places timeframe controls after the lead. */
   .pw-hero > .pw-hero-counter { order: 3; }
   .pw-hero > .pw-lead { order: 4; }
   .pw-hero > .pw-time-controls { order: 5; }
