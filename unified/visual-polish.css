@@ -15,6 +15,9 @@
 .pw-parity-info,
 .pw-parity-info-sm {
   box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: var(--pw-info-size) !important;
   height: var(--pw-info-size) !important;
   min-width: var(--pw-info-size) !important;
@@ -110,6 +113,21 @@
   top: 0;
 }
 
+/* Treat the scenario title and its info control as one visual unit. The parent
+   .pw-scenario-head can then keep the percentage at the opposite edge without
+   leaving the info control floating between the title and the slider. */
+.pw-scenario-title-row {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  gap: var(--pw-info-gap);
+}
+.pw-scenario-title-row > .pw-parity-info {
+  margin-inline-start: 0;
+  align-self: center;
+}
+
 /* Mission controls used to be a smaller one-off variant. Keep the semantic
    class for compatibility but render it through the same component token. */
 .pw-mission-primary-copy .pw-parity-info,
@@ -164,5 +182,27 @@
 
   .pw-programme .pw-parity-label-row {
     max-width: calc(100% - 2px);
+  }
+
+  /* Mobile alignment pass: keep the scenario title/control group separate from
+     the percentage and anchor inline mission controls to their own text line. */
+  .pw-scenario-title-row {
+    flex: 1 1 auto;
+    gap: 6px;
+  }
+  .pw-scenario-title-row > #scenarioTitle {
+    min-width: 0;
+  }
+  .pw-scenario-title-row > .pw-parity-info {
+    margin-inline-start: 0;
+    top: 0;
+  }
+  .pw-mission-primary-copy .pw-parity-info,
+  .pw-mission-impact-highlight .pw-parity-info {
+    margin-inline-start: 4px;
+    top: 0;
+  }
+  .pw-mission-impact-highlight .pw-parity-info {
+    align-self: center;
   }
 }
