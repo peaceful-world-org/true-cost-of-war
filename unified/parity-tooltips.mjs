@@ -31,6 +31,7 @@ function textFor(key) {
   const data = source();
   if (key === 'hero') return data.hero.tooltip;
   if (key === 'main') return data.hero.mainTooltip;
+  if (key === 'scenario') return data.opportunity.scenarioTooltip;
   if (METRIC_KEYS[key]) return data.metrics[METRIC_KEYS[key]]?.tooltip || '';
   return data.opportunity.programmes[key]?.tooltip || '';
 }
@@ -44,6 +45,7 @@ function titleFor(trigger) {
   const key = trigger.dataset.tooltipKey;
   if (key === 'hero') return document.querySelector('#title')?.textContent?.trim() || trigger.dataset.tooltipTitle || '';
   if (key === 'main') return document.querySelector('#currentPeriod')?.textContent?.trim() || trigger.dataset.tooltipTitle || '';
+  if (key === 'scenario') return document.querySelector('#scenarioTitle')?.textContent?.trim() || trigger.dataset.tooltipTitle || '';
   const liveLabel = trigger.closest('.pw-parity-label-row')
     ?.querySelector('.pw-reference-card-label, .pw-programme-name')
     ?.textContent?.trim();
@@ -99,7 +101,7 @@ function renderFloating(trigger, text) {
 }
 
 function renderInline(trigger, text) {
-  const surface = trigger.closest('.pw-reference-card, .pw-programme, .pw-hero-counter, .pw-hero') || trigger.parentElement;
+  const surface = trigger.closest('.pw-reference-card, .pw-programme, .pw-hero-counter, .pw-hero, .pw-scenario-panel') || trigger.parentElement;
   if (!surface) return;
   const popover = document.createElement('div');
   popover.className = 'pw-parity-inline-popover';
@@ -183,6 +185,15 @@ function attachMainCounterInfo() {
   row.append(makeButton('main', document.querySelector('#currentPeriod')?.textContent?.trim() || 'Period total'));
 }
 
+function attachScenarioInfo() {
+  const title = document.querySelector('#scenarioTitle');
+  if (!title || document.querySelector('.pw-parity-info[data-tooltip-key="scenario"]')) return;
+  const row = document.createElement('div');
+  row.className = 'pw-scenario-title-row';
+  title.parentNode.insertBefore(row, title);
+  row.append(title, makeButton('scenario', title.textContent.trim()));
+}
+
 function install() {
   const lead = document.querySelector('#lead');
   if (lead && !document.querySelector('.pw-parity-info[data-tooltip-key="hero"]')) {
@@ -193,6 +204,7 @@ function install() {
   }
 
   attachMainCounterInfo();
+  attachScenarioInfo();
 
   const cards = [
     ['#personalBurdenLabel', 'personal'],
