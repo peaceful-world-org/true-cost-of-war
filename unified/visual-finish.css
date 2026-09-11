@@ -26,6 +26,16 @@ html[data-preview-debug="true"] .pw-debug {
 .pw-counter-value-row .pw-counter-value { min-width: 0; }
 .pw-counter-value-row .pw-parity-info { flex: 0 0 22px; }
 
+/* Scenario title and its methodology trigger form one production-style label. */
+.pw-scenario-title-row {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+.pw-scenario-title-row .pw-parity-info {
+  margin-inline-start: 10px;
+}
+
 /* The reference session box measures active time but does not expose a timer. */
 #viewerElapsed {
   position: absolute;
@@ -37,6 +47,38 @@ html[data-preview-debug="true"] .pw-debug {
   clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Restore the dedicated methodology/philosophy section around the central
+   text and UNESCO quotation. */
+.pw-philosophy-section {
+  margin-top: 48px;
+  padding: 48px;
+  border: 1px solid rgba(52, 211, 153, .2);
+  border-radius: 32px;
+  background: linear-gradient(135deg, rgba(52, 211, 153, .05) 0%, rgba(15, 31, 53, .4) 100%);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, .4);
+}
+.pw-philosophy-section .pw-philosophy-card {
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: center;
+}
+.pw-philosophy-section h2 {
+  margin-bottom: 24px;
+}
+.pw-philosophy-section .pw-philosophy-copy {
+  max-width: 720px;
+  margin-inline: auto;
+  text-align: center;
+}
+.pw-philosophy-section .pw-philosophy-quote {
+  margin: 40px auto;
 }
 
 /* The production dissemination/share section is a softer green surface rather
@@ -184,6 +226,27 @@ html[data-preview-debug="true"] .pw-debug {
 @media (max-width: 600px) {
   .pw-counter-value-row { gap: 10px; }
 
+  .pw-philosophy-section {
+    margin-top: 32px;
+    padding: 32px 0 0;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, .05);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .pw-philosophy-section .pw-philosophy-card {
+    max-width: none;
+    text-align: left;
+  }
+  .pw-philosophy-section h2,
+  .pw-philosophy-section .pw-philosophy-copy {
+    text-align: left;
+  }
+  .pw-philosophy-section .pw-philosophy-quote {
+    margin: 32px 0;
+  }
+
   .pw-share-section {
     margin-top: 32px;
     padding: 32px 0 0;
@@ -201,9 +264,7 @@ html[data-preview-debug="true"] .pw-debug {
     text-align: center;
   }
 
-  .pw-share-section .pw-scale-section {
-    margin-top: 32px;
-  }
+  .pw-share-section .pw-scale-section { margin-top: 32px; }
   .pw-share-section .pw-scale-card {
     overflow: visible;
     margin: 0 0 24px;
