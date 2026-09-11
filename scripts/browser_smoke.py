@@ -4,8 +4,9 @@
 This intentionally uses the Chrome/Chromium already present on GitHub-hosted
 Ubuntu runners, so the project does not gain a browser-test dependency. The
 checks catch broken module loading, locale/RTL initialisation, URL-state
-regressions, mobile disclosure regressions, embed bootstrap failures and core
-user interactions before the preview is deployed.
+regressions, mobile disclosure regressions, embed bootstrap failures, core
+user interactions and key production-derived visual geometry before preview
+deployment.
 """
 
 from __future__ import annotations
@@ -214,15 +215,15 @@ def assert_case(case: Case, page: SnapshotParser, manifest: dict) -> None:
             fail(f"{case.name}: desktop programme toggle should stay hidden")
 
 
-def assert_interaction_harness(browser: str, base: str) -> None:
-    url = f"{base}interaction-smoke.html"
-    page = parse(dump_dom(browser, url, 900, 900, budget_ms=7500))
+def assert_harness(browser: str, base: str, filename: str, completion: str, budget_ms: int) -> None:
+    url = f"{base}{filename}"
+    page = parse(dump_dom(browser, url, 1280, 1000, budget_ms=budget_ms))
     result = page.value("smokeResults")
     if page.html_attrs.get("data-smoke") != "pass":
-        fail(f"interaction harness failed:\n{result or 'no result output'}")
-    if "PASS: interaction smoke complete" not in result:
-        fail(f"interaction harness did not reach completion:\n{result}")
-    print("PASS: interaction harness")
+        fail(f"{filename} failed:\n{result or 'no result output'}")
+    if completion not in result:
+        fail(f"{filename} did not reach completion:\n{result}")
+    print(f"PASS: {filename}")
 
 
 def main() -> None:
@@ -263,13 +264,30 @@ def main() -> None:
             page = parse(dump_dom(browser, url, case.width, case.height))
             assert_case(case, page, manifest)
             print(f"PASS: {case.name}")
-        assert_interaction_harness(browser, base)
+
+        assert_harness(
+            browser,
+            base,
+            "interaction-smoke.html",
+            "PASS: interaction smoke complete",
+            7500,
+        )
+        assert_harness(
+            browser,
+            base,
+            "visual-smoke.html",
+            "PASS: visual parity smoke complete",
+            6500,
+        )
     finally:
         server.shutdown()
         server.server_close()
         thread.join(timeout=2)
 
-    print(f"PASS: browser smoke succeeded for {len(cases)} page-load cases plus the interaction harness")
+    print(
+        f"PASS: browser smoke succeeded for {len(cases)} page-load cases "
+        "plus interaction and visual parity harnesses"
+    )
 
 
 if __name__ == "__main__":
