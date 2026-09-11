@@ -4,6 +4,21 @@ const mobile = window.matchMedia('(max-width: 600px)');
 let activeTrigger = null;
 let activeInline = null;
 
+const MOBILE_LANGUAGE_LABELS = Object.freeze({
+  en: 'EN',
+  de: 'DE',
+  es: 'ES',
+  fr: 'FR',
+  pt: 'PT',
+  ar: 'AR',
+  fa: 'FA',
+  ru: 'RU',
+  hi: 'HI',
+  ukr: 'UA',
+  'zh-CN': 'ZH',
+});
+const fullLanguageNames = new Map();
+
 const floating = document.createElement('div');
 floating.className = 'pw-parity-popover';
 floating.hidden = true;
@@ -67,6 +82,24 @@ function syncAccessibleLabels() {
   }
 }
 
+function syncLanguageOptionLabels() {
+  const select = document.querySelector('#language');
+  if (!select) return;
+
+  for (const option of select.options) {
+    const key = option.value;
+    if (!fullLanguageNames.has(key)) {
+      fullLanguageNames.set(key, option.textContent.trim());
+    }
+    const fullName = fullLanguageNames.get(key) || option.textContent.trim();
+    option.textContent = mobile.matches ? (MOBILE_LANGUAGE_LABELS[key] || fullName) : fullName;
+    option.title = fullName;
+  }
+
+  const selectedFullName = fullLanguageNames.get(select.value);
+  if (selectedFullName) select.title = selectedFullName;
+}
+
 function closeTooltip() {
   if (activeTrigger) activeTrigger.setAttribute('aria-expanded', 'false');
   if (activeInline) activeInline.remove();
@@ -105,14 +138,52 @@ function renderFloating(trigger, text) {
 }
 
 function renderInline(trigger, text) {
-  const surface = trigger.closest(
-    '.pw-reference-card, .pw-programme, .pw-hero-counter, .pw-hero, .pw-scenario-panel, .pw-mission-highlight, .pw-mission-card',
-  ) || trigger.parentElement;
-  if (!surface) return;
   const popover = document.createElement('div');
   popover.className = 'pw-parity-inline-popover';
   popover.setAttribute('role', 'tooltip');
   fillPopover(popover, trigger, text);
+
+  // On mobile, large parent surfaces can be hundreds of pixels tall. Appending
+  // the tooltip to the end of those surfaces makes a successful tap look like
+  // nothing happened. Keep the few top-level controls beside their trigger.
+  const key = trigger.dataset.tooltipKey;
+  if (key === 'hero') {
+    const host = trigger.closest('.pw-hero-info-row');
+    if (host) {
+      host.append(popover);
+      activeInline = popover;
+      return;
+    }
+  }
+  if (key === 'main') {
+    const host = trigger.closest('.pw-counter-value-row');
+    if (host) {
+      host.append(popover);
+      activeInline = popover;
+      return;
+    }
+  }
+  if (key === 'scenario') {
+    const head = trigger.closest('.pw-scenario-head');
+    if (head) {
+      head.insertAdjacentElement('afterend', popover);
+      activeInline = popover;
+      return;
+    }
+  }
+  if (key === 'missionFunding') {
+    const host = trigger.closest('.pw-mission-primary-copy');
+    if (host) {
+      host.append(popover);
+      activeInline = popover;
+      return;
+    }
+  }
+
+  const surface = trigger.closest(
+    '.pw-reference-card, .pw-programme, .pw-hero-counter, .pw-hero, .pw-scenario-panel, .pw-mission-highlight, .pw-mission-card',
+  ) || trigger.parentElement;
+  if (!surface) return;
   surface.append(popover);
   activeInline = popover;
 }
@@ -197,6 +268,8 @@ function attachScenarioInfo() {
 }
 
 function install() {
+  syncLanguageOptionLabels();
+
   const lead = document.querySelector('#lead');
   if (lead && !document.querySelector('.pw-parity-info[data-tooltip-key="hero"]')) {
     const row = document.createElement('div');
@@ -233,6 +306,9 @@ const languageObserver = new MutationObserver(() => {
 });
 languageObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir'] });
 
+document.querySelector('#language')?.addEventListener('change', syncLanguageOptionLabels);
+mobile.addEventListener?.('change', syncLanguageOptionLabels);
+
 document.addEventListener('click', (event) => {
   const trigger = event.target.closest?.('.pw-parity-info');
   if (trigger) {
@@ -246,6 +322,7 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') closeTooltip();
 });
 window.addEventListener('resize', () => {
+  syncLanguageOptionLabels();
   if (!activeTrigger) return;
   const trigger = activeTrigger;
   const text = textFor(trigger.dataset.tooltipKey);
