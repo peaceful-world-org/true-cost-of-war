@@ -22,7 +22,9 @@ OPPORTUNITY = {
 }
 NARRATIVE = {
     "scaleHeading", "scaleTitle", "day", "month", "year", "missionHeading", "missionCopy",
-    "impactTitle", "impact", "cta", "ctaHref", "philosophyTitle", "philosophyCopy", "quote",
+    "missionBeforeInfo", "missionAfterInfo", "missionFirstEmphasis", "missionSecondEmphasis",
+    "missionNoteTemplate", "missionTooltip", "impactTitle", "impactHeading", "impactHighlight",
+    "impactTooltip", "impact", "cta", "ctaHref", "philosophyTitle", "philosophyCopy", "quote",
     "quoteSource", "closing",
 }
 
@@ -107,6 +109,8 @@ def main() -> None:
                 non_empty(programme.get(key), f"{language}.opportunity.programmes.{programme_key}.{key}")
         for key in NARRATIVE:
             non_empty(narrative.get(key), f"{language}.narrative.{key}")
+        if "{value}" not in narrative["missionNoteTemplate"]:
+            raise SystemExit(f"{language}.narrative.missionNoteTemplate: missing {{value}} marker")
 
     print(f"PASS: generated parity copy is complete for {len(languages)} source languages")
 
