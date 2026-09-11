@@ -185,6 +185,12 @@ def line_around_direct_child(target: Node | None) -> tuple[str, str]:
     return before, after
 
 
+def value_template(target: Node | None) -> str:
+    """Preserve the source language's number position using a {value} token."""
+    before, after = line_around_direct_child(target)
+    return normalize(f"{before} {{value}} {after}")
+
+
 def require(value: str, language: str, label: str) -> str:
     value = normalize(value)
     if not value:
@@ -238,9 +244,6 @@ def extract(language: str, source: Path) -> dict:
     food_target = find_id(root, "pw2-live-hunger")
     health_target = find_id(root, "pw2-live-health")
     poverty_target = find_id(root, "pw2-live-poverty")
-    food_label, people_suffix = line_around_direct_child(food_target)
-    health_label, health_suffix = line_around_direct_child(health_target)
-    poverty_label, poverty_suffix = line_around_direct_child(poverty_target)
     bullet_container = food_target.parent if food_target else None
     alternatives = previous_element(bullet_container)
 
@@ -294,15 +297,13 @@ def extract(language: str, source: Path) -> dict:
     main_tooltip = find_class(main_card, "pw2-tooltip")
     main_caption = find_id(root, "pw2-heroSubcopy")
 
-    people_candidates = [people_suffix, health_suffix, poverty_suffix]
-    people = next((normalize(value) for value in people_candidates if normalize(value)), "")
-
     return {
         "source": source.relative_to(ROOT).as_posix(),
         "hero": {
             "subtitle": require(node_text(hero_subtitle_node), language, "hero.subtitle"),
-            "livePrefix": require(live_prefix, language, "hero.livePrefix"),
-            "liveSuffix": require(live_suffix, language, "hero.liveSuffix"),
+            "livePrefix": normalize(live_prefix),
+            "liveSuffix": normalize(live_suffix),
+            "liveTemplate": require(value_template(spend_per_second), language, "hero.liveTemplate"),
             "lead": require(node_text(lead, exclude_classes={"pw2-tooltip"}), language, "hero.lead"),
             "tooltip": require(node_text(hero_tooltip), language, "hero.tooltip"),
             "mainCaption": require(node_text(main_caption, exclude_classes={"pw2-tooltip"}), language, "hero.mainCaption"),
@@ -312,10 +313,9 @@ def extract(language: str, source: Path) -> dict:
             "title": require(node_text(session_title), language, "session.title"),
             "note": require(node_text(session_note), language, "session.note"),
             "alternatives": require(node_text(alternatives, exclude_classes={"pw2-tooltip"}), language, "session.alternatives"),
-            "food": require(food_label, language, "session.food"),
-            "health": require(health_label, language, "session.health"),
-            "poverty": require(poverty_label, language, "session.poverty"),
-            "people": require(people, language, "session.people"),
+            "foodTemplate": require(value_template(food_target), language, "session.foodTemplate"),
+            "healthTemplate": require(value_template(health_target), language, "session.healthTemplate"),
+            "povertyTemplate": require(value_template(poverty_target), language, "session.povertyTemplate"),
         },
         "metrics": {
             "personal": personal,
