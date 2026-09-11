@@ -98,6 +98,7 @@
       const mobileHero = m.querySelector('.pw-hero');
       const mobileCounter = m.querySelector('.pw-hero-counter');
       const mobileLead = m.querySelector('.pw-lead');
+      const mobileLeadRow = m.querySelector('.pw-hero-info-row');
       const mobileTime = m.querySelector('.pw-time-controls');
       const mobileGrid = m.querySelector('.pw-hero > .pw-reference-grid');
       const mobileProgramme = m.querySelector('.pw-programme');
@@ -108,8 +109,9 @@
       assert(ms(mobileShell).borderRadius === '0px', 'mobile shell becomes edge-to-edge');
       assert(Math.abs(px(ms(mobileShell).paddingLeft) - 16) < 0.5, 'mobile shell keeps 16px production gutter');
       assert(ms(mobileHero).display === 'flex', 'mobile hero uses deterministic flex ordering');
-      const orderValues = `${ms(mobileCounter).order}/${ms(mobileLead).order}/${ms(mobileTime).order}`;
-      assert(ms(mobileCounter).order === '3' && ms(mobileLead).order === '4' && ms(mobileTime).order === '5', `mobile hero order contract matches production (${orderValues})`);
+      assert(Boolean(mobileLeadRow), 'methodology control keeps the hero lead in one wrapper');
+      const orderValues = `${ms(mobileCounter).order}/${ms(mobileLeadRow).order}/${ms(mobileTime).order}`;
+      assert(ms(mobileCounter).order === '3' && ms(mobileLeadRow).order === '4' && ms(mobileTime).order === '5', `mobile hero order contract matches production (${orderValues})`);
       assert(mobileCounter.getBoundingClientRect().top < mobileLead.getBoundingClientRect().top, 'mobile hero counter appears before long explanatory lead');
       assert(mobileLead.getBoundingClientRect().top < mobileTime.getBoundingClientRect().top, 'mobile lead appears before timeframe controls');
       assert(mobileTime.getBoundingClientRect().top < mobileGrid.getBoundingClientRect().top, 'mobile timeframe controls appear before impact cards');
