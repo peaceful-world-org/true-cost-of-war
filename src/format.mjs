@@ -5,7 +5,7 @@
 // units and digit style therefore remain predictable across locales while the
 // application architecture is consolidated.
 
-const DEFAULT_UNITS = Object.freeze({ trillion: 'tn', billion: 'bn', million: 'm' });
+const DEFAULT_UNITS = Object.freeze({ trillion: 'T', billion: 'B', million: 'M' });
 const DEFAULT_PROFILE = Object.freeze({
   numberLocale: 'en-US',
   currencySymbol: '$',
@@ -41,12 +41,12 @@ export function formatInteger(value, meta = {}) {
   });
 }
 
-export function formatRatio(value, meta = {}, { maximumFractionDigits = 1 } = {}) {
+export function formatRatio(value, meta = {}) {
   const profile = profileOf(meta);
   const number = numberOf(value);
   return localized(number, profile.numberLocale, {
-    minimumFractionDigits: number < 10 ? 1 : 0,
-    maximumFractionDigits,
+    minimumFractionDigits: Math.abs(number) < 10 ? 1 : 0,
+    maximumFractionDigits: Math.abs(number) < 10 ? 1 : 0,
   });
 }
 
