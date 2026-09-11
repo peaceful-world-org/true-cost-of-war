@@ -9,61 +9,18 @@
 
 .pw-opportunity-list-column { min-width: 0; }
 
+/* Mobile summary exists in the reference at tablet/mobile breakpoints. */
+.pw-mobile-summary { display: none; }
+
+/* The reference uses one continuous green fund surface on desktop. */
 .pw-opportunity-fund {
   position: sticky;
   top: 24px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   align-self: start;
-}
-
-.pw-opportunity-fund .pw-allocation {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-  margin: 0 0 16px;
-  padding: 18px;
-  border: 1px solid rgba(16, 185, 129, .22);
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, .1) 0%, rgba(0, 0, 0, .45) 100%);
-}
-
-.pw-opportunity-fund .pw-allocation-card {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.pw-opportunity-fund .pw-allocation-head {
-  align-items: baseline;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.pw-opportunity-fund .pw-allocation-head strong {
-  color: #fff;
-  font-family: Inter, system-ui, sans-serif;
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.pw-opportunity-fund .pw-allocation-track {
-  height: 8px;
-  margin-top: 8px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, .1);
-}
-
-.pw-opportunity-fund .pw-allocation-card[data-allocation="development"] i {
-  background: var(--peace);
-}
-
-.pw-opportunity-fund .pw-allocation-card[data-allocation="defence"] i {
-  background: var(--danger-direct);
-}
-
-.pw-opportunity-fund .pw-mission-card {
   padding: 40px;
   border: 1px solid rgba(16, 185, 129, .3);
   border-radius: 24px;
@@ -71,40 +28,148 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, .5);
 }
 
-.pw-opportunity-fund .pw-mission-heading {
+.pw-fund-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 16px;
   color: var(--peace);
-  font-family: Inter, system-ui, sans-serif;
   font-size: 15px;
   font-weight: 800;
   letter-spacing: .1em;
   text-transform: uppercase;
 }
+.pw-fund-header::before {
+  content: "";
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  flex: 0 0 1.2em;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='12'%20cy='12'%20r='5'/%3E%3Cpath%20d='M12%201v2M12%2021v2M4.22%204.22l1.42%201.42M18.36%2018.36l1.42%201.42M1%2012h2M21%2012h2M4.22%2019.78l1.42-1.42M18.36%205.64l1.42-1.42'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='12'%20cy='12'%20r='5'/%3E%3Cpath%20d='M12%201v2M12%2021v2M4.22%204.22l1.42%201.42M18.36%2018.36l1.42%201.42M1%2012h2M21%2012h2M4.22%2019.78l1.42-1.42M18.36%205.64l1.42-1.42'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.pw-fund-amount {
+  margin-bottom: 12px;
+  color: #fff;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: clamp(34px, 3.5vw, 54px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+.pw-fund-subtitle {
+  margin-bottom: 24px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+  text-wrap: balance;
+}
 
-.pw-opportunity-fund .pw-mission-title {
-  margin: 0 0 24px;
+/* Reuse the unified allocation DOM but render it as the single split bar used
+   in production. */
+.pw-opportunity-fund .pw-allocation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  margin: 0 0 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.pw-opportunity-fund .pw-allocation::after {
+  content: "";
+  display: block;
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 8px;
+  margin-top: 4px;
+  border-radius: 4px;
+  background: linear-gradient(90deg,
+    var(--peace) 0 var(--development-share, 10%),
+    var(--danger) var(--development-share, 10%) 100%);
+  transition: background .3s ease;
+}
+.pw-opportunity-fund .pw-allocation-card {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.pw-opportunity-fund .pw-allocation-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.pw-opportunity-fund .pw-allocation-card[data-allocation="defence"] .pw-allocation-head {
+  align-items: flex-end;
+  text-align: end;
+}
+.pw-opportunity-fund .pw-allocation-head strong {
+  color: #fff;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+}
+.pw-opportunity-fund .pw-allocation-card[data-allocation="development"] .pw-allocation-head strong { color: var(--peace); }
+.pw-opportunity-fund .pw-allocation-card[data-allocation="defence"] .pw-allocation-head strong { color: var(--danger-direct); }
+.pw-opportunity-fund .pw-allocation-track { display: none; }
+
+/* Mission content is the lower part of the same fund card, not a second card. */
+.pw-opportunity-fund .pw-mission-card {
+  margin-top: auto;
+  padding: 24px 0 0;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.pw-opportunity-fund .pw-mission-heading {
+  margin-bottom: 12px;
   color: #fff;
   font-family: Montserrat, Inter, system-ui, sans-serif;
   font-size: 18px;
   font-weight: 800;
-  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
-
+.pw-opportunity-fund .pw-mission-title {
+  margin: 0;
+  color: var(--muted);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0;
+  text-transform: none;
+}
 .pw-opportunity-fund .pw-mission-highlight {
-  margin: 0 0 28px;
+  margin: 24px 0 28px;
   padding: 24px;
   border: 1px solid rgba(16, 185, 129, .2);
   border-radius: 16px;
   background: rgba(16, 185, 129, .05);
 }
-
+.pw-opportunity-fund .pw-mission-highlight > strong {
+  color: #fff;
+  font-family: Montserrat, Inter, system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.4;
+}
 .pw-opportunity-fund .pw-mission-copy {
   color: var(--muted);
   font-size: 15px;
   font-weight: 500;
   line-height: 1.6;
 }
-
 .pw-opportunity-fund .pw-mission-cta {
   width: 100%;
   margin-top: 0;
@@ -117,7 +182,6 @@
   box-shadow: 0 8px 20px rgba(16, 185, 129, .25);
   text-shadow: 0 1px 2px rgba(0, 0, 0, .2);
 }
-
 .pw-opportunity-fund .pw-mission-cta:hover,
 .pw-opportunity-fund .pw-mission-cta:focus-visible {
   transform: translateY(-2px);
@@ -125,14 +189,27 @@
   box-shadow: 0 12px 25px rgba(16, 185, 129, .4);
 }
 
-html[dir="rtl"] .pw-opportunity-fund .pw-allocation-head {
-  text-align: right;
-}
+html[dir="rtl"] .pw-opportunity-fund .pw-allocation-head { text-align: right; }
 
 @media (max-width: 900px) {
-  .pw-opportunity-split {
-    grid-template-columns: 1fr;
+  .pw-mobile-summary {
+    display: block;
+    margin-bottom: 24px;
+    padding: 24px;
+    border: 1px solid rgba(16, 185, 129, .3);
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, .1) 0%, rgba(0, 0, 0, .4) 100%);
   }
+  .pw-mobile-summary .pw-fund-header { margin-bottom: 12px; }
+  .pw-mobile-summary .pw-fund-amount { margin-bottom: 8px; }
+  .pw-mobile-summary-desc {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .pw-opportunity-split { grid-template-columns: 1fr; }
   .pw-opportunity-fund {
     position: static;
     margin-top: 20px;
@@ -140,38 +217,14 @@ html[dir="rtl"] .pw-opportunity-fund .pw-allocation-head {
 }
 
 @media (max-width: 600px) {
-  .pw-opportunity-split { gap: 0; }
-
-  .pw-opportunity-fund {
-    margin-top: 24px;
-    padding-top: 32px;
-    border-top: 1px solid rgba(255, 255, 255, .05);
-  }
-
-  .pw-opportunity-fund .pw-allocation {
-    gap: 12px;
-    margin-bottom: 24px;
+  .pw-mobile-summary {
     padding: 0 0 24px;
     border: 0;
     border-bottom: 1px solid rgba(255, 255, 255, .05);
     border-radius: 0;
     background: transparent;
   }
-
-  .pw-opportunity-fund .pw-allocation-head {
-    font-size: 12px;
-    flex-wrap: wrap;
-  }
-
-  .pw-opportunity-fund .pw-mission-card {
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .pw-opportunity-fund .pw-mission-heading {
+  .pw-mobile-summary .pw-fund-header {
     margin-bottom: 8px;
     color: var(--muted);
     font-family: Inter, system-ui, sans-serif;
@@ -179,24 +232,75 @@ html[dir="rtl"] .pw-opportunity-fund .pw-allocation-head {
     font-weight: 600;
     letter-spacing: .05em;
   }
+  .pw-mobile-summary .pw-fund-amount { font-size: 40px; }
 
-  .pw-opportunity-fund .pw-mission-title {
-    margin-bottom: 20px;
-    font-size: 18px;
-    text-transform: none;
+  .pw-opportunity-split { gap: 0; }
+  .pw-opportunity-fund {
+    margin-top: 24px;
+    padding: 32px 0 0;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, .05);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .pw-opportunity-fund .pw-fund-header {
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .05em;
+  }
+  .pw-opportunity-fund .pw-fund-amount {
+    margin-bottom: 8px;
+    font-size: 40px;
+  }
+  .pw-opportunity-fund .pw-fund-subtitle {
+    margin-bottom: 24px;
+    font-size: 15px;
+    text-wrap: normal;
   }
 
+  .pw-opportunity-fund .pw-allocation {
+    gap: 8px 12px;
+    margin-bottom: 24px;
+    padding: 0 0 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, .05);
+  }
+  .pw-opportunity-fund .pw-allocation-head {
+    font-size: 12px;
+    flex-wrap: wrap;
+  }
+
+  .pw-opportunity-fund .pw-mission-card {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .pw-opportunity-fund .pw-mission-heading {
+    margin-bottom: 12px;
+    color: #fff;
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .pw-opportunity-fund .pw-mission-title {
+    margin-bottom: 0;
+    color: rgba(255, 255, 255, .8);
+    font-size: 15px;
+  }
   .pw-opportunity-fund .pw-mission-highlight {
     margin: 20px 0 24px;
     padding: 16px;
     border-color: rgba(16, 185, 129, .15);
   }
-
   .pw-opportunity-fund .pw-mission-copy {
     color: rgba(255, 255, 255, .7);
     font-size: 14px;
   }
-
   .pw-opportunity-fund .pw-mission-cta {
     margin-top: 8px;
     padding: 18px 24px;
