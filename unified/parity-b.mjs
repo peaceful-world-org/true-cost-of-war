@@ -7,7 +7,6 @@ import { parityCopy } from './parity-b-copy.mjs';
 
 const REFERENCE_SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
 const POPULATION_BASELINE = 8.1e9;
-const SESSION_EQUIVALENTS = Object.freeze({ food: 62.5, health: 125, poverty: 1000 });
 
 const [manifest, modelDocument] = await Promise.all([
   fetch('./locales/manifest.json', { cache: 'no-store' }).then((r) => r.json()),
@@ -37,7 +36,6 @@ const el = {
   sessionFood: document.querySelector('#sessionFood'),
   sessionHealth: document.querySelector('#sessionHealth'),
   sessionPoverty: document.querySelector('#sessionPoverty'),
-  viewerElapsed: document.querySelector('#viewerElapsed'),
   personalBurdenLabel: document.querySelector('#personalBurdenLabel'),
   personalBurden: document.querySelector('#personalBurden'),
   personalBurdenDesc: document.querySelector('#personalBurdenDesc'),
@@ -104,14 +102,6 @@ function prepareSessionLine(valueNode, template) {
 function applyValueTemplate(template, value) {
   const source = String(template || '{value}');
   return source.includes('{value}') ? source.replace('{value}', String(value)) : String(value);
-}
-
-function elapsedSeconds() {
-  const parts = (el.viewerElapsed?.textContent || '00:00').trim().split(':').map(Number);
-  if (parts.some((value) => !Number.isFinite(value))) return 0;
-  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
-  if (parts.length === 2) return parts[0] * 60 + parts[1];
-  return 0;
 }
 
 function snapshot() {
@@ -211,11 +201,10 @@ function renderDynamic() {
   const snap = snapshot();
   const m = meta();
 
-  const active = elapsedSeconds();
-  const sessionSpend = perSecond * active;
-  setText(el.sessionFood, formatInteger(Math.floor(sessionSpend / SESSION_EQUIVALENTS.food), m));
-  setText(el.sessionHealth, formatInteger(Math.floor(sessionSpend / SESSION_EQUIVALENTS.health), m));
-  setText(el.sessionPoverty, formatInteger(Math.floor(sessionSpend / SESSION_EQUIVALENTS.poverty), m));
+  // Important: the four live session values are owned by visual-polish.mjs as
+  // one production-derived clock. This parity layer must never recompute the
+  // three session equivalents from the rounded viewerElapsed text. Doing so
+  // creates a second writer with a 1-second clock and makes values oscillate.
 
   setText(el.personalBurden, formatMoney(snap.totals.militarySpend / POPULATION_BASELINE, m));
   setText(el.directValue, formatInteger(snap.totals.directDeaths, m));
