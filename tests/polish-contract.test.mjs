@@ -18,6 +18,9 @@ test('polish layer is loaded last in the unified visual stack', () => {
 test('all parity info controls share one geometry token', () => {
   assert.match(css, /--pw-info-size:\s*20px/);
   assert.match(css, /\.pw-parity-info,\s*\n\.pw-parity-info-sm/);
+  assert.match(css, /display:\s*inline-flex/);
+  assert.match(css, /align-items:\s*center/);
+  assert.match(css, /justify-content:\s*center/);
   assert.match(css, /width:\s*var\(--pw-info-size\)\s*!important/);
   assert.match(css, /height:\s*var\(--pw-info-size\)\s*!important/);
   assert.match(css, /flex:\s*0 0 var\(--pw-info-size\)\s*!important/);
@@ -28,6 +31,13 @@ test('info placement distinguishes hero, metric cards and programme titles', () 
   assert.match(css, /\.pw-hero-info-row \.pw-lead[\s\S]*?display:\s*inline/);
   assert.match(css, /\.pw-reference-card \.pw-parity-label-row[\s\S]*?align-items:\s*flex-start/);
   assert.match(css, /\.pw-programme \.pw-parity-label-row[\s\S]*?justify-content:\s*flex-start/);
+});
+
+test('mobile info controls stay grouped with scenario and mission text', () => {
+  assert.match(css, /\.pw-scenario-title-row\s*\{[\s\S]*?display:\s*inline-flex[\s\S]*?align-items:\s*center[\s\S]*?gap:\s*var\(--pw-info-gap\)/);
+  assert.match(css, /\.pw-scenario-title-row > \.pw-parity-info\s*\{[\s\S]*?margin-inline-start:\s*0[\s\S]*?align-self:\s*center/);
+  assert.match(css, /@media \(max-width:\s*600px\)[\s\S]*?\.pw-scenario-title-row\s*\{[\s\S]*?flex:\s*1 1 auto[\s\S]*?gap:\s*6px/);
+  assert.match(css, /@media \(max-width:\s*600px\)[\s\S]*?\.pw-mission-primary-copy \.pw-parity-info,[\s\S]*?\.pw-mission-impact-highlight \.pw-parity-info\s*\{[\s\S]*?margin-inline-start:\s*4px[\s\S]*?top:\s*0/);
 });
 
 test('live session loop preserves the production timing constants and clock', () => {
