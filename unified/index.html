@@ -7,13 +7,14 @@
   <title>True Cost of War — Unified Candidate</title>
   <link rel="stylesheet" href="./app.css">
   <link rel="stylesheet" href="./parity-b.css">
+  <link rel="stylesheet" href="./parity-share.css">
 </head>
 <body>
   <main class="pw-shell">
     <div class="pw-preview-banner" role="status">
       <div>
         <strong>UNIFIED CANDIDATE · PREVIEW</strong>
-        <span>v0.5 · Parity Sprint B · not production</span>
+        <span>v0.6 · Parity Sprint B · not production</span>
       </div>
       <label class="pw-preview-language">
         <span id="languageLabel">Language</span>
@@ -96,7 +97,7 @@
     <section class="pw-grid pw-grid-headline" id="headlineMetrics" hidden></section>
 
     <section class="pw-economic-section">
-      <h2 id="economicTitle">ECONOMIC IMPACT</h2>
+      <h2 id="economicTitle">COMPREHENSIVE ECONOMIC IMPACT</h2>
       <p class="pw-section-intro" id="economicIntro">Military expenditure is only one part of the total cost.</p>
       <div class="pw-reference-grid">
         <article class="pw-reference-card pw-glow" data-tone="gold">
@@ -108,7 +109,7 @@
           <div class="pw-reference-card-value" id="lifeYearsValue">—</div>
         </article>
         <article class="pw-reference-card pw-glow" data-tone="gold">
-          <div class="pw-reference-card-label" id="economicLossLabel">TOTAL ECONOMIC IMPACT</div>
+          <div class="pw-reference-card-label" id="economicLossLabel">TOTAL ECONOMIC LOSSES</div>
           <div class="pw-reference-card-value" id="economicLossValue">—</div>
         </article>
       </div>
@@ -128,17 +129,43 @@
         <input id="share" class="pw-scenario-range" type="range" min="5" max="50" step="1" value="10">
         <div class="pw-share-track" aria-hidden="true"><i id="shareProgress"></i></div>
         <div class="pw-scenario-bottom">
-          <span class="pw-scenario-scale">5% ··· 50%</span>
+          <span class="pw-scenario-spectrum" id="scenarioSpectrum">Conservative → Moderate → Systemic</span>
           <div class="pw-scenario-pills" role="group" aria-label="Preset redistribution scenarios">
             <button type="button" class="pw-scenario-chip" data-share="10">10%</button>
             <button type="button" class="pw-scenario-chip" data-share="25">25%</button>
             <button type="button" class="pw-scenario-chip" data-share="50">50%</button>
           </div>
         </div>
+
+        <div class="pw-allocation">
+          <div class="pw-allocation-card" data-allocation="development">
+            <div class="pw-allocation-head"><span id="developmentAllocationLabel">Redirected to development</span><strong id="developmentAllocationValue">—</strong></div>
+            <div class="pw-allocation-track"><i id="developmentAllocationBar"></i></div>
+          </div>
+          <div class="pw-allocation-card" data-allocation="defence">
+            <div class="pw-allocation-head"><span id="defenceAllocationLabel">Remaining military expenditure</span><strong id="defenceAllocationValue">—</strong></div>
+            <div class="pw-allocation-track"><i id="defenceAllocationBar"></i></div>
+          </div>
+        </div>
       </div>
 
       <div class="pw-programmes" id="programmes"></div>
+      <button type="button" class="pw-programme-toggle" id="programmeToggle" aria-expanded="false" hidden>Show more programmes</button>
       <div class="pw-grid pw-grid-opportunity" id="opportunityMetrics" hidden></div>
+    </section>
+
+    <section class="pw-share-section">
+      <h2 id="shareTitle">SHARE THE RESULT</h2>
+      <p class="pw-section-intro" id="shareIntro">Generate a text summary or square card from the current calculator state.</p>
+      <div class="pw-share-actions">
+        <button type="button" class="pw-share-button" id="buildText">Generate text</button>
+        <button type="button" class="pw-share-button" id="copyText">Copy data</button>
+        <button type="button" class="pw-share-button" data-primary="true" id="buildCard">Generate card</button>
+        <button type="button" class="pw-share-button" id="downloadCard">Download PNG</button>
+      </div>
+      <div class="pw-copy-state" id="copyState" aria-live="polite"></div>
+      <div class="pw-share-output" id="shareTextWrap" hidden><pre class="pw-share-text" id="shareTextOutput"></pre></div>
+      <div class="pw-share-output" id="shareCardWrap" hidden><img class="pw-share-preview" id="shareCardPreview" alt="Generated True Cost of War infographic preview"></div>
     </section>
 
     <details class="pw-method">
@@ -172,5 +199,6 @@
 
   <script type="module" src="./app.mjs"></script>
   <script type="module" src="./parity-b.mjs"></script>
+  <script type="module" src="./parity-share.mjs"></script>
 </body>
 </html>
