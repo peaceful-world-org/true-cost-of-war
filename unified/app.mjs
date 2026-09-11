@@ -1,10 +1,20 @@
 import { calculateLegacySnapshot } from '../src/runtime.mjs';
+import {
+  formatElapsed,
+  formatInteger,
+  formatMoney,
+  formatPerSecond,
+  formatRatio,
+} from '../src/format.mjs';
+import { createActiveTimeTracker } from '../src/active-time.mjs';
 import { readCandidateState, writeCandidateState } from './state.mjs';
 
 const DEFAULT_LANGUAGE = 'en';
 const MODE_ORDER = ['year', '1year', '10years', 'lifetime', 'day', 'hour', 'minute', 'since1945'];
-const SECONDS_PER_365_DAY_YEAR = 365 * 24 * 60 * 60;
-const SESSION_STARTED_AT = Date.now();
+const REFERENCE_SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
+const LIVE_THROTTLE_MS = 80;
+const MODE_EASE_MS = 1200;
+const URL_SYNC_DELAY_MS = 250;
 
 const elements = {
   eyebrow: document.querySelector('#eyebrow'),
@@ -51,15 +61,28 @@ const [manifest, modelDocument] = await Promise.all([
 
 const languages = manifest.languages;
 const model = modelDocument.values;
-const perSecond = model.annualMilitarySpend / SECONDS_PER_365_DAY_YEAR;
+const perSecond = model.annualMilitarySpend / REFERENCE_SECONDS_PER_YEAR;
+const activeViewing = createActiveTimeTracker({ initiallyActive: !document.hidden });
+
 let currentLocale = null;
 let currentLanguage = DEFAULT_LANGUAGE;
-let liveTimer = null;
+let animationFrameId = null;
+let lastLiveRenderAt = 0;
+let urlSyncTimer = null;
 let lastSnapshot = null;
+let lastDisplayedValues = null;
+let modeTransition = null;
+const cardOutputs = new Map();
 
 function requireJson(response) {
   if (!response.ok) throw new Error(`${response.url}: HTTP ${response.status}`);
   return response.json();
+}
+
+function setText(element, value) {
+  if (!element) return;
+  const text = String(value);
+  if (element.textContent !== text) element.textContent = text;
 }
 
 function resolveBrowserLanguage() {
@@ -80,6 +103,10 @@ currentLanguage = initialState.language;
 elements.share.value = initialState.share;
 elements.birthYear.value = initialState.birthYear;
 
+function currentMeta() {
+  return languages[currentLanguage];
+}
+
 function populateLanguages() {
   elements.language.replaceChildren();
   for (const [key, meta] of Object.entries(languages)) {
@@ -96,15 +123,20 @@ async function loadLocale(language, requestedMode = elements.mode.value || initi
   if (!meta) throw new RangeError(`Unsupported language: ${language}`);
   const locale = await fetch(`./locales/${language}.json`, { cache: 'no-store' }).then(requireJson);
   validateLocale(locale, language);
+
   currentLanguage = language;
   currentLocale = locale;
   document.documentElement.lang = meta.htmlLang;
   document.documentElement.dir = meta.dir;
   document.title = locale.pageTitle;
   elements.language.value = language;
+
   applyStaticCopy();
   populateModes(requestedMode);
-  renderAll();
+  buildCards();
+  modeTransition = null;
+  renderNow();
+  queueUrlSync();
 }
 
 function validateLocale(locale, language) {
@@ -115,27 +147,31 @@ function validateLocale(locale, language) {
   for (const mode of MODE_ORDER) {
     if (!locale.modes[mode]) throw new Error(`${language}.json missing modes.${mode}`);
   }
+  const formatting = languages[language]?.formatting;
+  if (!formatting?.numberLocale || !formatting?.units?.trillion || !formatting?.units?.billion || !formatting?.units?.million) {
+    throw new Error(`manifest formatting profile incomplete for ${language}`);
+  }
 }
 
 function applyStaticCopy() {
   const t = currentLocale;
-  elements.eyebrow.textContent = t.eyebrow;
-  elements.title.textContent = t.title;
-  elements.lead.textContent = t.lead;
-  elements.languageLabel.textContent = t.language;
-  elements.timeframeLabel.textContent = t.timeframe;
-  elements.birthYearLabel.textContent = t.birthYear;
-  elements.shareLabelText.textContent = t.redirectedShare;
-  elements.scenarioTitle.textContent = t.redirectedShare;
-  elements.opportunityTitle.textContent = t.opportunityTitle;
-  elements.liveMetricLabel.textContent = t.metrics.militarySpend;
-  elements.mainCounterLabel.textContent = t.metrics.militarySpend;
-  elements.sessionMetricLabel.textContent = t.metrics.militarySpend;
-  elements.methodMilitaryLabel.textContent = t.metrics.militarySpend;
-  elements.methodDeathsLabel.textContent = t.metrics.directDeaths;
-  elements.legacyLink.textContent = t.legacyLink;
+  setText(elements.eyebrow, t.eyebrow);
+  setText(elements.title, t.title);
+  setText(elements.lead, t.lead);
+  setText(elements.languageLabel, t.language);
+  setText(elements.timeframeLabel, t.timeframe);
+  setText(elements.birthYearLabel, t.birthYear);
+  setText(elements.shareLabelText, t.redirectedShare);
+  setText(elements.scenarioTitle, t.redirectedShare);
+  setText(elements.opportunityTitle, t.opportunityTitle);
+  setText(elements.liveMetricLabel, t.metrics.militarySpend);
+  setText(elements.mainCounterLabel, t.metrics.militarySpend);
+  setText(elements.sessionMetricLabel, t.metrics.militarySpend);
+  setText(elements.methodMilitaryLabel, t.metrics.militarySpend);
+  setText(elements.methodDeathsLabel, t.metrics.directDeaths);
+  setText(elements.legacyLink, t.legacyLink);
   elements.legacyLink.href = `../parity/${currentLanguage}/`;
-  elements.legacyNote.textContent = t.legacyNote;
+  setText(elements.legacyNote, t.legacyNote);
 }
 
 function populateModes(requestedMode = 'year') {
@@ -150,26 +186,16 @@ function populateModes(requestedMode = 'year') {
   elements.mode.value = previous;
 }
 
-function formatters() {
-  const meta = languages[currentLanguage];
-  return {
-    money: new Intl.NumberFormat(meta.intlLocale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }),
-    compactMoney: new Intl.NumberFormat(meta.intlLocale, { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 3 }),
-    number: new Intl.NumberFormat(meta.intlLocale, { maximumFractionDigits: 0 }),
-    ratio: new Intl.NumberFormat(meta.intlLocale, { maximumFractionDigits: 2 }),
-  };
-}
-
 const formulaInfo = {
-  direct: 'annualDirectDeaths × selected period',
-  indirect: 'directDeaths × indirectMultiplier',
-  life: '(directDeaths + indirectDeaths) × avgYearsLostPerDeath',
-  infra: 'annualInfraDamage × selected period',
-  econ: 'militarySpend + infrastructureDamage + deaths × economicValuePerDeath',
-  redirected: 'militarySpend × selected share',
-  schools: 'redirectedAmount ÷ schoolCost',
-  education: 'redirectedAmount ÷ educationCost',
-  health: 'redirectedAmount ÷ healthCost',
+  directDeaths: 'annualDirectDeaths × selected period',
+  indirectDeaths: 'directDeaths × indirectMultiplier',
+  lifeYearsLost: '(directDeaths + indirectDeaths) × avgYearsLostPerDeath',
+  infrastructureDamage: 'annualInfraDamage × selected period',
+  economicSetback: 'militarySpend + infrastructureDamage + deaths × economicValuePerDeath',
+  redirectedAmount: 'militarySpend × selected share',
+  schoolsEquivalent: 'redirectedAmount ÷ schoolCost',
+  educationMultiples: 'redirectedAmount ÷ educationCost',
+  healthMultiples: 'redirectedAmount ÷ healthCost',
 };
 
 function closeInfoPopovers(except = null) {
@@ -181,10 +207,11 @@ function closeInfoPopovers(except = null) {
   }
 }
 
-function metricCard(label, value, kind = 'money', info = null) {
+function metricCard(key, label, kind = 'money') {
   const article = document.createElement('article');
   article.className = 'pw-card pw-glow';
   article.dataset.kind = kind;
+  article.dataset.metric = key;
 
   const head = document.createElement('div');
   head.className = 'pw-card-head';
@@ -193,12 +220,13 @@ function metricCard(label, value, kind = 'money', info = null) {
   name.textContent = label;
   head.append(name);
 
+  const info = formulaInfo[key];
   if (info) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'pw-info-button';
     button.textContent = 'i';
-    button.setAttribute('aria-label', `${label}: formula`);
+    button.setAttribute('aria-label', label);
     button.setAttribute('aria-expanded', 'false');
 
     const popover = document.createElement('div');
@@ -223,12 +251,35 @@ function metricCard(label, value, kind = 'money', info = null) {
 
   const output = document.createElement('div');
   output.className = 'pw-card-value';
-  output.textContent = value;
+  output.textContent = '—';
+  cardOutputs.set(key, output);
   article.append(head, output);
   return article;
 }
 
-function currentState(snapshot) {
+function buildCards() {
+  cardOutputs.clear();
+  closeInfoPopovers();
+  const t = currentLocale.metrics;
+
+  elements.headlineMetrics.replaceChildren(
+    metricCard('directDeaths', t.directDeaths, 'danger-direct'),
+    metricCard('indirectDeaths', t.indirectDeaths, 'danger-indirect'),
+    metricCard('lifeYearsLost', t.lifeYearsLost, 'neutral'),
+    metricCard('infrastructureDamage', t.infrastructureDamage, 'neutral'),
+    metricCard('economicSetback', t.economicSetback, 'neutral'),
+  );
+
+  elements.opportunityMetrics.replaceChildren(
+    metricCard('redirectedAmount', t.redirectedAmount, 'peace'),
+    metricCard('schoolsEquivalent', t.schoolsEquivalent, 'peace'),
+    metricCard('educationMultiples', t.educationMultiples, 'peace'),
+    metricCard('healthMultiples', t.healthMultiples, 'peace'),
+  );
+  installGlowTracking();
+}
+
+function currentState(snapshot = lastSnapshot || calculateSnapshot()) {
   return {
     language: currentLanguage,
     mode: snapshot.period.mode,
@@ -237,10 +288,19 @@ function currentState(snapshot) {
   };
 }
 
-function syncUrl(snapshot) {
-  const next = writeCandidateState(location.href, currentState(snapshot));
+function syncUrl() {
+  if (!currentLocale) return;
+  const next = writeCandidateState(location.href, currentState());
   const current = `${location.pathname}${location.search}${location.hash}`;
   if (next !== current) history.replaceState(null, '', next);
+}
+
+function queueUrlSync() {
+  if (urlSyncTimer !== null) window.clearTimeout(urlSyncTimer);
+  urlSyncTimer = window.setTimeout(() => {
+    urlSyncTimer = null;
+    syncUrl();
+  }, URL_SYNC_DELAY_MS);
 }
 
 function calculateSnapshot(now = new Date()) {
@@ -260,8 +320,9 @@ function shareProgressPercent(sharePercent) {
 }
 
 function updateScenarioControls(snapshot) {
-  elements.shareLabel.textContent = `${snapshot.sharePercent}%`;
+  setText(elements.shareLabel, `${snapshot.sharePercent}%`);
   elements.shareProgress.style.width = `${Math.max(0, Math.min(100, shareProgressPercent(snapshot.sharePercent)))}%`;
+  elements.share.style.setProperty('--rangeFill', `${Math.max(0, Math.min(100, shareProgressPercent(snapshot.sharePercent)))}%`);
   for (const chip of elements.scenarioChips) {
     const active = Number(chip.dataset.share) === snapshot.sharePercent;
     chip.classList.toggle('pw-active', active);
@@ -269,70 +330,91 @@ function updateScenarioControls(snapshot) {
   }
 }
 
-function renderCards(snapshot) {
-  const fmt = formatters();
-  const t = currentLocale.metrics;
-
-  elements.headlineMetrics.replaceChildren(
-    metricCard(t.directDeaths, fmt.number.format(snapshot.totals.directDeaths), 'danger', formulaInfo.direct),
-    metricCard(t.indirectDeaths, fmt.number.format(snapshot.totals.indirectDeaths), 'danger', formulaInfo.indirect),
-    metricCard(t.lifeYearsLost, fmt.number.format(snapshot.totals.lifeYearsLost), 'danger', formulaInfo.life),
-    metricCard(t.infrastructureDamage, fmt.compactMoney.format(snapshot.totals.infrastructureDamage), 'gold', formulaInfo.infra),
-    metricCard(t.economicSetback, fmt.compactMoney.format(snapshot.totals.economicSetback), 'gold', formulaInfo.econ),
-  );
-
-  elements.opportunityMetrics.replaceChildren(
-    metricCard(t.redirectedAmount, fmt.compactMoney.format(snapshot.opportunityCosts.redirected), 'peace', formulaInfo.redirected),
-    metricCard(t.schoolsEquivalent, fmt.number.format(snapshot.opportunityCosts.schools), 'peace', formulaInfo.schools),
-    metricCard(t.educationMultiples, fmt.ratio.format(snapshot.opportunityCosts.education), 'peace', formulaInfo.education),
-    metricCard(t.healthMultiples, fmt.ratio.format(snapshot.opportunityCosts.health), 'peace', formulaInfo.health),
-  );
-  installGlowTracking();
+function valuesFromSnapshot(snapshot) {
+  return {
+    militarySpend: snapshot.totals.militarySpend,
+    directDeaths: snapshot.totals.directDeaths,
+    indirectDeaths: snapshot.totals.indirectDeaths,
+    lifeYearsLost: snapshot.totals.lifeYearsLost,
+    infrastructureDamage: snapshot.totals.infrastructureDamage,
+    economicSetback: snapshot.totals.economicSetback,
+    redirectedAmount: snapshot.opportunityCosts.redirected,
+    schoolsEquivalent: snapshot.opportunityCosts.schools,
+    educationMultiples: snapshot.opportunityCosts.education,
+    healthMultiples: snapshot.opportunityCosts.health,
+  };
 }
 
-function updateDynamicValues(now = new Date()) {
-  if (!currentLocale) return;
+function interpolateValues(from, to, amount) {
+  const result = {};
+  for (const [key, target] of Object.entries(to)) {
+    const start = Number(from?.[key]);
+    result[key] = Number.isFinite(start) ? start + (target - start) * amount : target;
+  }
+  return result;
+}
+
+function displayValues(targetValues, frameTime) {
+  if (!modeTransition) return targetValues;
+  const progress = Math.max(0, Math.min(1, (frameTime - modeTransition.startedAt) / MODE_EASE_MS));
+  const eased = 1 - Math.pow(1 - progress, 5);
+  const values = interpolateValues(modeTransition.from, targetValues, eased);
+  if (progress >= 1) modeTransition = null;
+  return values;
+}
+
+function updateCardValues(values) {
+  const meta = currentMeta();
+  setText(cardOutputs.get('directDeaths'), formatInteger(values.directDeaths, meta));
+  setText(cardOutputs.get('indirectDeaths'), formatInteger(values.indirectDeaths, meta));
+  setText(cardOutputs.get('lifeYearsLost'), formatInteger(values.lifeYearsLost, meta));
+  setText(cardOutputs.get('infrastructureDamage'), formatMoney(values.infrastructureDamage, meta));
+  setText(cardOutputs.get('economicSetback'), formatMoney(values.economicSetback, meta, { short: true }));
+  setText(cardOutputs.get('redirectedAmount'), formatMoney(values.redirectedAmount, meta));
+  setText(cardOutputs.get('schoolsEquivalent'), formatInteger(values.schoolsEquivalent, meta));
+  setText(cardOutputs.get('educationMultiples'), formatRatio(values.educationMultiples, meta));
+  setText(cardOutputs.get('healthMultiples'), formatRatio(values.healthMultiples, meta));
+}
+
+function updateDynamicValues(now = new Date(), frameTime = performance.now()) {
+  if (!currentLocale) return null;
+
   const snapshot = calculateSnapshot(now);
   lastSnapshot = snapshot;
-  const fmt = formatters();
+  const target = valuesFromSnapshot(snapshot);
+  const displayed = displayValues(target, frameTime);
+  lastDisplayedValues = displayed;
+  const meta = currentMeta();
 
-  elements.currentPeriod.textContent = currentLocale.modes[snapshot.period.mode];
-  elements.mainCounterValue.textContent = fmt.compactMoney.format(snapshot.totals.militarySpend);
-  elements.liveRate.textContent = `${fmt.money.format(perSecond)}/s`;
+  document.documentElement.classList.toggle('pw-is-live', snapshot.period.mode === 'year');
+  setText(elements.currentPeriod, currentLocale.modes[snapshot.period.mode]);
+  setText(elements.mainCounterValue, formatMoney(displayed.militarySpend, meta));
+  setText(elements.liveRate, formatPerSecond(perSecond, meta));
+  updateCardValues(displayed);
 
-  const elapsedSeconds = Math.max(0, (Date.now() - SESSION_STARTED_AT) / 1000);
-  const sessionSpend = perSecond * elapsedSeconds;
+  const activeSeconds = activeViewing.elapsedSeconds(frameTime);
+  const sessionSpend = perSecond * activeSeconds;
   const sessionRedirected = sessionSpend * (snapshot.sharePercent / 100);
-  const elapsedWholeSeconds = Math.floor(elapsedSeconds);
-  const minutes = Math.floor(elapsedWholeSeconds / 60);
-  const seconds = elapsedWholeSeconds % 60;
-  elements.viewerElapsed.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  elements.viewerSpend.textContent = fmt.money.format(sessionSpend);
-  elements.viewerRedirected.textContent = `${snapshot.sharePercent}% → ${fmt.money.format(sessionRedirected)}`;
+  setText(elements.viewerElapsed, formatElapsed(activeSeconds));
+  setText(elements.viewerSpend, formatMoney(sessionSpend, meta));
+  setText(elements.viewerRedirected, `${snapshot.sharePercent}% → ${formatMoney(sessionRedirected, meta)}`);
 
-  if (snapshot.period.mode === 'lifetime') {
-    elements.birthControl.hidden = false;
-    elements.birthYear.disabled = false;
-  } else {
-    elements.birthControl.hidden = true;
-    elements.birthYear.disabled = true;
-  }
+  const lifetime = snapshot.period.mode === 'lifetime';
+  elements.birthControl.hidden = !lifetime;
+  elements.birthYear.disabled = !lifetime;
   updateScenarioControls(snapshot);
   return snapshot;
 }
 
-function renderAll() {
-  if (!currentLocale) return;
-  const snapshot = updateDynamicValues(new Date());
-  renderCards(snapshot);
-  const fmt = formatters();
-
-  elements.methodMilitaryValue.textContent = `${fmt.compactMoney.format(model.annualMilitarySpend)} / year`;
-  elements.methodDeathsValue.textContent = `${fmt.number.format(model.annualDirectDeaths)} / year`;
+function updateStaticDiagnostics(snapshot) {
+  const meta = currentMeta();
+  setText(elements.methodMilitaryValue, formatMoney(model.annualMilitarySpend, meta));
+  setText(elements.methodDeathsValue, formatInteger(model.annualDirectDeaths, meta));
 
   elements.debug.textContent = [
-    `candidate: unified-v0.3`,
-    `language: ${currentLanguage} (${languages[currentLanguage].intlLocale}, ${languages[currentLanguage].dir})`,
+    `candidate: unified-v0.4-sprint-a`,
+    `language: ${currentLanguage} (${meta.intlLocale}, ${meta.dir})`,
+    `format number locale: ${meta.formatting.numberLocale}`,
     `template: unified/index.html`,
     `css: unified/app.css`,
     `js: unified/app.mjs`,
@@ -340,16 +422,30 @@ function renderAll() {
     `locale: unified/locales/${currentLanguage}.json`,
     `data: data/model.json schemaVersion=${modelDocument.schemaVersion}`,
     `runtime: src/runtime.mjs`,
-    `engine: src/legacy-engine.mjs`,
-    `interaction parity: hero counter + session counter + scenario slider/chips + metric info popovers`,
+    `formatter: src/format.mjs`,
+    `active clock: src/active-time.mjs`,
+    `live throttle: ${LIVE_THROTTLE_MS}ms`,
+    `mode ease: ${MODE_EASE_MS}ms`,
+    `seconds/year for live rate: ${REFERENCE_SECONDS_PER_YEAR}`,
     `mode: ${snapshot.period.mode}`,
     `annual fraction: ${snapshot.period.fraction}`,
-    `preview URL state: lang + mode + share + birth`,
-    `v2 research candidate connected: no`,
+    `session clock: active-visible-time only`,
     `production files changed: 0`,
   ].join('\n');
+}
 
-  syncUrl(snapshot);
+function renderNow({ updateDiagnostics = true } = {}) {
+  if (!currentLocale) return;
+  const frameTime = performance.now();
+  const snapshot = updateDynamicValues(new Date(), frameTime);
+  if (updateDiagnostics && snapshot) updateStaticDiagnostics(snapshot);
+}
+
+function startModeTransition() {
+  modeTransition = {
+    startedAt: performance.now(),
+    from: { ...(lastDisplayedValues || valuesFromSnapshot(lastSnapshot || calculateSnapshot())) },
+  };
 }
 
 function installGlowTracking() {
@@ -363,26 +459,71 @@ function installGlowTracking() {
   }
 }
 
-function scheduleLiveUpdates() {
-  if (liveTimer !== null) clearInterval(liveTimer);
-  liveTimer = null;
+function ensureLiveLoop() {
+  if (animationFrameId !== null || document.hidden) return;
+  animationFrameId = window.requestAnimationFrame(liveFrame);
+}
+
+function liveFrame(frameTime) {
+  animationFrameId = null;
   if (document.hidden) return;
-  liveTimer = window.setInterval(() => updateDynamicValues(new Date()), 250);
+
+  if (frameTime - lastLiveRenderAt >= LIVE_THROTTLE_MS) {
+    updateDynamicValues(new Date(), frameTime);
+    lastLiveRenderAt = frameTime;
+  }
+  ensureLiveLoop();
+}
+
+function handleVisibilityChange() {
+  const frameTime = performance.now();
+  activeViewing.setActive(!document.hidden, frameTime);
+
+  if (document.hidden) {
+    if (animationFrameId !== null) window.cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+    return;
+  }
+
+  lastLiveRenderAt = 0;
+  renderNow({ updateDiagnostics: false });
+  ensureLiveLoop();
 }
 
 elements.language.addEventListener('change', () => loadLocale(elements.language.value, elements.mode.value));
-elements.mode.addEventListener('change', renderAll);
-elements.birthYear.addEventListener('input', renderAll);
-elements.birthYear.addEventListener('change', renderAll);
-elements.share.addEventListener('input', renderAll);
-elements.share.addEventListener('change', renderAll);
+elements.mode.addEventListener('change', () => {
+  startModeTransition();
+  renderNow();
+  queueUrlSync();
+});
+elements.birthYear.addEventListener('input', () => {
+  modeTransition = null;
+  renderNow();
+  queueUrlSync();
+});
+elements.birthYear.addEventListener('change', () => {
+  modeTransition = null;
+  renderNow();
+  queueUrlSync();
+});
+elements.share.addEventListener('input', () => {
+  modeTransition = null;
+  renderNow({ updateDiagnostics: false });
+  queueUrlSync();
+});
+elements.share.addEventListener('change', () => {
+  renderNow();
+  queueUrlSync();
+});
 for (const chip of elements.scenarioChips) {
   chip.addEventListener('click', () => {
     elements.share.value = chip.dataset.share;
-    renderAll();
+    modeTransition = null;
+    renderNow();
+    queueUrlSync();
   });
 }
-document.addEventListener('visibilitychange', scheduleLiveUpdates);
+document.addEventListener('visibilitychange', handleVisibilityChange);
 document.addEventListener('click', () => closeInfoPopovers());
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') closeInfoPopovers();
@@ -391,4 +532,4 @@ document.addEventListener('keydown', (event) => {
 populateLanguages();
 await loadLocale(currentLanguage, initialState.mode);
 installGlowTracking();
-scheduleLiveUpdates();
+ensureLiveLoop();
