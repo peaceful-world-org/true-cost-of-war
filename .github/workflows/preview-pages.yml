@@ -61,6 +61,9 @@ jobs:
       - name: Extract localized migration copy
         run: python scripts/extract_legacy_locale_copy.py --output unified/legacy-copy.json
 
+      - name: Validate localized migration copy
+        run: python scripts/validate_legacy_copy.py
+
       - name: Build unified multilingual candidate
         run: python scripts/build_unified_candidate.py
 
