@@ -262,6 +262,8 @@ def extract(language: str, source: Path) -> dict:
     scenario_spectrum = find_class(opportunity_section, "pw2-range-subtitle")
     scenario_title = find_class(opportunity_section, "pw2-range-title")
     scenario_tooltip = find_class(scenario_title, "pw2-tooltip")
+    mobile_summary = find_class(opportunity_section, "pw2-mobile-summary")
+    mobile_fund_subtitle = find_class(mobile_summary, "pw2-mobile-summary-desc")
 
     programmes = {
         "education": programme(root, language, "pw2-educationEquivalent", "education"),
@@ -341,6 +343,7 @@ def extract(language: str, source: Path) -> dict:
             "scenarioSpectrum": require(node_text(scenario_spectrum, exclude_classes={"pw2-tooltip"}), language, "opportunity.scenarioSpectrum"),
             "fundHeading": require(node_text(fund_heading, exclude_classes={"pw2-tooltip"}), language, "opportunity.fundHeading"),
             "fundSubtitle": require(node_text(fund_subtitle, exclude_classes={"pw2-tooltip"}), language, "opportunity.fundSubtitle"),
+            "mobileFundSubtitle": require(node_text(mobile_fund_subtitle, exclude_classes={"pw2-tooltip"}), language, "opportunity.mobileFundSubtitle"),
             "showMore": require(node_text(show_more, exclude_classes={"pw2-tooltip"}), language, "opportunity.showMore"),
             "programmes": programmes,
         },
