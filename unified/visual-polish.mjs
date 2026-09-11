@@ -1,14 +1,19 @@
 // UX-only presentation layer for the first-screen live counters.
 //
-// This deliberately mirrors the original calculator's behaviour: values are
-// sampled at an 80 ms cadence, the whole number element never moves, and the
-// displayed precision decreases as the session total grows. That keeps the
-// early counter visibly alive without making million-scale values flicker.
+// Goal: preserve the calm scale-aware behaviour of the original calculator,
+// while removing the visible 80 ms stepping that made the sub-million counter
+// feel jerky in the unified build.
+//
+// Below $1m the monetary counter follows active time on every animation frame,
+// so the count-up reads as one continuous flow. At $1m+ visible precision drops
+// sharply: one decimal in millions, then progressively coarser billion/trillion
+// notation. The number element itself never moves, fades or blurs.
 
 import { formatInteger, formattingProfile } from '../src/format.mjs';
 
 const REFERENCE_SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
-const LIVE_CADENCE_MS = 80;
+const MILLION_THRESHOLD = 1e6;
+const DERIVED_CADENCE_MS = 250;
 const SESSION_EQUIVALENTS = Object.freeze({ food: 62.5, health: 125, poverty: 1000 });
 
 const [manifest, modelDocument] = await Promise.all([
@@ -27,7 +32,7 @@ const lastRendered = new Map();
 let accumulatedMs = 0;
 let activeSince = document.hidden ? null : performance.now();
 let frameId = null;
-let lastPaintAt = 0;
+let lastDerivedPaintAt = 0;
 
 function languageKey() {
   return document.querySelector('#language')?.value || new URLSearchParams(location.search).get('lang') || 'en';
@@ -52,14 +57,14 @@ function setActive(active, now = performance.now()) {
   }
 }
 
-// Exact display strategy of the original short money formatter:
-//   < $1m   -> whole dollars
-//   $1m+    -> whole millions
-//   $1b+    -> 1-2 decimals
-//   $1t+    -> 1 decimal
-// The arithmetic remains continuous; only visible precision is reduced as the
-// number grows, which is what prevents the million-range counter from flashing.
-function formatLegacyLiveMoney(value, meta) {
+// Scale-aware display strategy tuned for perceptual flow:
+//   < $1m   -> whole dollars, updated every animation frame
+//   $1m+    -> one decimal million (calm, but still visibly alive)
+//   $1b+    -> up to three decimals in billions
+//   $1t+    -> up to three decimals in trillions
+// This keeps the early count-up fluid, then progressively reduces the number
+// of changing digits as the magnitude grows.
+function formatFlowMoney(value, meta) {
   const profile = formattingProfile(meta);
   const original = Number.isFinite(Number(value)) ? Number(value) : 0;
   const absolute = Math.abs(original);
@@ -71,17 +76,16 @@ function formatLegacyLiveMoney(value, meta) {
   if (absolute >= 1e12) {
     scaled = absolute / 1e12;
     unit = profile.units.trillion;
-    minimumFractionDigits = 1;
-    maximumFractionDigits = 1;
+    maximumFractionDigits = 3;
   } else if (absolute >= 1e9) {
     scaled = absolute / 1e9;
     unit = profile.units.billion;
-    minimumFractionDigits = 1;
-    maximumFractionDigits = 2;
-  } else if (absolute >= 1e6) {
+    maximumFractionDigits = 3;
+  } else if (absolute >= MILLION_THRESHOLD) {
     scaled = absolute / 1e6;
     unit = profile.units.million;
-    maximumFractionDigits = 0;
+    minimumFractionDigits = 1;
+    maximumFractionDigits = 1;
   } else {
     scaled = Math.round(absolute);
   }
@@ -107,12 +111,22 @@ function writeOwned(node, value) {
   if (node.textContent !== text) node.textContent = text;
 }
 
-function renderLive(now = performance.now()) {
+function currentSession(now = performance.now()) {
   const seconds = elapsedActiveMs(now) / 1000;
-  const spend = perSecond * seconds;
-  const meta = currentMeta();
+  return {
+    seconds,
+    spend: perSecond * seconds,
+    meta: currentMeta(),
+  };
+}
 
-  writeOwned(viewerSpend, formatLegacyLiveMoney(spend, meta));
+function renderViewer(now = performance.now()) {
+  const { spend, meta } = currentSession(now);
+  writeOwned(viewerSpend, formatFlowMoney(spend, meta));
+}
+
+function renderDerived(now = performance.now()) {
+  const { spend, meta } = currentSession(now);
   writeOwned(sessionFood, formatInteger(Math.floor(spend / SESSION_EQUIVALENTS.food), meta));
   writeOwned(sessionHealth, formatInteger(Math.floor(spend / SESSION_EQUIVALENTS.health), meta));
   writeOwned(sessionPoverty, formatInteger(Math.floor(spend / SESSION_EQUIVALENTS.poverty), meta));
@@ -120,19 +134,30 @@ function renderLive(now = performance.now()) {
 
 function frame(now) {
   frameId = null;
-  if (!document.hidden && now - lastPaintAt >= LIVE_CADENCE_MS) {
-    renderLive(now);
-    lastPaintAt = now;
+  if (!document.hidden) {
+    // The dominant money counter follows the browser's display cadence. This is
+    // what removes the visible 80 ms staircase below $1m. Because formatFlowMoney
+    // reduces precision at larger scales, DOM text stops changing every frame
+    // once the total reaches the million range.
+    renderViewer(now);
+
+    if (now - lastDerivedPaintAt >= DERIVED_CADENCE_MS) {
+      renderDerived(now);
+      lastDerivedPaintAt = now;
+    }
   }
   frameId = requestAnimationFrame(frame);
 }
 
-// app.mjs also computes canonical session state. If its formatter writes to one
-// of these presentation nodes, restore the legacy-style representation before
-// the browser paints the intermediate value.
+// app.mjs / parity-b.mjs still calculate canonical values for the rest of the
+// interface. If either writes into a presentation node owned here, restore the
+// most recent polished value in the same microtask checkpoint. This prevents
+// competing formatters from flashing between frames.
 const observer = new MutationObserver(() => {
-  const overwritten = ownedNodes.some((node) => node.textContent !== lastRendered.get(node));
-  if (overwritten && !document.hidden) renderLive(performance.now());
+  for (const node of ownedNodes) {
+    const expected = lastRendered.get(node);
+    if (expected !== undefined && node.textContent !== expected) node.textContent = expected;
+  }
 });
 for (const node of ownedNodes) {
   node.classList.add('pw-flow-value');
@@ -142,16 +167,22 @@ for (const node of ownedNodes) {
 document.addEventListener('visibilitychange', () => {
   const now = performance.now();
   setActive(!document.hidden, now);
-  lastPaintAt = 0;
-  if (!document.hidden) renderLive(now);
+  lastDerivedPaintAt = 0;
+  if (!document.hidden) {
+    renderViewer(now);
+    renderDerived(now);
+  }
 });
 
 const language = document.querySelector('#language');
 language?.addEventListener('change', () => {
-  lastPaintAt = 0;
-  renderLive(performance.now());
+  const now = performance.now();
+  lastDerivedPaintAt = 0;
+  renderViewer(now);
+  renderDerived(now);
 });
 
-document.documentElement.dataset.motionPolish = 'legacy-live-cadence';
-renderLive(performance.now());
+document.documentElement.dataset.motionPolish = 'smooth-scale-aware-flow';
+renderViewer(performance.now());
+renderDerived(performance.now());
 frameId = requestAnimationFrame(frame);
