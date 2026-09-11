@@ -32,6 +32,8 @@ function textFor(key) {
   if (key === 'hero') return data.hero.tooltip;
   if (key === 'main') return data.hero.mainTooltip;
   if (key === 'scenario') return data.opportunity.scenarioTooltip;
+  if (key === 'missionFunding') return data.narrative.missionTooltip;
+  if (key === 'impactEfficiency') return data.narrative.impactTooltip;
   if (METRIC_KEYS[key]) return data.metrics[METRIC_KEYS[key]]?.tooltip || '';
   return data.opportunity.programmes[key]?.tooltip || '';
 }
@@ -46,13 +48,15 @@ function titleFor(trigger) {
   if (key === 'hero') return document.querySelector('#title')?.textContent?.trim() || trigger.dataset.tooltipTitle || '';
   if (key === 'main') return document.querySelector('#currentPeriod')?.textContent?.trim() || trigger.dataset.tooltipTitle || '';
   if (key === 'scenario') return document.querySelector('#scenarioTitle')?.textContent?.trim() || trigger.dataset.tooltipTitle || '';
+  if (key === 'missionFunding') return document.querySelector('.pw-mission-heading')?.textContent?.trim() || trigger.dataset.tooltipTitle || '';
+  if (key === 'impactEfficiency') return document.querySelector('.pw-mission-impact-highlight')?.textContent?.trim() || trigger.dataset.tooltipTitle || '';
   const liveLabel = trigger.closest('.pw-parity-label-row')
     ?.querySelector('.pw-reference-card-label, .pw-programme-name')
     ?.textContent?.trim();
   if (liveLabel) return liveLabel;
   return trigger.dataset.tooltipTitle || trigger
-    .closest('.pw-reference-card, .pw-programme, .pw-hero-counter, .pw-hero')
-    ?.querySelector('.pw-reference-card-label, .pw-programme-name, .pw-counter-kicker, h1')
+    .closest('.pw-reference-card, .pw-programme, .pw-hero-counter, .pw-hero, .pw-mission-card, .pw-mission-highlight')
+    ?.querySelector('.pw-reference-card-label, .pw-programme-name, .pw-counter-kicker, h1, .pw-mission-heading, .pw-mission-impact-highlight')
     ?.textContent?.trim() || '';
 }
 
@@ -101,7 +105,9 @@ function renderFloating(trigger, text) {
 }
 
 function renderInline(trigger, text) {
-  const surface = trigger.closest('.pw-reference-card, .pw-programme, .pw-hero-counter, .pw-hero, .pw-scenario-panel') || trigger.parentElement;
+  const surface = trigger.closest(
+    '.pw-reference-card, .pw-programme, .pw-hero-counter, .pw-hero, .pw-scenario-panel, .pw-mission-highlight, .pw-mission-card',
+  ) || trigger.parentElement;
   if (!surface) return;
   const popover = document.createElement('div');
   popover.className = 'pw-parity-inline-popover';
@@ -134,10 +140,6 @@ function makeButton(key, title = '') {
   if (title) button.dataset.tooltipTitle = title;
   button.setAttribute('aria-label', title ? `${title}: info` : 'Information');
   button.setAttribute('aria-expanded', 'false');
-  button.addEventListener('click', (event) => {
-    event.stopPropagation();
-    toggleTooltip(button);
-  });
   return button;
 }
 
@@ -232,7 +234,13 @@ const languageObserver = new MutationObserver(() => {
 languageObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir'] });
 
 document.addEventListener('click', (event) => {
-  if (!event.target.closest('.pw-parity-info, .pw-parity-popover, .pw-parity-inline-popover')) closeTooltip();
+  const trigger = event.target.closest?.('.pw-parity-info');
+  if (trigger) {
+    event.stopPropagation();
+    toggleTooltip(trigger);
+    return;
+  }
+  if (!event.target.closest?.('.pw-parity-popover, .pw-parity-inline-popover')) closeTooltip();
 });
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') closeTooltip();
