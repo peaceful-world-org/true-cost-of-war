@@ -52,6 +52,12 @@ jobs:
       - name: Test shared calculation engine and runtime
         run: node --test tests/*.test.mjs
 
+      - name: Syntax-check unified browser modules
+        run: |
+          for file in unified/*.mjs src/*.mjs; do
+            node --check "$file"
+          done
+
       - name: Build isolated shadow runtime
         run: python scripts/build_shadow_runtime.py
 
