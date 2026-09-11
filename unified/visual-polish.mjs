@@ -1,13 +1,14 @@
-// UX-only presentation layer for genuinely smooth first-screen live counters.
+// UX-only presentation layer for the first-screen live counters.
 //
-// Important: do not animate the whole number element. The previous version
-// translated each value on every text mutation, which made the counter visibly
-// bounce. This layer now owns only the rapidly changing session values and
-// renders their numeric progression directly on requestAnimationFrame.
+// This deliberately mirrors the original calculator's behaviour: values are
+// sampled at an 80 ms cadence, the whole number element never moves, and the
+// displayed precision decreases as the session total grows. That keeps the
+// early counter visibly alive without making million-scale values flicker.
 
 import { formatInteger, formattingProfile } from '../src/format.mjs';
 
 const REFERENCE_SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
+const LIVE_CADENCE_MS = 80;
 const SESSION_EQUIVALENTS = Object.freeze({ food: 62.5, health: 125, poverty: 1000 });
 
 const [manifest, modelDocument] = await Promise.all([
@@ -26,6 +27,7 @@ const lastRendered = new Map();
 let accumulatedMs = 0;
 let activeSince = document.hidden ? null : performance.now();
 let frameId = null;
+let lastPaintAt = 0;
 
 function languageKey() {
   return document.querySelector('#language')?.value || new URLSearchParams(location.search).get('lang') || 'en';
@@ -50,36 +52,43 @@ function setActive(active, now = performance.now()) {
   }
 }
 
-function formatLiveSessionMoney(value, meta) {
+// Exact display strategy of the original short money formatter:
+//   < $1m   -> whole dollars
+//   $1m+    -> whole millions
+//   $1b+    -> 1-2 decimals
+//   $1t+    -> 1 decimal
+// The arithmetic remains continuous; only visible precision is reduced as the
+// number grows, which is what prevents the million-range counter from flashing.
+function formatLegacyLiveMoney(value, meta) {
   const profile = formattingProfile(meta);
   const original = Number.isFinite(Number(value)) ? Number(value) : 0;
   const absolute = Math.abs(original);
   let scaled = absolute;
   let unit = '';
-  let decimals = 0;
+  let minimumFractionDigits = 0;
+  let maximumFractionDigits = 0;
 
-  // Session totals normally live in the million range. Three fixed decimals
-  // make the lowest visible place worth $1,000, so at the current global rate
-  // the display can advance on essentially every 60 Hz frame without adding
-  // fake motion. Higher ranges retain sensible compact notation for unusually
-  // long sessions.
   if (absolute >= 1e12) {
     scaled = absolute / 1e12;
     unit = profile.units.trillion;
-    decimals = 5;
+    minimumFractionDigits = 1;
+    maximumFractionDigits = 1;
   } else if (absolute >= 1e9) {
     scaled = absolute / 1e9;
     unit = profile.units.billion;
-    decimals = 5;
+    minimumFractionDigits = 1;
+    maximumFractionDigits = 2;
   } else if (absolute >= 1e6) {
     scaled = absolute / 1e6;
     unit = profile.units.million;
-    decimals = 3;
+    maximumFractionDigits = 0;
+  } else {
+    scaled = Math.round(absolute);
   }
 
   const number = scaled.toLocaleString(profile.numberLocale || 'en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
+    minimumFractionDigits,
+    maximumFractionDigits,
   });
   const signed = original < 0 ? `-${number}` : number;
   const currency = profile.currencySymbol || '$';
@@ -103,7 +112,7 @@ function renderLive(now = performance.now()) {
   const spend = perSecond * seconds;
   const meta = currentMeta();
 
-  writeOwned(viewerSpend, formatLiveSessionMoney(spend, meta));
+  writeOwned(viewerSpend, formatLegacyLiveMoney(spend, meta));
   writeOwned(sessionFood, formatInteger(Math.floor(spend / SESSION_EQUIVALENTS.food), meta));
   writeOwned(sessionHealth, formatInteger(Math.floor(spend / SESSION_EQUIVALENTS.health), meta));
   writeOwned(sessionPoverty, formatInteger(Math.floor(spend / SESSION_EQUIVALENTS.poverty), meta));
@@ -111,13 +120,16 @@ function renderLive(now = performance.now()) {
 
 function frame(now) {
   frameId = null;
-  if (!document.hidden) renderLive(now);
+  if (!document.hidden && now - lastPaintAt >= LIVE_CADENCE_MS) {
+    renderLive(now);
+    lastPaintAt = now;
+  }
   frameId = requestAnimationFrame(frame);
 }
 
-// app.mjs still computes the canonical session state. If its coarser formatter
-// writes into these presentation nodes, restore the smooth presentation in the
-// same microtask checkpoint so the intermediate coarse value is not painted.
+// app.mjs also computes canonical session state. If its formatter writes to one
+// of these presentation nodes, restore the legacy-style representation before
+// the browser paints the intermediate value.
 const observer = new MutationObserver(() => {
   const overwritten = ownedNodes.some((node) => node.textContent !== lastRendered.get(node));
   if (overwritten && !document.hidden) renderLive(performance.now());
@@ -130,12 +142,16 @@ for (const node of ownedNodes) {
 document.addEventListener('visibilitychange', () => {
   const now = performance.now();
   setActive(!document.hidden, now);
+  lastPaintAt = 0;
   if (!document.hidden) renderLive(now);
 });
 
 const language = document.querySelector('#language');
-language?.addEventListener('change', () => renderLive(performance.now()));
+language?.addEventListener('change', () => {
+  lastPaintAt = 0;
+  renderLive(performance.now());
+});
 
-document.documentElement.dataset.motionPolish = 'continuous-live';
+document.documentElement.dataset.motionPolish = 'legacy-live-cadence';
 renderLive(performance.now());
 frameId = requestAnimationFrame(frame);
