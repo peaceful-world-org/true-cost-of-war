@@ -12,13 +12,15 @@
   <link rel="stylesheet" href="./visual-reference.css">
   <link rel="stylesheet" href="./visual-opportunity.css">
   <link rel="stylesheet" href="./visual-structure.css">
+  <link rel="stylesheet" href="./visual-icons.css">
+  <link rel="stylesheet" href="./visual-finish.css">
 </head>
 <body>
   <main class="pw-shell">
     <div class="pw-preview-banner" role="status">
       <div>
         <strong>UNIFIED CANDIDATE · PREVIEW</strong>
-        <span>v0.8 · Visual parity pass · not production</span>
+        <span>v0.9 · RU/EN visual parity · not production</span>
       </div>
       <label class="pw-preview-language">
         <span id="languageLabel">Language</span>
@@ -168,13 +170,17 @@
       <p class="pw-section-intro" id="shareIntro">Generate a text summary or square card from the current calculator state.</p>
       <div class="pw-share-actions">
         <button type="button" class="pw-share-button" id="buildText">Generate text</button>
-        <button type="button" class="pw-share-button" id="copyText">Copy data</button>
         <button type="button" class="pw-share-button" data-primary="true" id="buildCard">Generate card</button>
-        <button type="button" class="pw-share-button" id="downloadCard">Download PNG</button>
       </div>
-      <div class="pw-copy-state" id="copyState" aria-live="polite"></div>
-      <div class="pw-share-output" id="shareTextWrap" hidden><pre class="pw-share-text" id="shareTextOutput"></pre></div>
-      <div class="pw-share-output" id="shareCardWrap" hidden><img class="pw-share-preview" id="shareCardPreview" alt="Generated True Cost of War infographic preview"></div>
+      <div class="pw-share-output" id="shareTextWrap" hidden>
+        <pre class="pw-share-text" id="shareTextOutput"></pre>
+        <button type="button" class="pw-share-button pw-share-output-action" id="copyText">Copy data</button>
+        <div class="pw-copy-state" id="copyState" aria-live="polite"></div>
+      </div>
+      <div class="pw-share-output" id="shareCardWrap" hidden>
+        <img class="pw-share-preview" id="shareCardPreview" alt="Generated True Cost of War infographic preview">
+        <button type="button" class="pw-share-button pw-share-output-action" id="downloadCard">Download PNG</button>
+      </div>
     </section>
 
     <details class="pw-method">
