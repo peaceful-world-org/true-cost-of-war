@@ -119,16 +119,37 @@
   top: -1px;
 }
 
-/* Live numeric text is deliberately motionless as an element. The numbers
-   themselves advance on every animation frame in visual-polish.mjs. This
-   prevents the whole value from bobbing vertically while keeping digit widths
-   stable as the counter changes. */
+/* Exact live-number typography from the production calculator. The smaller
+   currency and unit spans are part of the perceived calmness of the counter:
+   only the numeric run changes while its surrounding visual anchors stay put. */
 .pw-flow-value {
   transform: none !important;
   filter: none !important;
   opacity: 1 !important;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
+  font-variant-numeric: tabular-nums !important;
+  font-feature-settings: "tnum" 1, "lnum" 1 !important;
+}
+
+.pw-flow-value .pw2-currency-sign {
+  display: inline-block;
+  font-family: var(--font-heading, Montserrat, system-ui, sans-serif);
+  font-size: .85em;
+  font-weight: 700;
+  opacity: .7;
+}
+
+.pw-flow-value .pw2-val-unit {
+  display: inline-block;
+  margin-left: .2em;
+  font-family: var(--font-heading, Montserrat, system-ui, sans-serif);
+  font-size: .55em;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: lowercase;
+  vertical-align: baseline;
+  opacity: .8;
+  white-space: nowrap;
 }
 
 @media (max-width: 600px) {
