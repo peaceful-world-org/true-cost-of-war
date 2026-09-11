@@ -67,11 +67,26 @@ Goal: migrate the proven product into the unified architecture without redesigni
 - [x] Preview embed smoke harness for RU / EN / AR / FA
 - [ ] Full visual RTL validation on AR / FA
 
+## Automated browser gates
+
+- [x] Headless Chromium page-load smoke covers all 11 supported locales
+- [x] Focused browser cases cover RU lifetime, EN minute, AR mobile RTL and FA mobile embed
+- [x] Scenario chips update the calculator and persist share state into the URL
+- [x] Lifetime mode reveals the birth-year control and birth-year edits persist into the URL
+- [x] Mobile programme disclosure expands all five initially hidden rows
+- [x] Mobile methodology tooltip opens inline and closes with Escape
+- [x] Text summary generation and copy feedback execute in a real browser
+- [x] Generated infographic decodes as exactly 1080×1080
+- [x] Language switching to Arabic updates `lang`, `dir`, visible copy, text summary and generated infographic
+- [x] Embed request/response returns a useful `pw2-resize` height inside a real iframe
+
+These checks run against the built preview bundle before GitHub Pages deployment. They are regression gates, not a substitute for final human visual comparison on real desktop and mobile devices.
+
 ## Current migration note
 
 The unified preview now carries the major reference interaction and narrative surfaces and no longer relies on an RU/EN-only parity layer. During CI, the wording already published in each localized calculator is extracted into a generated, validated copy corpus and consumed by the shared runtime. Small labels that exist only in the new unified shell live in one explicit 11-language UI-copy module.
 
-The remaining work is now deliberately concentrated in browser/device smoke testing, AR/FA visual RTL validation, RU/EN visual calibration against the reference, real-host embed verification, and the final independent parity council review. Detailed visual tuning remains deferred until those functional gates are stable. Production remains untouched.
+Automated browser smoke is now complete across all 11 locales, with interaction-level coverage for URL state, lifetime controls, mobile disclosure, tooltips, sharing, 1080×1080 image generation, Arabic RTL switching and iframe resizing. The remaining work is deliberately concentrated in human device/visual testing, AR/FA visual RTL validation, RU/EN visual calibration against the reference, real-host embed verification, and the final independent parity council review. Detailed visual tuning remains deferred until those gates are stable. Production remains untouched.
 
 ## Promotion gates
 
