@@ -73,6 +73,9 @@ jobs:
       - name: Build unified multilingual candidate
         run: python scripts/build_unified_candidate.py
 
+      - name: Validate built unified bundle
+        run: python scripts/validate_unified_bundle.py
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
