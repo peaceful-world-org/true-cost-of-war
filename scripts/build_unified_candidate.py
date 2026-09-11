@@ -3,8 +3,8 @@
 
 The candidate is intentionally isolated from production. It uses one HTML
 shell, one CSS file, one JavaScript application, the shared calculation
-runtime, a small shareable-state helper, and one JSON locale file per supported
-language.
+runtime, shared formatter/active-time helpers, and one JSON locale file per
+supported language.
 """
 
 from __future__ import annotations
@@ -47,6 +47,8 @@ REQUIRED_METRICS = {
     "healthMultiples",
 }
 REQUIRED_MODES = {"year", "1year", "10years", "lifetime", "day", "hour", "minute", "since1945"}
+REQUIRED_FORMATTING = {"numberLocale", "currencySymbol", "currencyPosition", "units", "perSecond"}
+REQUIRED_FORMAT_UNITS = {"trillion", "billion", "million"}
 
 
 def digest(path: Path) -> str:
@@ -69,7 +71,10 @@ def validate() -> list[str]:
         SOURCE / "app.css",
         SOURCE / "app.mjs",
         SOURCE / "state.mjs",
+        SOURCE / "PARITY_CHECKLIST.md",
         SOURCE / "locales" / "manifest.json",
+        ROOT / "src" / "format.mjs",
+        ROOT / "src" / "active-time.mjs",
     ):
         if not required.is_file():
             raise SystemExit(f"Missing unified candidate source: {required.relative_to(ROOT)}")
@@ -80,6 +85,8 @@ def validate() -> list[str]:
         raise SystemExit("data/routes.json: no languages found")
 
     locale_manifest = load_json(SOURCE / "locales" / "manifest.json")
+    if locale_manifest.get("schemaVersion") != 2:
+        raise SystemExit("unified/locales/manifest.json: schemaVersion must be 2 for Sprint A")
     manifest_languages = locale_manifest.get("languages")
     if not isinstance(manifest_languages, dict):
         raise SystemExit("unified/locales/manifest.json: languages must be an object")
@@ -99,6 +106,18 @@ def validate() -> list[str]:
             raise SystemExit(f"unified/locales/manifest.json:{language}: dir must be ltr or rtl")
         if language in {"ar", "fa"} and meta["dir"] != "rtl":
             raise SystemExit(f"unified/locales/manifest.json:{language}: RTL language must declare dir=rtl")
+
+        formatting = meta.get("formatting")
+        if not isinstance(formatting, dict) or not REQUIRED_FORMATTING.issubset(formatting):
+            raise SystemExit(f"unified/locales/manifest.json:{language}: incomplete formatting profile")
+        if formatting.get("currencyPosition") not in {"before", "after"}:
+            raise SystemExit(f"unified/locales/manifest.json:{language}: currencyPosition must be before or after")
+        units = formatting.get("units")
+        if not isinstance(units, dict) or not REQUIRED_FORMAT_UNITS.issubset(units):
+            raise SystemExit(f"unified/locales/manifest.json:{language}: formatting.units is incomplete")
+        for key in ("numberLocale", "currencySymbol", "perSecond"):
+            if not isinstance(formatting.get(key), str) or not formatting[key]:
+                raise SystemExit(f"unified/locales/manifest.json:{language}: formatting.{key} must be non-empty")
 
         locale_path = SOURCE / "locales" / f"{language}.json"
         locale = load_json(locale_path)
@@ -135,19 +154,38 @@ def validate() -> list[str]:
             raise SystemExit(f"unified/index.html missing interaction-parity marker: {marker}")
 
     app = (SOURCE / "app.mjs").read_text(encoding="utf-8")
-    if "calculateLegacySnapshot" not in app or "../src/runtime.mjs" not in app:
-        raise SystemExit("unified/app.mjs must use the shared calculation runtime")
-    if "../data/model.json" not in app:
-        raise SystemExit("unified/app.mjs must load the canonical legacy data file")
-    if "./state.mjs" not in app or "readCandidateState" not in app or "writeCandidateState" not in app:
-        raise SystemExit("unified/app.mjs must use the shareable preview state helper")
-    for marker in ("SESSION_STARTED_AT", "viewerSpend", "scenarioChips", "closeInfoPopovers"):
+    required_app_markers = (
+        "calculateLegacySnapshot",
+        "../src/runtime.mjs",
+        "../src/format.mjs",
+        "../src/active-time.mjs",
+        "createActiveTimeTracker",
+        "requestAnimationFrame",
+        "REFERENCE_SECONDS_PER_YEAR",
+        "365.25",
+        "./state.mjs",
+        "readCandidateState",
+        "writeCandidateState",
+        "../data/model.json",
+    )
+    for marker in required_app_markers:
         if marker not in app:
-            raise SystemExit(f"unified/app.mjs missing interaction-parity behavior: {marker}")
+            raise SystemExit(f"unified/app.mjs: missing Sprint A marker {marker!r}")
+    if "Intl.NumberFormat" in app:
+        raise SystemExit("unified/app.mjs must use src/format.mjs instead of Intl compact currency formatting")
+    if "setInterval(" in app:
+        raise SystemExit("unified/app.mjs must use the throttled animation-frame loop, not setInterval")
+    if "Date.now() - SESSION_STARTED_AT" in app:
+        raise SystemExit("unified/app.mjs must measure active viewing time, not wall-clock session time")
 
     state = (SOURCE / "state.mjs").read_text(encoding="utf-8")
     if "clampInteger(params.get('share'), 5, 50" not in state:
         raise SystemExit("unified/state.mjs must keep preview share state in the legacy 5-50 range")
+
+    checklist = (SOURCE / "PARITY_CHECKLIST.md").read_text(encoding="utf-8")
+    for gate in ("Embed mode", "Text summary generation", "Mobile summary", "Final independent parity review"):
+        if gate not in checklist:
+            raise SystemExit(f"unified/PARITY_CHECKLIST.md: missing promotion gate/surface {gate!r}")
 
     return sorted(route_languages)
 
@@ -169,11 +207,15 @@ def main() -> None:
     manifest = {
         "schemaVersion": 1,
         "status": "preview-not-production",
-        "candidate": "unified-v0.3",
-        "architecture": "one HTML + one CSS + one JS app + one state helper + one locale JSON per language + shared data/runtime",
+        "candidate": "unified-v0.4-sprint-a",
+        "architecture": "one HTML + one CSS + one JS app + shared formatter + active-time clock + one state helper + one locale JSON per language + shared data/runtime",
         "interactionParity": [
             "legacy-style hero counter",
-            "live session-spend counter",
+            "active-viewing session-spend counter",
+            "reference-style currency/compact formatter",
+            "365.25-day live spending rate",
+            "throttled animation-frame live loop",
+            "1200ms mode-change ease-out",
             "5-50 redistribution slider",
             "10/25/50 scenario chips",
             "metric formula popovers",
@@ -187,7 +229,7 @@ def main() -> None:
         encoding="utf-8",
     )
 
-    print(f"Built unified candidate v0.3 for {len(languages)} languages")
+    print(f"Built unified candidate v0.4 Sprint A for {len(languages)} languages")
     print("Production files changed: 0")
     print("Preview entrypoint: unified/index.html?lang=<language>")
 
