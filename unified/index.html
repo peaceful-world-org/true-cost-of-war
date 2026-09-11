@@ -6,13 +6,14 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <title>True Cost of War — Unified Candidate</title>
   <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./parity-b.css">
 </head>
 <body>
   <main class="pw-shell">
     <div class="pw-preview-banner" role="status">
       <div>
         <strong>UNIFIED CANDIDATE · PREVIEW</strong>
-        <span>v0.4 · Parity Sprint A · not production</span>
+        <span>v0.5 · Parity Sprint B · not production</span>
       </div>
       <label class="pw-preview-language">
         <span id="languageLabel">Language</span>
@@ -23,11 +24,14 @@
     <section class="pw-hero">
       <div class="pw-eyebrow" id="eyebrow">Peaceful World</div>
       <h1 id="title">The True Cost of War</h1>
+      <div class="pw-hero-subtitle" id="heroSubtitle">IN REAL TIME</div>
 
       <div class="pw-live-fact">
         <span class="pw-live-dot" aria-hidden="true"></span>
-        <span id="liveMetricLabel">Military expenditure</span>
+        <span id="liveFactPrefix">Global military spending is</span>
         <strong id="liveRate">—</strong>
+        <span id="liveFactSuffix">every second.</span>
+        <span id="liveMetricLabel" hidden>Military expenditure</span>
       </div>
 
       <p class="pw-lead" id="lead">Loading locale…</p>
@@ -56,23 +60,64 @@
 
       <aside class="pw-session-card">
         <div class="pw-session-head">
-          <span id="sessionMetricLabel">Military expenditure</span>
+          <span class="pw-session-title" id="sessionTitle">DURING YOUR VIEW OF THIS PAGE:</span>
           <time id="viewerElapsed">00:00</time>
+          <span id="sessionMetricLabel" hidden>Military expenditure</span>
         </div>
         <div class="pw-session-value" id="viewerSpend">—</div>
-        <div class="pw-session-divider"></div>
-        <div class="pw-session-row">
-          <span id="shareLabelText">Redirected share</span>
-          <strong id="viewerRedirected">—</strong>
-        </div>
+        <div class="pw-session-note" id="sessionNote">allocated to global military budgets.</div>
+        <div class="pw-session-alt-title" id="sessionAlternatives">Alternative allocation of these resources could:</div>
+        <ul class="pw-session-equivalents">
+          <li>• <span id="sessionFoodLabel">provide food for</span> <strong id="sessionFood">0</strong></li>
+          <li>• <span id="sessionHealthLabel">provide basic healthcare for</span> <strong id="sessionHealth">0</strong></li>
+          <li>• <span id="sessionPovertyLabel">lift from extreme poverty</span> <strong id="sessionPoverty">0</strong></li>
+        </ul>
+        <span id="shareLabelText" hidden>Redirected share</span>
+        <span id="viewerRedirected" hidden>—</span>
       </aside>
     </section>
 
-    <section class="pw-grid pw-grid-headline" id="headlineMetrics"></section>
+    <section class="pw-reference-grid" aria-label="Demographic impact">
+      <article class="pw-reference-card pw-glow" data-tone="gold">
+        <div class="pw-reference-card-label" id="personalBurdenLabel">INDIRECT FINANCIAL BURDEN</div>
+        <div class="pw-reference-card-value" id="personalBurden">—</div>
+        <div class="pw-reference-card-desc" id="personalBurdenDesc">Average indirect financial burden per person on the planet.</div>
+      </article>
+      <article class="pw-reference-card pw-glow" data-tone="direct">
+        <div class="pw-reference-card-label" id="directLabel">DIRECT DEMOGRAPHIC LOSSES</div>
+        <div class="pw-reference-card-value" id="directValue">—</div>
+      </article>
+      <article class="pw-reference-card pw-glow" data-tone="indirect">
+        <div class="pw-reference-card-label" id="indirectLabel">INDIRECT DEMOGRAPHIC LOSSES</div>
+        <div class="pw-reference-card-value" id="indirectValue">—</div>
+      </article>
+    </section>
+
+    <section class="pw-grid pw-grid-headline" id="headlineMetrics" hidden></section>
+
+    <section class="pw-economic-section">
+      <h2 id="economicTitle">ECONOMIC IMPACT</h2>
+      <p class="pw-section-intro" id="economicIntro">Military expenditure is only one part of the total cost.</p>
+      <div class="pw-reference-grid">
+        <article class="pw-reference-card pw-glow" data-tone="gold">
+          <div class="pw-reference-card-label" id="infrastructureLabel">INFRASTRUCTURE DAMAGE</div>
+          <div class="pw-reference-card-value" id="infrastructureValue">—</div>
+        </article>
+        <article class="pw-reference-card pw-glow">
+          <div class="pw-reference-card-label" id="lifeYearsLabel">YEARS OF LIFE LOST</div>
+          <div class="pw-reference-card-value" id="lifeYearsValue">—</div>
+        </article>
+        <article class="pw-reference-card pw-glow" data-tone="gold">
+          <div class="pw-reference-card-label" id="economicLossLabel">TOTAL ECONOMIC IMPACT</div>
+          <div class="pw-reference-card-value" id="economicLossValue">—</div>
+        </article>
+      </div>
+    </section>
 
     <section class="pw-section pw-opportunity-section">
       <div class="pw-section-head">
-        <h2 id="opportunityTitle">Opportunity cost</h2>
+        <h2 id="opportunityTitle">WHAT THE SAME RESOURCES COULD SUPPORT</h2>
+        <p class="pw-section-intro" id="opportunityIntro">Move the share to compare military expenditure with major global development needs.</p>
       </div>
 
       <div class="pw-scenario-panel pw-glow">
@@ -92,7 +137,8 @@
         </div>
       </div>
 
-      <div class="pw-grid pw-grid-opportunity" id="opportunityMetrics"></div>
+      <div class="pw-programmes" id="programmes"></div>
+      <div class="pw-grid pw-grid-opportunity" id="opportunityMetrics" hidden></div>
     </section>
 
     <details class="pw-method">
@@ -124,6 +170,6 @@
     </details>
   </main>
 
-  <script type="module" src="./app.mjs"></script>
+  <script type="module" src="./parity-b.mjs"></script>
 </body>
 </html>
