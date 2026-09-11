@@ -124,6 +124,15 @@ def ancestor(node: Node | None, class_name: str) -> Node | None:
     return None
 
 
+def has_ancestor_class(node: Node | None, class_name: str) -> bool:
+    current = node.parent if node else None
+    while current is not None:
+        if class_name in current.classes:
+            return True
+        current = current.parent
+    return False
+
+
 def element_children(node: Node | None) -> list[Node]:
     if node is None:
         return []
@@ -289,6 +298,26 @@ def extract(language: str, source: Path) -> dict:
     mission_block = find_id(root, "pw2-mission-block")
     fund_heading = find_class(mission_block, "pw2-pf-header")
     fund_subtitle = find_class(mission_block, "pw2-pf-subtitle")
+    mission_description = find_class(mission_block, "pw2-pf-m-desc")
+    mission_info_trigger = find_class(mission_description, "pw2-info-trigger")
+    mission_before_info, mission_after_info = line_around_direct_child(mission_info_trigger)
+    mission_tooltip = find_class(mission_info_trigger, "pw2-tooltip")
+    mission_percent = find_id(mission_block, "pw2-mission-percent-text")
+    mission_emphasis = [
+        require(node_text(node, exclude_classes={"pw2-tooltip"}), language, "narrative.missionEmphasis")
+        for node in walk(mission_description)
+        if node.tag == "strong"
+        and not has_ancestor_class(node, "pw2-tooltip")
+        and not has_ancestor_class(node, "pw2-mission-note")
+    ] if mission_description else []
+    if len(mission_emphasis) < 2:
+        raise SystemExit(f"{language}: unable to extract the two mission emphasis spans")
+
+    impact_title_node = find_class(mission_block, "pw2-micro-title")
+    impact_text_wrap = find_class(impact_title_node, "pw2-impact-text-wrap")
+    impact_highlight = find_class(impact_title_node, "pw2-impact-highlight")
+    impact_tooltip = find_class(impact_highlight, "pw2-tooltip")
+
     cta = find_class(mission_block, "pw2-cta-main")
     philosophy = find_class(root, "pw2-philosophy-card")
     philosophy_intros = find_all_class(philosophy, "pw2-intro")
@@ -354,8 +383,17 @@ def extract(language: str, source: Path) -> dict:
             "month": require(month_label, language, "narrative.month"),
             "year": require(year_label, language, "narrative.year"),
             "missionHeading": require(node_text(find_class(mission_block, "pw2-pf-m-header"), exclude_classes={"pw2-tooltip"}), language, "narrative.missionHeading"),
-            "missionCopy": require(node_text(find_class(mission_block, "pw2-pf-m-desc"), exclude_classes={"pw2-tooltip"}), language, "narrative.missionCopy"),
-            "impactTitle": require(node_text(find_class(mission_block, "pw2-micro-title"), exclude_classes={"pw2-tooltip"}), language, "narrative.impactTitle"),
+            "missionCopy": require(node_text(mission_description, exclude_classes={"pw2-tooltip"}), language, "narrative.missionCopy"),
+            "missionBeforeInfo": require(mission_before_info, language, "narrative.missionBeforeInfo"),
+            "missionAfterInfo": require(mission_after_info, language, "narrative.missionAfterInfo"),
+            "missionFirstEmphasis": mission_emphasis[0],
+            "missionSecondEmphasis": mission_emphasis[1],
+            "missionNoteTemplate": require(value_template(mission_percent), language, "narrative.missionNoteTemplate"),
+            "missionTooltip": require(node_text(mission_tooltip), language, "narrative.missionTooltip"),
+            "impactTitle": require(node_text(impact_title_node, exclude_classes={"pw2-tooltip"}), language, "narrative.impactTitle"),
+            "impactHeading": require(node_text(impact_text_wrap, exclude_classes={"pw2-impact-highlight", "pw2-tooltip"}), language, "narrative.impactHeading"),
+            "impactHighlight": require(node_text(impact_highlight, exclude_classes={"pw2-tooltip"}), language, "narrative.impactHighlight"),
+            "impactTooltip": require(node_text(impact_tooltip), language, "narrative.impactTooltip"),
             "impact": require(node_text(find_class(mission_block, "pw2-micro-text"), exclude_classes={"pw2-tooltip"}), language, "narrative.impact"),
             "cta": require(node_text(cta, exclude_classes={"pw2-tooltip"}), language, "narrative.cta"),
             "ctaHref": cta.attrs.get("href", "") if cta else "",
