@@ -5,6 +5,7 @@ import test from 'node:test';
 const index = readFileSync(new URL('../unified/index.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../unified/visual-polish.css', import.meta.url), 'utf8');
 const motion = readFileSync(new URL('../unified/visual-polish.mjs', import.meta.url), 'utf8');
+const parity = readFileSync(new URL('../unified/parity-b.mjs', import.meta.url), 'utf8');
 
 test('polish layer is loaded last in the unified visual stack', () => {
   const valueParity = index.indexOf('./visual-value-parity.css');
@@ -56,6 +57,14 @@ test('all four live values share the same production render gate', () => {
   assert.doesNotMatch(motion, /paintDerived/);
   assert.doesNotMatch(motion, /persistentNumberNode/);
   assert.doesNotMatch(motion, /MONEY_CADENCE_MS/);
+});
+
+test('parity layer cannot become a second writer for session equivalents', () => {
+  assert.doesNotMatch(parity, /setText\(el\.sessionFood,/);
+  assert.doesNotMatch(parity, /setText\(el\.sessionHealth,/);
+  assert.doesNotMatch(parity, /setText\(el\.sessionPoverty,/);
+  assert.doesNotMatch(parity, /function elapsedSeconds\s*\(/);
+  assert.doesNotMatch(parity, /SESSION_EQUIVALENTS/);
 });
 
 test('live session values have exclusive visible DOM ownership', () => {
