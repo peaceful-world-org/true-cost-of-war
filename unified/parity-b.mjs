@@ -15,7 +15,7 @@ const [manifest, modelDocument] = await Promise.all([
 ]);
 const model = modelDocument.values;
 const perSecond = model.annualMilitarySpend / REFERENCE_SECONDS_PER_YEAR;
-const mobileQuery = window.matchMedia('(max-width: 600px)');
+const mobileQuery = window.matchMedia('(max-width: 900px)');
 let programmesExpanded = false;
 
 const controls = {
@@ -55,6 +55,7 @@ const el = {
   economicLossValue: document.querySelector('#economicLossValue'),
   opportunityTitle: document.querySelector('#opportunityTitle'),
   opportunityIntro: document.querySelector('#opportunityIntro'),
+  scenarioTitle: document.querySelector('#scenarioTitle'),
   scenarioSpectrum: document.querySelector('#scenarioSpectrum'),
   developmentAllocationLabel: document.querySelector('#developmentAllocationLabel'),
   developmentAllocationValue: document.querySelector('#developmentAllocationValue'),
@@ -147,6 +148,7 @@ function renderStatic() {
   setText(el.economicLossLabel, t.economicLoss);
   setText(el.opportunityTitle, t.opportunityTitle);
   setText(el.opportunityIntro, t.opportunityIntro);
+  setText(el.scenarioTitle, t.scenarioTitle);
   setText(el.scenarioSpectrum, t.scenarioSpectrum);
   setText(el.developmentAllocationLabel, t.developmentAllocation);
   setText(el.defenceAllocationLabel, t.defenceAllocation);
@@ -219,8 +221,11 @@ function renderDynamic() {
   const share = snap.sharePercent;
   const development = snap.opportunityCosts.redirected;
   const defence = Math.max(0, snap.totals.militarySpend - development);
-  setText(el.developmentAllocationValue, `${share}% · ${formatMoney(development, m, { short: true })}`);
+  const developmentShort = formatMoney(development, m, { short: true });
+  setText(el.developmentAllocationValue, `${share}% · ${developmentShort}`);
   setText(el.defenceAllocationValue, `${100 - share}% · ${formatMoney(defence, m, { short: true })}`);
+  setText(document.querySelector('#impactTotalAmount'), developmentShort);
+  setText(document.querySelector('#mobileImpactTotalAmount'), developmentShort);
   if (el.developmentAllocationBar) el.developmentAllocationBar.style.width = `${share}%`;
   if (el.defenceAllocationBar) el.defenceAllocationBar.style.width = `${100 - share}%`;
 
