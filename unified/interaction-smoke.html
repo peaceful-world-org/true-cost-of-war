@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en" data-smoke="running">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Unified interaction smoke harness</title>
+  <style>
+    body { margin: 0; font: 14px/1.5 system-ui, sans-serif; background: #111827; color: #e5e7eb; }
+    #smokeResults { margin: 0; padding: 16px; white-space: pre-wrap; }
+    #appFrame { display: block; width: 390px; height: 760px; border: 0; }
+  </style>
+</head>
+<body>
+  <pre id="smokeResults">RUNNING</pre>
+  <iframe id="appFrame" title="Unified interaction smoke target"></iframe>
+
+  <script type="module">
+    const root = document.documentElement;
+    const output = document.querySelector('#smokeResults');
+    const frame = document.querySelector('#appFrame');
+    const notes = [];
+    let resizeHeight = 0;
+
+    function note(message) {
+      notes.push(`PASS: ${message}`);
+      output.textContent = notes.join('\n');
+    }
+
+    function assert(condition, message) {
+      if (!condition) throw new Error(message);
+      note(message);
+    }
+
+    function delay(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    async function waitFor(predicate, label, timeout = 3500) {
+      const started = performance.now();
+      while (performance.now() - started < timeout) {
+        if (predicate()) return;
+        await delay(25);
+      }
+      throw new Error(`timeout waiting for ${label}`);
+    }
+
+    window.addEventListener('message', (event) => {
+      if (event.source !== frame.contentWindow) return;
+      if (event.data?.type === 'pw2-resize' && Number(event.data.height) > 0) {
+        resizeHeight = Number(event.data.height);
+      }
+    });
+
+    try {
+      frame.src = './index.html?lang=en&mode=1year&share=10&year=1990&embed=1';
+      await new Promise((resolve, reject) => {
+        frame.addEventListener('load', resolve, { once: true });
+        setTimeout(() => reject(new Error('iframe load timeout')), 4000);
+      });
+
+      const win = frame.contentWindow;
+      const doc = frame.contentDocument;
+      await waitFor(
+        () => doc.querySelector('#debug')?.textContent.includes('language: en'),
+        'English runtime initialisation',
+      );
+      await waitFor(() => doc.querySelectorAll('.pw-programme').length === 8, 'programme rendering');
+
+      assert(doc.documentElement.classList.contains('pw-embed-mode'), 'embed mode bootstraps inside iframe');
+      assert(doc.documentElement.dir === 'ltr', 'English starts in LTR mode');
+      assert(doc.querySelector('#shareLabel')?.textContent.trim() === '10%', 'initial redistribution share is 10%');
+      assert(doc.querySelector('#mainCounterValue')?.textContent.trim() !== '—', 'main counter renders a calculated value');
+
+      const chip25 = doc.querySelector('.pw-scenario-chip[data-share="25"]');
+      chip25.click();
+      await waitFor(() => doc.querySelector('#shareLabel')?.textContent.trim() === '25%', '25% scenario update');
+      await delay(320);
+      assert(new URL(win.location.href).searchParams.get('share') === '25', 'scenario interaction persists to URL state');
+
+      const mode = doc.querySelector('#mode');
+      mode.value = 'lifetime';
+      mode.dispatchEvent(new Event('change', { bubbles: true }));
+      await waitFor(() => !doc.querySelector('#birthControl').hidden, 'lifetime birth-year control');
+      await delay(320);
+      assert(new URL(win.location.href).searchParams.get('mode') === 'lifetime', 'timeframe interaction persists to URL state');
+
+      const toggle = doc.querySelector('#programmeToggle');
+      assert(toggle.hidden === false, 'mobile-width programme disclosure control is available');
+      assert(doc.querySelectorAll('.pw-programme[data-mobile-extra="true"][hidden]').length === 5, 'five extra programmes start collapsed on mobile');
+      toggle.click();
+      await waitFor(() => toggle.getAttribute('aria-expanded') === 'true', 'programme expansion');
+      assert(doc.querySelectorAll('.pw-programme[data-mobile-extra="true"][hidden]').length === 0, 'programme expansion reveals all extra rows');
+
+      const heroInfo = doc.querySelector('.pw-parity-info[data-tooltip-key="hero"]');
+      heroInfo.click();
+      await waitFor(() => heroInfo.getAttribute('aria-expanded') === 'true', 'mobile tooltip open state');
+      assert(Boolean(doc.querySelector('.pw-parity-inline-popover')), 'mobile methodology tooltip renders inline');
+
+      doc.querySelector('#buildText').click();
+      await waitFor(() => !doc.querySelector('#shareTextWrap').hidden, 'text summary visibility');
+      const summary = doc.querySelector('#shareTextOutput').textContent;
+      assert(summary.includes('Peaceful World') && summary.length > 100, 'text summary is populated with shareable content');
+
+      doc.querySelector('#buildCard').click();
+      await waitFor(() => doc.querySelector('#shareCardPreview').src.startsWith('data:image/png'), 'infographic generation');
+      assert(!doc.querySelector('#shareCardWrap').hidden, 'generated infographic preview becomes visible');
+
+      const language = doc.querySelector('#language');
+      language.value = 'ar';
+      language.dispatchEvent(new Event('change', { bubbles: true }));
+      await waitFor(() => doc.documentElement.lang === 'ar' && doc.documentElement.dir === 'rtl', 'Arabic RTL language switch');
+      assert(doc.querySelector('#title').textContent.trim() !== 'The True Cost of War', 'Arabic title replaces English copy');
+
+      win.postMessage({ type: 'pw2-request-resize' }, '*');
+      await waitFor(() => resizeHeight > 0, 'iframe resize response');
+      assert(resizeHeight > 300, 'embed resize contract returns a useful height');
+
+      root.dataset.smoke = 'pass';
+      output.textContent = `${notes.join('\n')}\nPASS: interaction smoke complete`;
+    } catch (error) {
+      root.dataset.smoke = 'fail';
+      output.textContent = `${notes.join('\n')}\nFAIL: ${error?.stack || error}`;
+      console.error(error);
+    }
+  </script>
+</body>
+</html>
