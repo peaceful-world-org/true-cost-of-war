@@ -16,6 +16,10 @@ PROGRAMMES = {
 METRICS = {"personal", "direct", "indirect", "infrastructure", "life", "economicLoss"}
 HERO = {"subtitle", "livePrefix", "liveSuffix", "liveTemplate", "lead", "tooltip", "mainCaption", "mainTooltip"}
 SESSION = {"title", "note", "alternatives", "foodTemplate", "healthTemplate", "povertyTemplate"}
+OPPORTUNITY = {
+    "title", "intro", "scenarioTitle", "scenarioTooltip", "scenarioSpectrum",
+    "fundHeading", "fundSubtitle", "showMore", "programmes",
+}
 NARRATIVE = {
     "scaleHeading", "scaleTitle", "day", "month", "year", "missionHeading", "missionCopy",
     "impactTitle", "impact", "cta", "ctaHref", "philosophyTitle", "philosophyCopy", "quote",
@@ -68,6 +72,8 @@ def main() -> None:
             raise SystemExit(f"{language}: session missing {sorted(missing)}")
         if set(metrics) != METRICS:
             raise SystemExit(f"{language}: metric copy keys do not match contract")
+        if set(opportunity) != OPPORTUNITY:
+            raise SystemExit(f"{language}: opportunity copy keys do not match contract")
         if set(opportunity.get("programmes", {})) != PROGRAMMES:
             raise SystemExit(f"{language}: programme copy keys do not match contract")
         missing = NARRATIVE - set(narrative)
@@ -94,7 +100,7 @@ def main() -> None:
 
         for key in ("title", "intro"):
             non_empty(economic.get(key), f"{language}.economic.{key}")
-        for key in ("title", "intro", "scenarioSpectrum", "showMore"):
+        for key in OPPORTUNITY - {"programmes"}:
             non_empty(opportunity.get(key), f"{language}.opportunity.{key}")
         for programme_key, programme in opportunity["programmes"].items():
             for key in ("label", "note", "tooltip", "initialValue"):
