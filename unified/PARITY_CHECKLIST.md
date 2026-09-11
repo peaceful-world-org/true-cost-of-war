@@ -27,38 +27,42 @@ Goal: migrate the proven product into the unified architecture without redesigni
 - [x] URL writes are kept outside the animation hot path
 - [x] Main metrics update continuously in live modes
 - [x] Mode changes use a 1200 ms ease-out count-up
-- [ ] Published hero subtitle and opening lead ported exactly
+- [ ] Published hero subtitle and opening lead ported exactly for every locale (RU/EN migration copy is in place)
 - [ ] Reference metric descriptions ported to locale schema
 - [ ] Reference methodology tooltip corpus ported to locale schema
 
 ## Reference surfaces still to port
 
 - [ ] Hero-level methodology info control
-- [ ] Main period-total info control and caption
-- [ ] Session human equivalents: food / basic healthcare / extreme poverty
-- [ ] Per-person indirect financial burden card
-- [ ] Direct / indirect death cards with descriptions and distinct colour roles
-- [ ] Economic-impact section title + intro
-- [ ] Infrastructure / YPLL / aggregate cards with reference descriptions
-- [ ] Opportunity-cost section title + intro
-- [ ] All 8 opportunity-cost programme rows
-- [ ] Programme need notes and xN progress bars
-- [ ] Extra-programme expand/collapse interaction
-- [ ] Conservative → Moderate → Systemic slider labels
-- [ ] Development / remaining-defence allocation bars
+- [ ] Main period-total info control and caption (caption restored; info control pending)
+- [x] Session human equivalents: food / basic healthcare / extreme poverty
+- [x] Per-person indirect financial burden card
+- [ ] Direct / indirect death cards with descriptions and distinct colour roles (cards/colour roles restored; descriptions pending)
+- [x] Economic-impact section title + intro (RU/EN migration copy)
+- [ ] Infrastructure / YPLL / aggregate cards with reference descriptions (cards restored; descriptions pending)
+- [x] Opportunity-cost section title + intro (RU/EN migration copy)
+- [x] All 8 opportunity-cost programme rows
+- [x] Programme need notes and xN progress bars
+- [x] Extra-programme expand/collapse interaction on mobile
+- [x] Conservative → Moderate → Systemic slider labels
+- [x] Development / remaining-defence allocation bars
 - [ ] Micro-redistribution mission block
 - [ ] Peaceful World support CTA
 - [ ] Philosophy / UNESCO quote block
 - [ ] Day / month / year scale tiles
-- [ ] Text summary generation
-- [ ] Copy-to-clipboard feedback state
-- [ ] 1080×1080 infographic generation and download
-- [ ] Mobile summary and progressive disclosure
+- [x] Text summary generation
+- [x] Copy-to-clipboard feedback state
+- [x] 1080×1080 infographic generation and download
+- [x] Mobile summary and progressive disclosure
 - [ ] Desktop tooltip collision protection
 - [ ] Mobile inline tooltip container
-- [ ] Embed mode (`?embed=1`)
-- [ ] iframe resize contract (`pw2-resize`, `ResizeObserver`, request/response)
+- [x] Embed mode (`?embed=1`)
+- [x] iframe resize contract (`pw2-resize`, `ResizeObserver`, request/response)
 - [ ] Full RTL validation after restored reference layout is present
+
+## Current migration note
+
+Unified v0.7 now carries most of the reference interaction skeleton. The next pass is intentionally about parity details rather than redesign: tooltips/descriptions, remaining reference narrative blocks, full-locale copy, RTL/mobile validation, and visual calibration against the production reference.
 
 ## Promotion gates
 
