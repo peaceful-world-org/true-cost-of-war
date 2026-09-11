@@ -69,5 +69,5 @@ Do not call the unified candidate production-ready until all of the following ar
 3. Desktop and mobile visual comparison is complete.
 4. RU/EN plus AR/FA RTL smoke tests pass.
 5. Embed mode is verified inside a real host page.
-6. A final independent parity review finds no critical divergence.
+6. Final independent parity review finds no critical divergence.
 7. Methodology/data changes, if any, are reviewed separately from the parity migration.
