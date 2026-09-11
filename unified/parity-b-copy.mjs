@@ -49,6 +49,7 @@ export function parityCopy(language) {
     economicLoss: source.metrics.economicLoss.label,
     opportunityTitle: source.opportunity.title,
     opportunityIntro: source.opportunity.intro,
+    scenarioTitle: source.opportunity.scenarioTitle,
     scenarioSpectrum: source.opportunity.scenarioSpectrum,
     developmentAllocation: ui.developmentAllocation,
     defenceAllocation: ui.defenceAllocation,
