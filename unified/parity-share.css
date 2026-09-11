@@ -17,4 +17,6 @@
 .pw-share-text { margin: 0; color: #dbeafe; font: 500 13px/1.65 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; }
 .pw-share-preview { display: block; width: min(100%, 520px); margin: 0 auto 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,.12); }
 .pw-copy-state { min-height: 20px; margin-top: 8px; color: var(--peace); font-size: 12px; }
+.pw-share-intro-secondary { margin-top: 0; }
+.pw-share-download-note { margin-top: 12px; color: var(--muted); font-size: 11px; line-height: 1.4; text-align: center; }
 @media (max-width: 600px) { .pw-share-actions { display: grid; grid-template-columns: 1fr; } .pw-share-button { width: 100%; } }
