@@ -8,16 +8,6 @@ import { parityCopy } from './parity-b-copy.mjs';
 const REFERENCE_SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
 const POPULATION_BASELINE = 8.1e9;
 const SESSION_EQUIVALENTS = Object.freeze({ food: 62.5, health: 125, poverty: 1000 });
-const PROGRAMME_COST_KEYS = Object.freeze({
-  education: 'educationCost',
-  hunger: 'hungerCost',
-  health: 'healthCost',
-  water: 'waterCost',
-  electricity: 'electricityCost',
-  internet: 'internetCost',
-  climate: 'climateCost',
-  schools: 'schoolCost',
-});
 
 const [manifest, modelDocument] = await Promise.all([
   fetch('./locales/manifest.json', { cache: 'no-store' }).then((r) => r.json()),
@@ -44,9 +34,6 @@ const el = {
   sessionTitle: document.querySelector('#sessionTitle'),
   sessionNote: document.querySelector('#sessionNote'),
   sessionAlternatives: document.querySelector('#sessionAlternatives'),
-  sessionFoodLabel: document.querySelector('#sessionFoodLabel'),
-  sessionHealthLabel: document.querySelector('#sessionHealthLabel'),
-  sessionPovertyLabel: document.querySelector('#sessionPovertyLabel'),
   sessionFood: document.querySelector('#sessionFood'),
   sessionHealth: document.querySelector('#sessionHealth'),
   sessionPoverty: document.querySelector('#sessionPoverty'),
@@ -95,6 +82,29 @@ function setText(node, value) {
   if (node && node.textContent !== String(value)) node.textContent = String(value);
 }
 
+function splitTemplate(template) {
+  const source = String(template || '{value}');
+  const marker = source.indexOf('{value}');
+  if (marker < 0) return ['', source];
+  return [source.slice(0, marker).trim(), source.slice(marker + 7).trim()];
+}
+
+function prepareSessionLine(valueNode, template) {
+  const line = valueNode?.closest('li');
+  if (!line || !valueNode) return;
+  const [before, after] = splitTemplate(template);
+  const children = [document.createTextNode('• ')];
+  if (before) children.push(document.createTextNode(`${before} `));
+  children.push(valueNode);
+  if (after) children.push(document.createTextNode(` ${after}`));
+  line.replaceChildren(...children);
+}
+
+function applyValueTemplate(template, value) {
+  const source = String(template || '{value}');
+  return source.includes('{value}') ? source.replace('{value}', String(value)) : String(value);
+}
+
 function elapsedSeconds() {
   const parts = (el.viewerElapsed?.textContent || '00:00').trim().split(':').map(Number);
   if (parts.some((value) => !Number.isFinite(value))) return 0;
@@ -123,9 +133,9 @@ function renderStatic() {
   setText(el.sessionTitle, t.sessionTitle);
   setText(el.sessionNote, t.sessionNote);
   setText(el.sessionAlternatives, t.sessionAlternatives);
-  setText(el.sessionFoodLabel, t.food);
-  setText(el.sessionHealthLabel, t.health);
-  setText(el.sessionPovertyLabel, t.poverty);
+  prepareSessionLine(el.sessionFood, t.sessionTemplates.food);
+  prepareSessionLine(el.sessionHealth, t.sessionTemplates.health);
+  prepareSessionLine(el.sessionPoverty, t.sessionTemplates.poverty);
   setText(el.personalBurdenLabel, t.personalBurden);
   setText(el.personalBurdenDesc, t.personalBurdenDesc);
   setText(el.directLabel, t.directDeaths);
@@ -148,10 +158,12 @@ function buildProgrammes() {
   if (!el.programmes) return;
   const t = copy();
   el.programmes.replaceChildren();
-  t.programmes.forEach(([key, label], index) => {
+  t.programmes.forEach(([key, label, noteText, tooltipText, valueTemplate], index) => {
     const row = document.createElement('article');
     row.className = 'pw-programme pw-glow';
     row.dataset.programme = key;
+    row.dataset.valueTemplate = valueTemplate || '{value}';
+    row.dataset.tooltipText = tooltipText || '';
     if (index >= 3) row.dataset.mobileExtra = 'true';
 
     const content = document.createElement('div');
@@ -160,11 +172,7 @@ function buildProgrammes() {
     name.textContent = label;
     const note = document.createElement('div');
     note.className = 'pw-programme-note';
-    const costKey = PROGRAMME_COST_KEYS[key];
-    const annualCost = model[costKey];
-    note.textContent = languageKey() === 'ru'
-      ? `Оценочная потребность: ${formatMoney(annualCost, meta())} / год`
-      : `Reference annual need: ${formatMoney(annualCost, meta())}`;
+    note.textContent = noteText;
     content.append(name, note);
 
     const value = document.createElement('div');
@@ -194,13 +202,12 @@ function updateProgrammeVisibility() {
 function renderDynamic() {
   const snap = snapshot();
   const m = meta();
-  const t = copy();
 
   const active = elapsedSeconds();
   const sessionSpend = perSecond * active;
-  setText(el.sessionFood, `${formatInteger(Math.floor(sessionSpend / SESSION_EQUIVALENTS.food), m)} ${t.people}`);
-  setText(el.sessionHealth, `${formatInteger(Math.floor(sessionSpend / SESSION_EQUIVALENTS.health), m)} ${t.people}`);
-  setText(el.sessionPoverty, `${formatInteger(Math.floor(sessionSpend / SESSION_EQUIVALENTS.poverty), m)} ${t.people}`);
+  setText(el.sessionFood, formatInteger(Math.floor(sessionSpend / SESSION_EQUIVALENTS.food), m));
+  setText(el.sessionHealth, formatInteger(Math.floor(sessionSpend / SESSION_EQUIVALENTS.health), m));
+  setText(el.sessionPoverty, formatInteger(Math.floor(sessionSpend / SESSION_EQUIVALENTS.poverty), m));
 
   setText(el.personalBurden, formatMoney(snap.totals.militarySpend / POPULATION_BASELINE, m));
   setText(el.directValue, formatInteger(snap.totals.directDeaths, m));
@@ -217,27 +224,27 @@ function renderDynamic() {
   if (el.developmentAllocationBar) el.developmentAllocationBar.style.width = `${share}%`;
   if (el.defenceAllocationBar) el.defenceAllocationBar.style.width = `${100 - share}%`;
 
-  const values = snap.opportunityCosts;
   const programmeValues = {
-    education: values.education,
-    hunger: values.hunger,
-    health: values.health,
-    water: values.water,
-    electricity: values.electricity,
-    internet: values.internet,
-    climate: values.climate,
-    schools: values.schools,
+    education: snap.opportunityCosts.education,
+    hunger: snap.opportunityCosts.hunger,
+    health: snap.opportunityCosts.health,
+    water: snap.opportunityCosts.water,
+    electricity: snap.opportunityCosts.electricity,
+    internet: snap.opportunityCosts.internet,
+    climate: snap.opportunityCosts.climate,
+    schools: snap.opportunityCosts.schools,
   };
 
   for (const [key, numeric] of Object.entries(programmeValues)) {
     const output = el.programmes?.querySelector(`[data-programme-value="${key}"]`);
     const row = el.programmes?.querySelector(`[data-programme="${key}"]`);
-    if (key === 'schools') {
-      setText(output, `${formatInteger(numeric, m)} ${t.institutions}`);
-      if (row) row.style.setProperty('--progress', `${Math.min(100, numeric > 0 ? 100 : 0)}%`);
-    } else {
-      setText(output, languageKey() === 'ru' ? `${formatRatio(numeric, m)} ${t.times}` : `${formatRatio(numeric, m)}${t.times}`);
-      if (row) row.style.setProperty('--progress', `${Math.min(100, Math.max(0, numeric * 100))}%`);
+    const formatted = key === 'schools' ? formatInteger(numeric, m) : formatRatio(numeric, m);
+    setText(output, applyValueTemplate(row?.dataset.valueTemplate, formatted));
+    if (row) {
+      const progress = key === 'schools'
+        ? (numeric > 0 ? 100 : 0)
+        : Math.min(100, Math.max(0, numeric * 100));
+      row.style.setProperty('--progress', `${progress}%`);
     }
   }
 }
