@@ -42,6 +42,51 @@ function fundSummary({ mobile = false } = {}) {
   return card;
 }
 
+function normalizeAllocationMarkup() {
+  const allocation = document.querySelector('.pw-allocation');
+  if (!allocation || allocation.dataset.parityNormalized === 'true') return allocation;
+
+  const developmentCard = allocation.querySelector('[data-allocation="development"]');
+  const defenceCard = allocation.querySelector('[data-allocation="defence"]');
+  const developmentHead = developmentCard?.querySelector('.pw-allocation-head');
+  const defenceHead = defenceCard?.querySelector('.pw-allocation-head');
+  const developmentBar = developmentCard?.querySelector('#developmentAllocationBar');
+  const defenceBar = defenceCard?.querySelector('#defenceAllocationBar');
+
+  if (!developmentHead || !defenceHead || !developmentBar || !defenceBar) return allocation;
+
+  const labels = section('div', 'pw-fund-bar-labels');
+  developmentHead.className = 'pw-fund-bar-label pw-fund-bar-label-peace';
+  defenceHead.className = 'pw-fund-bar-label pw-fund-bar-label-war';
+  labels.append(developmentHead, defenceHead);
+
+  const bar = section('div', 'pw-fund-bar-wrap');
+  developmentBar.className = 'pw-fund-bar-peace';
+  defenceBar.className = 'pw-fund-bar-war';
+  bar.append(developmentBar, defenceBar);
+
+  allocation.replaceChildren(labels, bar);
+  allocation.dataset.parityNormalized = 'true';
+  return allocation;
+}
+
+function renderMissionCopy(node, text) {
+  const sourceText = String(text || '');
+  const match = sourceText.match(/[0٠۰](?:[.,٫][0٠۰]+)?\s*[%٪]/u);
+  if (!match || match.index == null) {
+    node.textContent = sourceText;
+    return;
+  }
+
+  const before = sourceText.slice(0, match.index);
+  const after = sourceText.slice(match.index + match[0].length);
+  const percent = document.createElement('span');
+  percent.id = 'missionPercentText';
+  percent.className = 'pw-mission-percent';
+  percent.textContent = match[0];
+  node.append(document.createTextNode(before), percent, document.createTextNode(after));
+}
+
 function build() {
   document.querySelector('#parityNarrative')?.remove();
   document.querySelector('#parityScale')?.remove();
@@ -83,13 +128,12 @@ function build() {
   const missionCard = section('div', 'pw-mission-card');
   const missionHeading = section('div', 'pw-mission-heading');
   missionHeading.textContent = t.missionHeading;
-  const missionCopy = section('div', 'pw-mission-title');
-  missionCopy.textContent = t.missionCopy;
+  const missionCopy = section('div', 'pw-mission-copy pw-mission-primary-copy');
+  renderMissionCopy(missionCopy, t.missionCopy);
   const missionHighlight = section('div', 'pw-mission-highlight');
-  const impactTitle = document.createElement('strong');
+  const impactTitle = section('strong', 'pw-mission-impact-title');
   impactTitle.textContent = t.impactTitle;
-  const impact = section('div', 'pw-mission-copy');
-  impact.style.marginTop = '12px';
+  const impact = section('div', 'pw-mission-copy pw-mission-impact-copy');
   impact.textContent = t.impact;
   missionHighlight.append(impactTitle, impact);
   const cta = document.createElement('a');
@@ -118,7 +162,7 @@ function build() {
   philosophy.append(philosophyCard);
 
   const fundSlot = document.querySelector('#opportunityFundSlot');
-  const allocation = document.querySelector('.pw-allocation');
+  const allocation = normalizeAllocationMarkup();
   if (fundSlot) {
     fundSlot.replaceChildren();
     fundSlot.append(fundSummary());
