@@ -11,8 +11,8 @@ function language() {
   return document.querySelector('#language')?.value || 'en';
 }
 
-function narrative() {
-  return legacyCopy(language()).narrative;
+function source() {
+  return legacyCopy(language());
 }
 
 function meta() {
@@ -25,13 +25,31 @@ function section(tag, className) {
   return node;
 }
 
+function fundSummary({ mobile = false } = {}) {
+  const t = source().opportunity;
+  const card = section('div', mobile ? 'pw-mobile-summary' : 'pw-fund-summary');
+  if (mobile) card.id = 'mobileFundSummary';
+
+  const heading = section('div', 'pw-fund-header');
+  heading.textContent = t.fundHeading;
+  const amount = section('div', 'pw-fund-amount');
+  amount.id = mobile ? 'mobileImpactTotalAmount' : 'impactTotalAmount';
+  amount.textContent = '—';
+  const subtitle = section('div', mobile ? 'pw-mobile-summary-desc' : 'pw-fund-subtitle');
+  subtitle.textContent = mobile ? t.mobileFundSubtitle : t.fundSubtitle;
+
+  card.append(heading, amount, subtitle);
+  return card;
+}
+
 function build() {
   document.querySelector('#parityNarrative')?.remove();
   document.querySelector('#parityScale')?.remove();
+  document.querySelector('#mobileFundSummary')?.remove();
   const anchor = document.querySelector('.pw-share-section') || document.querySelector('.pw-method');
   if (!anchor) return;
 
-  const t = narrative();
+  const t = source().narrative;
   const m = meta();
   const wrapper = section('div', 'pw-parity-narrative');
   wrapper.id = 'parityNarrative';
@@ -91,9 +109,9 @@ function build() {
   rationale.textContent = t.philosophyCopy;
   const quote = section('blockquote', 'pw-philosophy-quote');
   quote.append(document.createTextNode(t.quote));
-  const source = section('span', 'pw-philosophy-source');
-  source.textContent = t.quoteSource;
-  quote.append(source);
+  const quoteSource = section('span', 'pw-philosophy-source');
+  quoteSource.textContent = t.quoteSource;
+  quote.append(quoteSource);
   const closing = section('div', 'pw-philosophy-copy');
   closing.textContent = t.closing;
   philosophyCard.append(h2, rationale, quote, closing);
@@ -103,11 +121,15 @@ function build() {
   const allocation = document.querySelector('.pw-allocation');
   if (fundSlot) {
     fundSlot.replaceChildren();
+    fundSlot.append(fundSummary());
     if (allocation) fundSlot.append(allocation);
     fundSlot.append(missionCard);
   } else {
     wrapper.append(mission);
   }
+
+  const opportunitySplit = document.querySelector('.pw-opportunity-split');
+  if (opportunitySplit) opportunitySplit.before(fundSummary({ mobile: true }));
 
   /* Production order: methodology/philosophy first, then one dissemination
      section containing the day/month/year scale and the sharing controls. */
