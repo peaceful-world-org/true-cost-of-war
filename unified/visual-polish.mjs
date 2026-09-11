@@ -1,10 +1,15 @@
 // Presentation ownership for the first-screen live session counter.
 //
-// The previous parity pass copied the legacy 80 ms render gate literally. At
-// the current global-spend rate that means jumps of roughly six thousand
-// dollars per paint, which is exactly the perceptual "chunking" we are trying
-// to remove. The data model stays unchanged; only the presentation clock is
-// made truly continuous.
+// The production calculator feels calmer for a simple reason: it keeps a
+// requestAnimationFrame loop running, but it does not repaint the visible live
+// values on every display frame. Its live presentation is sampled at roughly
+// 80 ms. The previous preview pass removed that gate, so the low-order digits
+// changed about 60 times per second and visibly flickered.
+//
+// This keeps the production-style 80 ms presentation cadence while preserving
+// the newer full running integer. In other words, the counter stays alive past
+// $1m instead of collapsing into whole-million steps, but its low-order digits
+// no longer churn on every screen refresh.
 //
 // This layer owns the visible session-spend value and the three live equivalent
 // counters after window load. Earlier unified modules keep references to the
@@ -13,6 +18,7 @@
 import { formattingProfile } from '../src/format.mjs';
 
 const SECONDS_PER_YEAR = 31557600;
+const ORIGINAL_LIVE_CADENCE_MS = 80;
 const SESSION_EQUIVALENTS = Object.freeze({ food: 62.5, health: 125, poverty: 1000 });
 
 const [manifest, modelDocument] = await Promise.all([
@@ -33,6 +39,7 @@ let viewerCurrencyAfterSpacer = null;
 let accumulatedVisibleMs = 0;
 let visibleStartedAt = document.hidden ? null : performance.now();
 let animationFrameId = null;
+let lastVisiblePaintAt = Number.NEGATIVE_INFINITY;
 let initialized = false;
 const integerFormatters = new Map();
 
@@ -101,18 +108,15 @@ function refreshCurrencyPlacement() {
   buildViewerMoneyDom(viewerSpend, currentMeta());
 }
 
-function render(now) {
-  animationFrameId = null;
-  if (!viewerSpend || document.hidden) return;
-
+function paintVisibleValues(now) {
   const meta = currentMeta();
   const elapsedSeconds = currentVisibleMs(now) / 1000;
   const spend = spendPerSecond * elapsedSeconds;
 
-  // Keep the session-spend display as a full running integer instead of
-  // collapsing to whole millions. At ~77k USD/s, compact "1m, 2m..." notation
-  // necessarily freezes for many seconds at a time and destroys the sense of
-  // flow. The rest of the calculator keeps the legacy compact formatting.
+  // Keep the full amount at every scale. This deliberately differs from the
+  // legacy compact formatter only at $1m+, where whole-million notation caused
+  // long visible freezes. The cadence, not the numeric scale, is what we port
+  // from production here.
   const moneyText = formatInteger(spend, meta);
   if (viewerNumberNode && viewerNumberNode.nodeValue !== moneyText) {
     viewerNumberNode.nodeValue = moneyText;
@@ -126,11 +130,25 @@ function render(now) {
   if (sessionHealth && sessionHealth.textContent !== healthText) sessionHealth.textContent = healthText;
   if (sessionPoverty && sessionPoverty.textContent !== povertyText) sessionPoverty.textContent = povertyText;
 
-  // No throttle: the visible values follow the display refresh cadence.
+  lastVisiblePaintAt = now;
+}
+
+function render(now) {
+  animationFrameId = null;
+  if (!viewerSpend || document.hidden) return;
+
+  // Match the production calculator's perceived cadence: rAF remains the clock,
+  // but DOM text is repainted only about every 80 ms. This removes the 60 Hz
+  // low-order digit shimmer without introducing a setInterval drift clock.
+  if (now - lastVisiblePaintAt >= ORIGINAL_LIVE_CADENCE_MS) {
+    paintVisibleValues(now);
+  }
+
   animationFrameId = requestAnimationFrame(render);
 }
 
-function startLoop() {
+function startLoop({ paintImmediately = false } = {}) {
+  if (paintImmediately) lastVisiblePaintAt = Number.NEGATIVE_INFINITY;
   if (!document.hidden && animationFrameId === null) {
     animationFrameId = requestAnimationFrame(render);
   }
@@ -149,10 +167,11 @@ function initialize() {
   refreshCurrencyPlacement();
   accumulatedVisibleMs = 0;
   visibleStartedAt = document.hidden ? null : performance.now();
+  lastVisiblePaintAt = Number.NEGATIVE_INFINITY;
 
   document.querySelector('#language')?.addEventListener('change', () => {
     refreshCurrencyPlacement();
-    startLoop();
+    startLoop({ paintImmediately: true });
   });
 
   document.addEventListener('visibilitychange', () => {
@@ -168,12 +187,12 @@ function initialize() {
       }
     } else {
       visibleStartedAt = now;
-      startLoop();
+      startLoop({ paintImmediately: true });
     }
   });
 
-  document.documentElement.dataset.motionPolish = 'continuous-live-flow';
-  startLoop();
+  document.documentElement.dataset.motionPolish = 'original-cadence-continuous-value';
+  startLoop({ paintImmediately: true });
 }
 
 // Wait until the earlier unified modules have captured their DOM references;
