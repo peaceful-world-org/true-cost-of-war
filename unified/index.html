@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="./embed.css">
   <link rel="stylesheet" href="./visual-reference.css">
   <link rel="stylesheet" href="./visual-opportunity.css">
+  <link rel="stylesheet" href="./visual-structure.css">
 </head>
 <body>
   <main class="pw-shell">
@@ -39,62 +40,62 @@
       </div>
 
       <p class="pw-lead" id="lead">Loading locale…</p>
-    </section>
 
-    <section class="pw-time-controls" aria-label="Calculator controls">
-      <label class="pw-time-control">
-        <span id="timeframeLabel">Timeframe</span>
-        <select id="mode"></select>
-      </label>
-      <label class="pw-time-control pw-birth-control" id="birthControl" hidden>
-        <span id="birthYearLabel">Birth year</span>
-        <input id="birthYear" type="number" min="1920" value="1990" inputmode="numeric">
-      </label>
-    </section>
+      <section class="pw-time-controls" aria-label="Calculator controls">
+        <label class="pw-time-control">
+          <span id="timeframeLabel">Timeframe</span>
+          <select id="mode"></select>
+        </label>
+        <label class="pw-time-control pw-birth-control" id="birthControl" hidden>
+          <span id="birthYearLabel">Birth year</span>
+          <input id="birthYear" type="number" min="1920" value="1990" inputmode="numeric">
+        </label>
+      </section>
 
-    <section class="pw-hero-counter pw-glow">
-      <div class="pw-counter-main">
-        <div class="pw-counter-kicker">
-          <span class="pw-live-dot" aria-hidden="true"></span>
-          <span id="currentPeriod">—</span>
+      <section class="pw-hero-counter pw-glow">
+        <div class="pw-counter-main">
+          <div class="pw-counter-kicker">
+            <span class="pw-live-dot" aria-hidden="true"></span>
+            <span id="currentPeriod">—</span>
+          </div>
+          <div class="pw-counter-value" id="mainCounterValue">—</div>
+          <div class="pw-counter-caption" id="mainCounterLabel">Military expenditure</div>
         </div>
-        <div class="pw-counter-value" id="mainCounterValue">—</div>
-        <div class="pw-counter-caption" id="mainCounterLabel">Military expenditure</div>
-      </div>
 
-      <aside class="pw-session-card">
-        <div class="pw-session-head">
-          <span class="pw-session-title" id="sessionTitle">DURING YOUR VIEW OF THIS PAGE:</span>
-          <time id="viewerElapsed">00:00</time>
-          <span id="sessionMetricLabel" hidden>Military expenditure</span>
-        </div>
-        <div class="pw-session-value" id="viewerSpend">—</div>
-        <div class="pw-session-note" id="sessionNote">allocated to global military budgets.</div>
-        <div class="pw-session-alt-title" id="sessionAlternatives">Alternative allocation of these resources could:</div>
-        <ul class="pw-session-equivalents">
-          <li>• <span id="sessionFoodLabel">provide food for</span> <strong id="sessionFood">0</strong></li>
-          <li>• <span id="sessionHealthLabel">provide basic healthcare for</span> <strong id="sessionHealth">0</strong></li>
-          <li>• <span id="sessionPovertyLabel">lift from extreme poverty</span> <strong id="sessionPoverty">0</strong></li>
-        </ul>
-        <span id="shareLabelText" hidden>Redirected share</span>
-        <span id="viewerRedirected" hidden>—</span>
-      </aside>
-    </section>
+        <aside class="pw-session-card">
+          <div class="pw-session-head">
+            <span class="pw-session-title" id="sessionTitle">DURING YOUR VIEW OF THIS PAGE:</span>
+            <time id="viewerElapsed">00:00</time>
+            <span id="sessionMetricLabel" hidden>Military expenditure</span>
+          </div>
+          <div class="pw-session-value" id="viewerSpend">—</div>
+          <div class="pw-session-note" id="sessionNote">allocated to global military budgets.</div>
+          <div class="pw-session-alt-title" id="sessionAlternatives">Alternative allocation of these resources could:</div>
+          <ul class="pw-session-equivalents">
+            <li>• <span id="sessionFoodLabel">provide food for</span> <strong id="sessionFood">0</strong></li>
+            <li>• <span id="sessionHealthLabel">provide basic healthcare for</span> <strong id="sessionHealth">0</strong></li>
+            <li>• <span id="sessionPovertyLabel">lift from extreme poverty</span> <strong id="sessionPoverty">0</strong></li>
+          </ul>
+          <span id="shareLabelText" hidden>Redirected share</span>
+          <span id="viewerRedirected" hidden>—</span>
+        </aside>
+      </section>
 
-    <section class="pw-reference-grid" aria-label="Demographic impact">
-      <article class="pw-reference-card pw-glow" data-tone="gold">
-        <div class="pw-reference-card-label" id="personalBurdenLabel">INDIRECT FINANCIAL BURDEN</div>
-        <div class="pw-reference-card-value" id="personalBurden">—</div>
-        <div class="pw-reference-card-desc" id="personalBurdenDesc">Average indirect financial burden per person on the planet.</div>
-      </article>
-      <article class="pw-reference-card pw-glow" data-tone="direct">
-        <div class="pw-reference-card-label" id="directLabel">DIRECT DEMOGRAPHIC LOSSES</div>
-        <div class="pw-reference-card-value" id="directValue">—</div>
-      </article>
-      <article class="pw-reference-card pw-glow" data-tone="indirect">
-        <div class="pw-reference-card-label" id="indirectLabel">INDIRECT DEMOGRAPHIC LOSSES</div>
-        <div class="pw-reference-card-value" id="indirectValue">—</div>
-      </article>
+      <section class="pw-reference-grid" aria-label="Demographic impact">
+        <article class="pw-reference-card pw-glow" data-tone="gold">
+          <div class="pw-reference-card-label" id="personalBurdenLabel">INDIRECT FINANCIAL BURDEN</div>
+          <div class="pw-reference-card-value" id="personalBurden">—</div>
+          <div class="pw-reference-card-desc" id="personalBurdenDesc">Average indirect financial burden per person on the planet.</div>
+        </article>
+        <article class="pw-reference-card pw-glow" data-tone="direct">
+          <div class="pw-reference-card-label" id="directLabel">DIRECT DEMOGRAPHIC LOSSES</div>
+          <div class="pw-reference-card-value" id="directValue">—</div>
+        </article>
+        <article class="pw-reference-card pw-glow" data-tone="indirect">
+          <div class="pw-reference-card-label" id="indirectLabel">INDIRECT DEMOGRAPHIC LOSSES</div>
+          <div class="pw-reference-card-value" id="indirectValue">—</div>
+        </article>
+      </section>
     </section>
 
     <section class="pw-grid pw-grid-headline" id="headlineMetrics" hidden></section>
