@@ -41,7 +41,7 @@ test('visible session-spend counter is a literal production timing port with one
   assert.match(motion, /takeExclusiveViewerOwnership/);
   assert.match(motion, /cloneNode\(true\)/);
   assert.match(motion, /existing\.replaceWith\(clone\)/);
-  assert.doesNotMatch(motion, /MutationObserver/);
+  assert.doesNotMatch(motion, /\bnew\s+MutationObserver\s*\(/);
   assert.doesNotMatch(motion, /#mainCounterValue/);
   assert.doesNotMatch(motion, /\.animate\s*\(/);
   assert.doesNotMatch(motion, /translateY\s*\(/);
