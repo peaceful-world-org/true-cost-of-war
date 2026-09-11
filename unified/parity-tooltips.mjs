@@ -169,6 +169,20 @@ function attachDescriptions() {
   }
 }
 
+function attachMainCounterInfo() {
+  const value = document.querySelector('#mainCounterValue');
+  if (!value || document.querySelector('.pw-parity-info[data-tooltip-key="main"]')) return;
+
+  let row = value.parentElement?.querySelector('.pw-counter-value-row');
+  if (!row) {
+    row = document.createElement('div');
+    row.className = 'pw-counter-value-row';
+    value.parentNode.insertBefore(row, value);
+    row.append(value);
+  }
+  row.append(makeButton('main', document.querySelector('#currentPeriod')?.textContent?.trim() || 'Period total'));
+}
+
 function install() {
   const lead = document.querySelector('#lead');
   if (lead && !document.querySelector('.pw-parity-info[data-tooltip-key="hero"]')) {
@@ -178,10 +192,7 @@ function install() {
     row.append(lead, makeButton('hero', document.querySelector('#title')?.textContent?.trim() || 'Model'));
   }
 
-  const kicker = document.querySelector('.pw-counter-kicker');
-  if (kicker && !kicker.querySelector('.pw-parity-info[data-tooltip-key="main"]')) {
-    kicker.append(makeButton('main', document.querySelector('#currentPeriod')?.textContent?.trim() || 'Period total'));
-  }
+  attachMainCounterInfo();
 
   const cards = [
     ['#personalBurdenLabel', 'personal'],
