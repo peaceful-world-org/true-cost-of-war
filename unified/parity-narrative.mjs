@@ -97,7 +97,17 @@ function build() {
   philosophyCard.append(h2, rationale, quote, closing);
   philosophy.append(philosophyCard);
 
-  wrapper.append(scale, mission, philosophy);
+  const fundSlot = document.querySelector('#opportunityFundSlot');
+  const allocation = document.querySelector('.pw-allocation');
+  if (fundSlot) {
+    fundSlot.replaceChildren();
+    if (allocation) fundSlot.append(allocation);
+    fundSlot.append(missionCard);
+  } else {
+    wrapper.append(mission);
+  }
+
+  wrapper.append(scale, philosophy);
   anchor.before(wrapper);
 }
 
