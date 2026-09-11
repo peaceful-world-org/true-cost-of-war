@@ -36,6 +36,9 @@ TARGET_IDS = {
     "currentPeriod",
     "debug",
     "programmeToggle",
+    "shareIntro",
+    "shareIntroSecondary",
+    "shareDownloadNote",
     "smokeResults",
 }
 VOID_TAGS = {
@@ -198,6 +201,12 @@ def assert_case(case: Case, page: SnapshotParser, manifest: dict) -> None:
         fail(f"{case.name}: share label={page.value('shareLabel')!r}, expected {case.share}%")
     if page.programmes != 8:
         fail(f"{case.name}: rendered {page.programmes} programme rows, expected 8")
+
+    if case.language in {"ru", "en"} and not case.embed:
+        if not page.value("shareIntro") or not page.value("shareIntroSecondary"):
+            fail(f"{case.name}: production dissemination paragraph pair did not render")
+        if not page.value("shareDownloadNote"):
+            fail(f"{case.name}: production download fallback note did not render")
 
     mobile = case.width <= 600
     if mobile:
