@@ -69,14 +69,48 @@ function setText(node, value) {
   if (node) node.textContent = String(value);
 }
 
+function ensureSecondaryIntro() {
+  if (!el.shareIntro) return null;
+  let secondary = document.querySelector('#shareIntroSecondary');
+  if (!secondary) {
+    secondary = document.createElement('p');
+    secondary.id = 'shareIntroSecondary';
+    secondary.className = 'pw-section-intro pw-share-intro-secondary';
+    el.shareIntro.after(secondary);
+  }
+  return secondary;
+}
+
+function ensureDownloadNote() {
+  if (!el.cardWrap || !el.downloadCard) return null;
+  let note = document.querySelector('#shareDownloadNote');
+  if (!note) {
+    note = document.createElement('div');
+    note.id = 'shareDownloadNote';
+    note.className = 'pw-share-download-note';
+    el.downloadCard.after(note);
+  }
+  return note;
+}
+
 function renderLabels() {
   const t = ui();
   setText(el.shareTitle, t.shareTitle);
   setText(el.shareIntro, t.shareIntro);
+  const secondary = ensureSecondaryIntro();
+  if (secondary) {
+    secondary.hidden = !t.shareIntroSecondary;
+    setText(secondary, t.shareIntroSecondary || '');
+  }
   setText(el.buildText, t.shareText);
   setText(el.buildCard, t.shareCard);
   setText(el.copyText, t.copy);
   setText(el.downloadCard, t.download);
+  const downloadNote = ensureDownloadNote();
+  if (downloadNote) {
+    downloadNote.hidden = !t.downloadNote;
+    setText(downloadNote, t.downloadNote || '');
+  }
 }
 
 function summaryText() {
