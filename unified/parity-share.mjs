@@ -2,7 +2,7 @@ import './app.mjs';
 import { calculateLegacySnapshot } from '../src/runtime.mjs';
 import { formatInteger, formatMoney, formatRatio } from '../src/format.mjs';
 import { legacyCopy } from './legacy-copy.mjs';
-import { shellUiCopy } from './ui-copy.mjs';
+import { disseminationParityCopy, shellUiCopy } from './ui-copy.mjs';
 
 const [manifest, modelDocument] = await Promise.all([
   fetch('./locales/manifest.json', { cache: 'no-store' }).then((r) => r.json()),
@@ -95,12 +95,13 @@ function ensureDownloadNote() {
 
 function renderLabels() {
   const t = ui();
+  const parity = disseminationParityCopy(language());
   setText(el.shareTitle, t.shareTitle);
   setText(el.shareIntro, t.shareIntro);
   const secondary = ensureSecondaryIntro();
   if (secondary) {
-    secondary.hidden = !t.shareIntroSecondary;
-    setText(secondary, t.shareIntroSecondary || '');
+    secondary.hidden = !parity?.secondary;
+    setText(secondary, parity?.secondary || '');
   }
   setText(el.buildText, t.shareText);
   setText(el.buildCard, t.shareCard);
@@ -108,8 +109,8 @@ function renderLabels() {
   setText(el.downloadCard, t.download);
   const downloadNote = ensureDownloadNote();
   if (downloadNote) {
-    downloadNote.hidden = !t.downloadNote;
-    setText(downloadNote, t.downloadNote || '');
+    downloadNote.hidden = !parity?.downloadNote;
+    setText(downloadNote, parity?.downloadNote || '');
   }
 }
 
