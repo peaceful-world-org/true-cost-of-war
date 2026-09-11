@@ -66,6 +66,7 @@
         'English runtime initialisation',
       );
       await waitFor(() => doc.querySelectorAll('.pw-programme').length === 8, 'programme rendering');
+      await waitFor(() => doc.querySelector('.pw-parity-info[data-tooltip-key="missionFunding"]'), 'mission parity rendering');
 
       assert(doc.documentElement.classList.contains('pw-embed-mode'), 'embed mode bootstraps inside iframe');
       assert(doc.documentElement.dir === 'ltr', 'English starts in LTR mode');
@@ -106,6 +107,25 @@
       await waitFor(() => heroInfo.getAttribute('aria-expanded') === 'false', 'Escape closes methodology tooltip');
       assert(!doc.querySelector('.pw-parity-inline-popover'), 'closed mobile tooltip is removed from layout');
 
+      const missionInfo = doc.querySelector('.pw-parity-info[data-tooltip-key="missionFunding"]');
+      const missionPercent = doc.querySelector('#missionPercentText');
+      assert(Boolean(missionInfo), 'mission funding info control is restored');
+      assert(Boolean(missionPercent) && missionPercent.textContent.includes('%'), 'mission percentage note is restored');
+      assert(doc.querySelectorAll('.pw-mission-primary-copy strong').length >= 2, 'mission copy restores emphasized 1-second and 7-second spans');
+      missionInfo.click();
+      await waitFor(() => missionInfo.getAttribute('aria-expanded') === 'true', 'mission funding tooltip opens');
+      assert((doc.querySelector('.pw-parity-inline-popover')?.textContent || '').length > 60, 'mission funding tooltip uses extracted source copy');
+      doc.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await waitFor(() => missionInfo.getAttribute('aria-expanded') === 'false', 'Escape closes mission funding tooltip');
+
+      const impactInfo = doc.querySelector('.pw-parity-info[data-tooltip-key="impactEfficiency"]');
+      assert(Boolean(impactInfo), 'impact efficiency info control is restored');
+      assert(Boolean(doc.querySelector('.pw-mission-impact-heading')) && Boolean(doc.querySelector('.pw-mission-impact-highlight')), 'impact title restores two-line production hierarchy');
+      impactInfo.click();
+      await waitFor(() => impactInfo.getAttribute('aria-expanded') === 'true', 'impact efficiency tooltip opens');
+      assert((doc.querySelector('.pw-parity-inline-popover')?.textContent || '').length > 60, 'impact efficiency tooltip uses extracted source copy');
+      doc.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
       doc.querySelector('#buildText').click();
       await waitFor(() => !doc.querySelector('#shareTextWrap').hidden, 'text summary visibility');
       const englishSummary = doc.querySelector('#shareTextOutput').textContent;
@@ -129,6 +149,8 @@
       await waitFor(() => doc.documentElement.lang === 'ar' && doc.documentElement.dir === 'rtl', 'Arabic RTL language switch');
       const arabicTitle = doc.querySelector('#title').textContent.trim();
       assert(arabicTitle && arabicTitle !== 'The True Cost of War', 'Arabic title replaces English copy');
+      await waitFor(() => doc.querySelector('.pw-parity-info[data-tooltip-key="missionFunding"]'), 'Arabic mission parity rebuild');
+      assert(doc.querySelectorAll('.pw-mission-primary-copy strong').length >= 2, 'RTL mission emphasis survives language switch');
 
       doc.querySelector('#buildText').click();
       await waitFor(() => doc.querySelector('#shareTextOutput').textContent.startsWith(arabicTitle), 'Arabic summary regeneration');

@@ -70,21 +70,74 @@ function normalizeAllocationMarkup() {
   return allocation;
 }
 
-function renderMissionCopy(node, text) {
+function makeInfoButton(key, title) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'pw-parity-info pw-parity-info-sm';
+  button.textContent = 'i';
+  button.dataset.tooltipKey = key;
+  button.dataset.tooltipTitle = title || '';
+  button.setAttribute('aria-label', title ? `${title}: info` : 'Information');
+  button.setAttribute('aria-expanded', 'false');
+  return button;
+}
+
+function appendEmphasizedText(node, text, emphasis) {
   const sourceText = String(text || '');
-  const match = sourceText.match(/[0٠۰](?:[.,٫][0٠۰]+)?\s*[%٪]/u);
-  if (!match || match.index == null) {
-    node.textContent = sourceText;
+  const marker = String(emphasis || '');
+  const index = marker ? sourceText.indexOf(marker) : -1;
+  if (index < 0) {
+    node.append(document.createTextNode(sourceText));
     return;
   }
+  if (index > 0) node.append(document.createTextNode(sourceText.slice(0, index)));
+  const strong = document.createElement('strong');
+  strong.textContent = marker;
+  node.append(strong);
+  if (index + marker.length < sourceText.length) {
+    node.append(document.createTextNode(sourceText.slice(index + marker.length)));
+  }
+}
 
-  const before = sourceText.slice(0, match.index);
-  const after = sourceText.slice(match.index + match[0].length);
-  const percent = document.createElement('span');
-  percent.id = 'missionPercentText';
-  percent.className = 'pw-mission-percent';
-  percent.textContent = match[0];
-  node.append(document.createTextNode(before), percent, document.createTextNode(after));
+function appendMissionCopy(node, t) {
+  node.replaceChildren();
+  appendEmphasizedText(node, t.missionBeforeInfo, t.missionFirstEmphasis);
+  node.append(document.createTextNode('\u00a0'));
+  node.append(makeInfoButton('missionFunding', t.missionHeading));
+  if (t.missionAfterInfo) {
+    node.append(document.createTextNode(' '));
+    appendEmphasizedText(node, t.missionAfterInfo, t.missionSecondEmphasis);
+  }
+
+  const lineBreak = document.createElement('br');
+  const note = document.createElement('span');
+  note.className = 'pw-mission-note';
+  const template = String(t.missionNoteTemplate || '{value}');
+  const marker = template.indexOf('{value}');
+  if (marker >= 0) {
+    note.append(document.createTextNode(template.slice(0, marker)));
+    const percent = document.createElement('span');
+    percent.id = 'missionPercentText';
+    percent.className = 'pw-mission-percent';
+    percent.textContent = '0.00%';
+    note.append(percent, document.createTextNode(template.slice(marker + 7)));
+  } else {
+    note.textContent = template;
+  }
+  node.append(lineBreak, note);
+}
+
+function buildImpactTitle(t) {
+  const title = section('div', 'pw-mission-impact-title');
+  const wrap = section('div', 'pw-mission-impact-text-wrap');
+  const heading = section('div', 'pw-mission-impact-heading');
+  heading.textContent = t.impactHeading;
+  const highlight = section('div', 'pw-mission-impact-highlight');
+  highlight.append(document.createTextNode(t.impactHighlight), document.createTextNode('\u00a0'));
+  highlight.append(makeInfoButton('impactEfficiency', t.impactHighlight));
+  wrap.append(heading, highlight);
+  title.append(wrap);
+  return title;
 }
 
 function build() {
@@ -129,10 +182,9 @@ function build() {
   const missionHeading = section('div', 'pw-mission-heading');
   missionHeading.textContent = t.missionHeading;
   const missionCopy = section('div', 'pw-mission-copy pw-mission-primary-copy');
-  renderMissionCopy(missionCopy, t.missionCopy);
+  appendMissionCopy(missionCopy, t);
   const missionHighlight = section('div', 'pw-mission-highlight');
-  const impactTitle = section('strong', 'pw-mission-impact-title');
-  impactTitle.textContent = t.impactTitle;
+  const impactTitle = buildImpactTitle(t);
   const impact = section('div', 'pw-mission-copy pw-mission-impact-copy');
   impact.textContent = t.impact;
   missionHighlight.append(impactTitle, impact);
