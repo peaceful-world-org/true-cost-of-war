@@ -29,12 +29,18 @@ test('info placement distinguishes hero, metric cards and programme titles', () 
   assert.match(css, /\.pw-programme \.pw-parity-label-row[\s\S]*?justify-content:\s*flex-start/);
 });
 
-test('live-flow enhancement covers the first-screen counters and respects reduced motion', () => {
-  for (const selector of ['#mainCounterValue', '#viewerSpend', '#sessionFood', '#sessionHealth', '#sessionPoverty']) {
-    assert.ok(motion.includes(`'${selector}'`), `motion target missing: ${selector}`);
+test('live-flow renders changing session values without bouncing the number element', () => {
+  for (const selector of ['#viewerSpend', '#sessionFood', '#sessionHealth', '#sessionPoverty']) {
+    assert.ok(motion.includes(`'${selector}'`), `live presentation target missing: ${selector}`);
   }
-  assert.match(motion, /prefers-reduced-motion:\s*reduce/);
-  assert.match(motion, /MutationObserver/);
-  assert.match(motion, /cubic-bezier\(\.22,\.72,\.2,1\)/);
-  assert.match(motion, /dataset\.motionPolish\s*=\s*'ready'/);
+  assert.doesNotMatch(motion, /#mainCounterValue/);
+  assert.doesNotMatch(motion, /\.animate\s*\(/);
+  assert.doesNotMatch(motion, /translateY\s*\(/);
+  assert.match(motion, /requestAnimationFrame/);
+  assert.match(motion, /formatLiveSessionMoney/);
+  assert.match(motion, /decimals\s*=\s*3/);
+  assert.match(motion, /visibilitychange/);
+  assert.match(motion, /dataset\.motionPolish\s*=\s*'continuous-live'/);
+  assert.match(css, /\.pw-flow-value[\s\S]*?transform:\s*none\s*!important/);
+  assert.match(css, /font-variant-numeric:\s*tabular-nums/);
 });
