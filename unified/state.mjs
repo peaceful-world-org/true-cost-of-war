@@ -12,7 +12,10 @@ export function readCandidateState(search, supportedLanguages, defaultLanguage =
   const language = supportedLanguages.includes(requestedLanguage) ? requestedLanguage : defaultLanguage;
   const mode = params.get('mode') || DEFAULTS.mode;
   const share = clampInteger(params.get('share'), 5, 50, DEFAULTS.share);
-  const birthYear = clampInteger(params.get('birth'), 1920, new Date().getFullYear(), DEFAULTS.birthYear);
+  // Reference links historically use `year`; v0.2/v0.3 preview links used
+  // `birth`. Read both during migration and write only the reference name.
+  const requestedYear = params.get('year') ?? params.get('birth');
+  const birthYear = clampInteger(requestedYear, 1920, new Date().getFullYear(), DEFAULTS.birthYear);
   return { language, mode, share, birthYear };
 }
 
@@ -21,6 +24,7 @@ export function writeCandidateState(urlLike, state) {
   url.searchParams.set('lang', state.language);
   url.searchParams.set('mode', state.mode);
   url.searchParams.set('share', String(state.share));
-  url.searchParams.set('birth', String(state.birthYear));
+  url.searchParams.set('year', String(state.birthYear));
+  url.searchParams.delete('birth');
   return `${url.pathname}${url.search}${url.hash}`;
 }
