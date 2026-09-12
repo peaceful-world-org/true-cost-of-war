@@ -7,7 +7,7 @@ The current public calculator is embedded directly in Tilda HTML blocks. The uni
 ## Build
 
 ```bash
-python scripts/build_tilda_embed.py --lang ru
+python scripts/build_tilda_embed.py --lang ru --max-block-bytes 150000
 ```
 
 The builder creates `dist/tilda/` with:
@@ -17,6 +17,8 @@ The builder creates `dist/tilda/` with:
 - `ru-single.html` — both blocks combined, useful if one T123 block accepts the full payload;
 - `ru-preview.html` — standalone browser-smoke harness;
 - `ru-manifest.json` — block sizes and deployment notes.
+
+The current Russian build is roughly 80 KB + 135 KB. The 150 KB value above is an internal live-test guardrail, not a documented Tilda platform limit. Tilda's public T123 documentation confirms support for HTML, CSS and JavaScript but does not publish a payload-size limit. If the editor rejects either block, the next packaging step is to split the payload further without changing the calculator runtime.
 
 ## Why Shadow DOM
 
