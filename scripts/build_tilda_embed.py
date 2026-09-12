@@ -250,15 +250,21 @@ def build_js(temp_root: Path, entry_source: str) -> str:
             entry.name,
             "--bundle",
             "--minify",
-            "--format=iife",
+            "--format=esm",
             "--platform=browser",
-            "--target=es2020",
+            "--target=es2022",
             f"--outfile={output.name}",
             "--log-level=warning",
         ],
         cwd=temp_root,
     )
-    return output.read_text(encoding="utf-8")
+    bundled = output.read_text(encoding="utf-8")
+    if re.search(r"(^|\n)\s*export\s", bundled):
+        fail("Tilda runtime bundle unexpectedly contains a top-level export")
+    # ESM output preserves top-level await used by the unified modules. Wrapping
+    # the already-bundled source in one async IIFE makes it safe in a normal
+    # inline <script> block while keeping the original module evaluation order.
+    return "(async()=>{\n" + bundled + "\n})().catch(console.error);"
 
 
 def extract_body_and_styles() -> tuple[str, list[str]]:
