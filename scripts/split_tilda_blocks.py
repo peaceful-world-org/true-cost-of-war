@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
-"""Split generated Tilda HTML into small T123-safe transport blocks.
-
-Tilda's T123 editor can reject large custom-code payloads with a "too much text"
-message. The native calculator build is intentionally self-contained, so this
-packager transports the already-built host/runtime as JSON strings across a
-sequence of small T123 blocks and reconstructs them in the browser.
-
-No calculator source, arithmetic, copy, or styles are changed by this step.
-"""
+"""Split a generated Tilda-native package into small T123 paste blocks."""
 
 from __future__ import annotations
 
@@ -34,13 +26,14 @@ def block_bytes(value: str) -> int:
 
 
 def payload_block(namespace: str, bucket: str, chunk: str) -> str:
-    encoded = json.dumps(chunk, ensure_ascii=False)
-    return script_safe(
+    # Escape closing script tags only inside the transported JS string. The
+    # wrapper's own </script> must remain real HTML so each T123 block closes.
+    encoded = script_safe(json.dumps(chunk, ensure_ascii=False))
+    return (
         "<script>\n"
         "(()=>{const p=globalThis["
         + json.dumps(namespace)
-        + "];if(!p)throw new Error('Tilda split transport is not initialized');"
-        + "p["
+        + "];if(!p)throw new Error('Tilda split transport is not initialized');p["
         + json.dumps(bucket)
         + "].push("
         + encoded
@@ -50,15 +43,10 @@ def payload_block(namespace: str, bucket: str, chunk: str) -> str:
 
 
 def split_payload(namespace: str, bucket: str, text: str, max_bytes: int) -> list[str]:
-    if not text:
-        return [payload_block(namespace, bucket, "")]
-
     blocks: list[str] = []
     start = 0
     while start < len(text):
-        low = 1
-        high = len(text) - start
-        best = 0
+        low, high, best = 1, len(text) - start, 0
         while low <= high:
             mid = (low + high) // 2
             candidate = payload_block(namespace, bucket, text[start : start + mid])
@@ -68,7 +56,7 @@ def split_payload(namespace: str, bucket: str, text: str, max_bytes: int) -> lis
             else:
                 high = mid - 1
         if best <= 0:
-            fail(f"Unable to fit even one character of {bucket} under {max_bytes} bytes")
+            fail(f"Unable to fit {bucket} content under {max_bytes} bytes")
         blocks.append(payload_block(namespace, bucket, text[start : start + best]))
         start += best
     return blocks
@@ -77,35 +65,31 @@ def split_payload(namespace: str, bucket: str, text: str, max_bytes: int) -> lis
 def init_block(namespace: str, anchor_id: str) -> str:
     return f"""<div id={json.dumps(anchor_id)}></div>
 <script>
-(()=>{{
-  globalThis[{json.dumps(namespace)}] = {{ host: [], runtime: [], anchorId: {json.dumps(anchor_id)} }};
-}})();
+(()=>{{globalThis[{json.dumps(namespace)}]={{host:[],runtime:[],anchorId:{json.dumps(anchor_id)}}};}})();
 </script>"""
 
 
 def final_block(namespace: str) -> str:
     return f"""<script>
 (()=>{{
-  const p = globalThis[{json.dumps(namespace)}];
-  if (!p) throw new Error('Tilda split transport is missing');
-  const anchor = document.getElementById(p.anchorId);
-  if (!anchor) throw new Error('Tilda split anchor is missing');
-
-  function install(markup) {{
-    const template = document.createElement('template');
-    template.innerHTML = markup.trim();
-    const scripts = Array.from(template.content.querySelectorAll('script'));
-    scripts.forEach((script) => script.remove());
-    anchor.parentNode.insertBefore(template.content, anchor);
-    for (const source of scripts) {{
-      const script = document.createElement('script');
-      for (const attr of source.attributes) script.setAttribute(attr.name, attr.value);
-      script.textContent = source.textContent;
-      anchor.parentNode.insertBefore(script, anchor);
+  const p=globalThis[{json.dumps(namespace)}];
+  if(!p)throw new Error('Tilda split transport is missing');
+  const anchor=document.getElementById(p.anchorId);
+  if(!anchor)throw new Error('Tilda split anchor is missing');
+  function install(markup){{
+    const template=document.createElement('template');
+    template.innerHTML=markup.trim();
+    const scripts=Array.from(template.content.querySelectorAll('script'));
+    scripts.forEach((script)=>script.remove());
+    anchor.parentNode.insertBefore(template.content,anchor);
+    for(const source of scripts){{
+      const script=document.createElement('script');
+      for(const attr of source.attributes)script.setAttribute(attr.name,attr.value);
+      script.textContent=source.textContent;
+      anchor.parentNode.insertBefore(script,anchor);
       script.remove();
     }}
   }}
-
   install(p.host.join(''));
   install(p.runtime.join(''));
   anchor.remove();
@@ -116,24 +100,21 @@ def final_block(namespace: str) -> str:
 
 def preview_harness(host_id: str) -> str:
     return f"""<script>
-window.addEventListener('pw-tcow-ready', () => {{
-  const host = document.getElementById({json.dumps(host_id)});
-  const root = host?.shadowRoot;
-  const share = root?.querySelector('#share');
-  if (!share) {{ host.dataset.pwSmoke = 'missing-share'; return; }}
-  share.value = '25';
-  share.dispatchEvent(new Event('input', {{ bubbles: true }}));
-  share.dispatchEvent(new Event('change', {{ bubbles: true }}));
-  setTimeout(() => {{
-    host.dataset.pwSmokeShare = root.querySelector('#shareLabel')?.textContent?.trim() || '';
-    const info = root.querySelector('.pw-parity-info');
-    if (info) {{
-      info.click();
-      host.dataset.pwSmokeInfo = info.getAttribute('aria-expanded') || '';
-    }}
-    host.dataset.pwSmoke = 'pass';
-  }}, 180);
-}}, {{ once: true }});
+window.addEventListener('pw-tcow-ready',()=>{{
+  const host=document.getElementById({json.dumps(host_id)});
+  const root=host?.shadowRoot;
+  const share=root?.querySelector('#share');
+  if(!share){{host.dataset.pwSmoke='missing-share';return;}}
+  share.value='25';
+  share.dispatchEvent(new Event('input',{{bubbles:true}}));
+  share.dispatchEvent(new Event('change',{{bubbles:true}}));
+  setTimeout(()=>{{
+    host.dataset.pwSmokeShare=root.querySelector('#shareLabel')?.textContent?.trim()||'';
+    const info=root.querySelector('.pw-parity-info');
+    if(info){{info.click();host.dataset.pwSmokeInfo=info.getAttribute('aria-expanded')||'';}}
+    host.dataset.pwSmoke='pass';
+  }},180);
+}},{{once:true}});
 </script>"""
 
 
@@ -151,21 +132,21 @@ def main() -> None:
     if not host_path.is_file() or not runtime_path.is_file():
         fail("Build the Tilda native package before splitting it")
 
-    host = host_path.read_text(encoding="utf-8")
-    runtime = runtime_path.read_text(encoding="utf-8")
     namespace = f"__PW_TCOW_TILDA_SPLIT_{language.upper().replace('-', '_')}__"
     anchor_id = f"pw-tcow-tilda-split-anchor-{language}"
     host_id = f"pw-tcow-tilda-{language}"
+    host = host_path.read_text(encoding="utf-8")
+    runtime = runtime_path.read_text(encoding="utf-8")
 
     blocks = [init_block(namespace, anchor_id)]
-    blocks.extend(split_payload(namespace, "host", host, args.max_block_bytes))
-    blocks.extend(split_payload(namespace, "runtime", runtime, args.max_block_bytes))
+    blocks += split_payload(namespace, "host", host, args.max_block_bytes)
+    blocks += split_payload(namespace, "runtime", runtime, args.max_block_bytes)
     blocks.append(final_block(namespace))
 
-    for index, block in enumerate(blocks, start=1):
+    for index, block in enumerate(blocks, 1):
         size = block_bytes(block)
         if size > args.max_block_bytes:
-            fail(f"Generated block {index} is {size} bytes, above limit {args.max_block_bytes}")
+            fail(f"Generated block {index} is {size} bytes, above {args.max_block_bytes}")
         (out_dir / f"{args.lang}-t123-{index:02d}.html").write_text(block + "\n", encoding="utf-8")
 
     combined = "\n".join(blocks)
@@ -188,23 +169,19 @@ def main() -> None:
         "maxBlockBytes": args.max_block_bytes,
         "blockCount": len(blocks),
         "blocks": [
-            {
-                "file": f"{args.lang}-t123-{index:02d}.html",
-                "bytes": block_bytes(block),
-            }
-            for index, block in enumerate(blocks, start=1)
+            {"file": f"{args.lang}-t123-{i:02d}.html", "bytes": block_bytes(block)}
+            for i, block in enumerate(blocks, 1)
         ],
-        "pasteOrder": [f"{args.lang}-t123-{index:02d}.html" for index in range(1, len(blocks) + 1)],
+        "pasteOrder": [f"{args.lang}-t123-{i:02d}.html" for i in range(1, len(blocks) + 1)],
         "sourceFiles": [host_path.name, runtime_path.name],
     }
     (out_dir / f"{args.lang}-t123-manifest.json").write_text(
-        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
+        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
 
     sizes = [block_bytes(block) for block in blocks]
     print(f"Split Tilda package for {args.lang}: {len(blocks)} T123 blocks")
-    print("Block sizes: " + ", ".join(str(size) for size in sizes))
+    print("Block sizes: " + ", ".join(map(str, sizes)))
     print(f"Largest block: {max(sizes)} bytes (limit {args.max_block_bytes})")
 
 
