@@ -52,6 +52,12 @@ jobs:
       - name: Smoke-test split Tilda-native Russian embed
         run: python scripts/tilda_browser_smoke.py
 
+      - name: Build external Tilda loader
+        run: python scripts/build_tilda_external_loader.py --lang ru
+
+      - name: Smoke-test external Tilda loader
+        run: python scripts/tilda_external_browser_smoke.py
+
       - name: Upload Tilda-native Russian embed
         uses: actions/upload-artifact@v4
         with:
