@@ -12,7 +12,7 @@ permissions:
 jobs:
   qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     steps:
       - name: Check out repository
@@ -42,6 +42,20 @@ jobs:
 
       - name: Test shared calculation engine and runtime
         run: node --test tests/*.test.mjs
+
+      - name: Build Tilda-native Russian embed
+        run: python scripts/build_tilda_embed.py --lang ru
+
+      - name: Smoke-test Tilda-native Russian embed
+        run: python scripts/tilda_browser_smoke.py
+
+      - name: Upload Tilda-native Russian embed
+        uses: actions/upload-artifact@v4
+        with:
+          name: true-cost-of-war-tilda-ru
+          path: dist/tilda
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Build reproducible widget bundle
         run: python scripts/build_widget_bundle.py
