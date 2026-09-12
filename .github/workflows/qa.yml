@@ -46,7 +46,10 @@ jobs:
       - name: Build Tilda-native Russian embed
         run: python scripts/build_tilda_embed.py --lang ru --max-block-bytes 150000
 
-      - name: Smoke-test Tilda-native Russian embed
+      - name: Split Tilda embed into editor-safe T123 blocks
+        run: python scripts/split_tilda_blocks.py --lang ru --max-block-bytes 42000
+
+      - name: Smoke-test split Tilda-native Russian embed
         run: python scripts/tilda_browser_smoke.py
 
       - name: Upload Tilda-native Russian embed
