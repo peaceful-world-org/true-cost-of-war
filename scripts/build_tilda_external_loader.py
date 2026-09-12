@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +35,8 @@ def main() -> None:
 
     host_markup = host_path.read_text(encoding="utf-8")
     runtime_markup = runtime_path.read_text(encoding="utf-8")
+    safe_language = re.sub(r"[^a-z0-9-]+", "-", args.lang.lower())
+    host_id = f"pw-tcow-tilda-{safe_language}"
 
     loader = f"""(()=>{{
   const current=document.currentScript;
@@ -58,6 +61,19 @@ def main() -> None:
   }}
 
   install({script_safe_json(host_markup)});
+
+  // The native package uses CSS containment to isolate its layout. In the
+  // external Tilda delivery that containment also becomes the containing block
+  // for desktop position:fixed tooltips, so after page scroll their viewport
+  // coordinates are interpreted relative to the calculator host. Relax only
+  // that containment here; Shadow DOM still provides style isolation.
+  const host=document.getElementById({json.dumps(host_id)});
+  if(host?.shadowRoot){{
+    const viewportStyle=document.createElement('style');
+    viewportStyle.textContent=':host{{contain:none!important;}}';
+    host.shadowRoot.append(viewportStyle);
+  }}
+
   install({script_safe_json(runtime_markup)});
   anchor.remove();
 }})();
@@ -66,13 +82,54 @@ def main() -> None:
     loader_path = out_dir / f"{args.lang}-loader.js"
     loader_path.write_text(loader, encoding="utf-8")
 
+    tooltip_harness = f"""
+<script>
+window.addEventListener('pw-tcow-ready', () => {{
+  const host = document.getElementById({json.dumps(host_id)});
+  const root = host?.shadowRoot;
+  if (!host || !root) return;
+  if (window.matchMedia('(max-width: 600px)').matches) {{
+    host.dataset.pwTooltipScroll = 'mobile-inline';
+    return;
+  }}
+
+  setTimeout(() => {{
+    const trigger = root.querySelector('.pw-parity-info[data-tooltip-key="infrastructure"]');
+    if (!trigger) {{
+      host.dataset.pwTooltipScroll = 'missing-trigger';
+      return;
+    }}
+    trigger.scrollIntoView({{ block: 'center' }});
+    requestAnimationFrame(() => {{
+      trigger.click();
+      requestAnimationFrame(() => {{
+        const popover = root.querySelector('.pw-parity-popover:not([hidden])');
+        if (!popover) {{
+          host.dataset.pwTooltipScroll = 'missing-popover';
+          return;
+        }}
+        const triggerRect = trigger.getBoundingClientRect();
+        const popoverRect = popover.getBoundingClientRect();
+        const triggerCenter = (triggerRect.top + triggerRect.bottom) / 2;
+        const popoverCenter = (popoverRect.top + popoverRect.bottom) / 2;
+        const visible = popoverRect.bottom > 0 && popoverRect.top < window.innerHeight;
+        const nearby = Math.abs(popoverCenter - triggerCenter) < 360;
+        host.dataset.pwTooltipScroll = visible && nearby ? 'pass' : 'misplaced';
+      }});
+    }});
+  }}, 250);
+}}, {{ once: true }});
+</script>
+"""
+
     preview = (
         '<!doctype html><html><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1">'
         '<title>Tilda external loader smoke</title></head><body>'
         '<div id="tilda-sentinel">Tilda host page</div>'
         f'<script src="./{args.lang}-loader.js"></script>'
-        '</body></html>'
+        + tooltip_harness
+        + '</body></html>'
     )
     (out_dir / f"{args.lang}-external-preview.html").write_text(preview, encoding="utf-8")
 
