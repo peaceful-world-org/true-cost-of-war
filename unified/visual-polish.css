@@ -184,25 +184,42 @@
     max-width: calc(100% - 2px);
   }
 
-  /* Mobile alignment pass: keep the scenario title/control group separate from
-     the percentage and anchor inline mission controls to their own text line. */
+  /* On narrow screens the scenario title can wrap to two lines. It therefore
+     needs normal inline text flow rather than two flex children: the info
+     control then follows the colon on the final line instead of sitting in the
+     empty space between the title and the percentage. */
   .pw-scenario-title-row {
+    display: block;
     flex: 1 1 auto;
-    gap: 6px;
+    min-width: 0;
+    max-width: 100%;
+    gap: 0;
   }
   .pw-scenario-title-row > #scenarioTitle {
+    display: inline;
     min-width: 0;
   }
   .pw-scenario-title-row > .pw-parity-info {
-    margin-inline-start: 0;
-    top: 0;
+    position: static;
+    margin-inline-start: 4px;
+    vertical-align: middle;
   }
+
+  /* These two controls live inside running copy. Keep them in the inline
+     formatting context so they sit on the text baseline and travel with the
+     words they explain instead of becoming independent flex rows. */
   .pw-mission-primary-copy .pw-parity-info,
   .pw-mission-impact-highlight .pw-parity-info {
-    margin-inline-start: 4px;
-    top: 0;
+    position: static;
+    margin-inline-start: 3px;
+    vertical-align: middle;
   }
-  .pw-mission-impact-highlight .pw-parity-info {
-    align-self: center;
+
+  /* The investment-efficiency sentence may wrap. A flex container turns the
+     info button into a separate flex item and can strand it on its own line;
+     normal inline layout keeps the non-breaking-space + icon attached to the
+     final word of the green statement. */
+  .pw-mission-impact-highlight {
+    display: block;
   }
 }
