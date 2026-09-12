@@ -1,0 +1,92 @@
+name: Deploy preview to GitHub Pages
+
+on:
+  push:
+    branches:
+      - preview
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: true-cost-of-war-preview
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: preview-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run baseline QA
+        run: python scripts/qa.py
+
+      - name: Validate v2 research candidate
+        run: python scripts/validate_v2_candidate.py
+
+      - name: Validate widget routes
+        run: python scripts/validate_routes.py
+
+      - name: Validate legacy formula parity
+        run: python scripts/validate_legacy_formula_parity.py
+
+      - name: Test shared calculation engine and runtime
+        run: node --test tests/*.test.mjs
+
+      - name: Syntax-check unified browser modules
+        run: |
+          for file in unified/*.mjs src/*.mjs; do
+            node --check "$file"
+          done
+
+      - name: Build isolated shadow runtime
+        run: python scripts/build_shadow_runtime.py
+
+      - name: Build localized visual-parity shadows
+        run: python scripts/build_shadow_parity.py
+
+      - name: Extract localized migration copy
+        run: python scripts/extract_legacy_locale_copy.py --output unified/legacy-copy.json
+
+      - name: Validate localized migration copy
+        run: python scripts/validate_legacy_copy.py
+
+      - name: Build unified multilingual candidate
+        run: python scripts/build_unified_candidate.py
+
+      - name: Validate built unified bundle
+        run: python scripts/validate_unified_bundle.py
+
+      - name: Run real-browser smoke tests
+        run: python scripts/browser_smoke.py
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload preview site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/shadow-v2
+
+      - name: Deploy preview
+        id: deployment
+        uses: actions/deploy-pages@v4

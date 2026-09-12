@@ -20,6 +20,8 @@ FILES = {
     "preview/shadow-v2/index.html": "index.html",
     "src/legacy-engine.mjs": "src/legacy-engine.mjs",
     "src/runtime.mjs": "src/runtime.mjs",
+    "src/format.mjs": "src/format.mjs",
+    "src/active-time.mjs": "src/active-time.mjs",
     "data/model.json": "data/model.json",
     "data/model-v2.candidate.json": "research/model-v2.candidate.json",
 }

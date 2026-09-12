@@ -1,0 +1,32 @@
+/* Structural parity overrides after the production-derived visual layers. */
+
+/* Production keeps all hero surfaces in one vertical flow. The methodology
+   control wraps the lead at runtime, so the wrapper itself is the flex item
+   whose order must match the reference. */
+.pw-hero {
+  display: flex;
+  flex-direction: column;
+  max-width: none;
+}
+
+.pw-hero > h1 { order: 1; }
+.pw-hero > .pw-hero-subtitle { order: 1; }
+.pw-hero > .pw-live-fact { order: 2; }
+.pw-hero > .pw-lead,
+.pw-hero > .pw-hero-info-row { order: 3; }
+.pw-hero > .pw-time-controls { order: 4; }
+.pw-hero > .pw-hero-counter { order: 5; }
+.pw-hero > .pw-reference-grid { order: 6; }
+
+@media (max-width: 600px) {
+  /* Production mobile deliberately moves the live counter ahead of the long
+     explanatory paragraph, then places timeframe controls after the lead. */
+  .pw-hero > .pw-hero-counter { order: 3; }
+  .pw-hero > .pw-lead,
+  .pw-hero > .pw-hero-info-row { order: 4; }
+  .pw-hero > .pw-time-controls { order: 5; }
+  .pw-hero > .pw-reference-grid { order: 6; }
+
+  .pw-hero > .pw-hero-counter { margin-top: 0; }
+  .pw-hero > .pw-reference-grid { margin-top: 0; }
+}

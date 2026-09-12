@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>True Cost of War — Unified Candidate</title>
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./parity-b.css">
+  <link rel="stylesheet" href="./parity-share.css">
+  <link rel="stylesheet" href="./embed.css">
+  <link rel="stylesheet" href="./visual-reference.css">
+  <link rel="stylesheet" href="./visual-opportunity.css">
+  <link rel="stylesheet" href="./visual-structure.css">
+  <link rel="stylesheet" href="./visual-icons.css">
+  <link rel="stylesheet" href="./visual-finish.css">
+  <link rel="stylesheet" href="./visual-value-parity.css">
+  <link rel="stylesheet" href="./visual-polish.css">
+</head>
+<body>
+  <main class="pw-shell">
+    <div class="pw-preview-banner" role="status">
+      <div>
+        <strong>UNIFIED CANDIDATE · PREVIEW</strong>
+        <span>v0.14 · motion + info polish · not production</span>
+      </div>
+      <label class="pw-preview-language">
+        <span id="languageLabel">Language</span>
+        <select id="language"></select>
+      </label>
+    </div>
+
+    <section class="pw-hero">
+      <div class="pw-eyebrow" id="eyebrow">Peaceful World</div>
+      <h1 id="title">The True Cost of War</h1>
+      <div class="pw-hero-subtitle" id="heroSubtitle">IN REAL TIME</div>
+
+      <div class="pw-live-fact">
+        <span class="pw-live-dot" aria-hidden="true"></span>
+        <span id="liveFactPrefix">Global military spending is</span>
+        <strong id="liveRate">—</strong>
+        <span id="liveFactSuffix">every second.</span>
+        <span id="liveMetricLabel" hidden>Military expenditure</span>
+      </div>
+
+      <p class="pw-lead" id="lead">Loading locale…</p>
+
+      <section class="pw-time-controls" aria-label="Calculator controls">
+        <label class="pw-time-control">
+          <span id="timeframeLabel">Timeframe</span>
+          <select id="mode"></select>
+        </label>
+        <label class="pw-time-control pw-birth-control" id="birthControl" hidden>
+          <span id="birthYearLabel">Birth year</span>
+          <input id="birthYear" type="number" min="1920" value="1990" inputmode="numeric">
+        </label>
+      </section>
+
+      <section class="pw-hero-counter pw-glow">
+        <div class="pw-counter-main">
+          <div class="pw-counter-kicker">
+            <span class="pw-live-dot" aria-hidden="true"></span>
+            <span id="currentPeriod">—</span>
+          </div>
+          <div class="pw-counter-value" id="mainCounterValue">—</div>
+          <div class="pw-counter-caption" id="mainCounterLabel">Military expenditure</div>
+        </div>
+
+        <aside class="pw-session-card">
+          <div class="pw-session-head">
+            <span class="pw-session-title" id="sessionTitle">DURING YOUR VIEW OF THIS PAGE:</span>
+            <time id="viewerElapsed">00:00</time>
+            <span id="sessionMetricLabel" hidden>Military expenditure</span>
+          </div>
+          <div class="pw-session-value" id="viewerSpend">—</div>
+          <div class="pw-session-note" id="sessionNote">allocated to global military budgets.</div>
+          <div class="pw-session-alt-title" id="sessionAlternatives">Alternative allocation of these resources could:</div>
+          <ul class="pw-session-equivalents">
+            <li>• <span id="sessionFoodLabel">provide food for</span> <strong id="sessionFood">0</strong></li>
+            <li>• <span id="sessionHealthLabel">provide basic healthcare for</span> <strong id="sessionHealth">0</strong></li>
+            <li>• <span id="sessionPovertyLabel">lift from extreme poverty</span> <strong id="sessionPoverty">0</strong></li>
+          </ul>
+          <span id="shareLabelText" hidden>Redirected share</span>
+          <span id="viewerRedirected" hidden>—</span>
+        </aside>
+      </section>
+
+      <section class="pw-reference-grid" aria-label="Demographic impact">
+        <article class="pw-reference-card pw-glow" data-tone="gold">
+          <div class="pw-reference-card-label" id="personalBurdenLabel">INDIRECT FINANCIAL BURDEN</div>
+          <div class="pw-reference-card-value" id="personalBurden">—</div>
+          <div class="pw-reference-card-desc" id="personalBurdenDesc">Average indirect financial burden per person on the planet.</div>
+        </article>
+        <article class="pw-reference-card pw-glow" data-tone="direct">
+          <div class="pw-reference-card-label" id="directLabel">DIRECT DEMOGRAPHIC LOSSES</div>
+          <div class="pw-reference-card-value" id="directValue">—</div>
+        </article>
+        <article class="pw-reference-card pw-glow" data-tone="indirect">
+          <div class="pw-reference-card-label" id="indirectLabel">INDIRECT DEMOGRAPHIC LOSSES</div>
+          <div class="pw-reference-card-value" id="indirectValue">—</div>
+        </article>
+      </section>
+    </section>
+
+    <section class="pw-grid pw-grid-headline" id="headlineMetrics" hidden></section>
+
+    <section class="pw-economic-section">
+      <h2 id="economicTitle">COMPREHENSIVE ECONOMIC IMPACT</h2>
+      <p class="pw-section-intro" id="economicIntro">Military expenditure is only one part of the total cost.</p>
+      <div class="pw-reference-grid">
+        <article class="pw-reference-card pw-glow" data-tone="gold">
+          <div class="pw-reference-card-label" id="infrastructureLabel">INFRASTRUCTURE DAMAGE</div>
+          <div class="pw-reference-card-value" id="infrastructureValue">—</div>
+        </article>
+        <article class="pw-reference-card pw-glow">
+          <div class="pw-reference-card-label" id="lifeYearsLabel">YEARS OF LIFE LOST</div>
+          <div class="pw-reference-card-value" id="lifeYearsValue">—</div>
+        </article>
+        <article class="pw-reference-card pw-glow" data-tone="gold">
+          <div class="pw-reference-card-label" id="economicLossLabel">TOTAL ECONOMIC LOSSES</div>
+          <div class="pw-reference-card-value" id="economicLossValue">—</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="pw-section pw-opportunity-section">
+      <div class="pw-section-head">
+        <h2 id="opportunityTitle">WHAT THE SAME RESOURCES COULD SUPPORT</h2>
+        <p class="pw-section-intro" id="opportunityIntro">Move the share to compare military expenditure with major global development needs.</p>
+      </div>
+
+      <div class="pw-scenario-panel pw-glow">
+        <div class="pw-scenario-head">
+          <span id="scenarioTitle">Redirected share</span>
+          <strong id="shareLabel">10%</strong>
+        </div>
+        <input id="share" class="pw-scenario-range" type="range" min="5" max="50" step="1" value="10">
+        <div class="pw-share-track" aria-hidden="true"><i id="shareProgress"></i></div>
+        <div class="pw-scenario-bottom">
+          <span class="pw-scenario-spectrum" id="scenarioSpectrum">Conservative → Moderate → Systemic</span>
+          <div class="pw-scenario-pills" role="group" aria-label="Preset redistribution scenarios">
+            <button type="button" class="pw-scenario-chip" data-share="10">10%</button>
+            <button type="button" class="pw-scenario-chip" data-share="25">25%</button>
+            <button type="button" class="pw-scenario-chip" data-share="50">50%</button>
+          </div>
+        </div>
+
+        <div class="pw-allocation">
+          <div class="pw-allocation-card" data-allocation="development">
+            <div class="pw-allocation-head"><span id="developmentAllocationLabel">Redirected to development</span><strong id="developmentAllocationValue">—</strong></div>
+            <div class="pw-allocation-track"><i id="developmentAllocationBar"></i></div>
+          </div>
+          <div class="pw-allocation-card" data-allocation="defence">
+            <div class="pw-allocation-head"><span id="defenceAllocationLabel">Remaining military expenditure</span><strong id="defenceAllocationValue">—</strong></div>
+            <div class="pw-allocation-track"><i id="defenceAllocationBar"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pw-opportunity-split">
+        <div class="pw-opportunity-list-column">
+          <div class="pw-programmes" id="programmes"></div>
+          <button type="button" class="pw-programme-toggle" id="programmeToggle" aria-expanded="false" hidden>Show more programmes</button>
+          <div class="pw-grid pw-grid-opportunity" id="opportunityMetrics" hidden></div>
+        </div>
+        <aside class="pw-opportunity-fund" id="opportunityFundSlot" aria-label="Peaceful World development scenario"></aside>
+      </div>
+    </section>
+
+    <section class="pw-share-section">
+      <h2 id="shareTitle">SHARE THE RESULT</h2>
+      <p class="pw-section-intro" id="shareIntro">Generate a text summary or square card from the current calculator state.</p>
+      <div class="pw-share-actions">
+        <button type="button" class="pw-share-button" id="buildText">Generate text</button>
+        <button type="button" class="pw-share-button" data-primary="true" id="buildCard">Generate card</button>
+      </div>
+      <div class="pw-share-output" id="shareTextWrap" hidden>
+        <pre class="pw-share-text" id="shareTextOutput"></pre>
+        <button type="button" class="pw-share-button pw-share-output-action" id="copyText">Copy data</button>
+        <div class="pw-copy-state" id="copyState" aria-live="polite"></div>
+      </div>
+      <div class="pw-share-output" id="shareCardWrap" hidden>
+        <img class="pw-share-preview" id="shareCardPreview" alt="Generated True Cost of War infographic preview">
+        <button type="button" class="pw-share-button pw-share-output-action" id="downloadCard">Download PNG</button>
+      </div>
+    </section>
+
+    <details class="pw-method">
+      <summary>
+        <span>data/model.json</span>
+        <span class="pw-method-sources">SIPRI · UCDP</span>
+      </summary>
+      <div class="pw-method-body">
+        <div class="pw-method-grid">
+          <div><span id="methodMilitaryLabel">Military expenditure</span><strong id="methodMilitaryValue">—</strong></div>
+          <div><span id="methodDeathsLabel">Direct deaths</span><strong id="methodDeathsValue">—</strong></div>
+        </div>
+        <p>This preview still reproduces the legacy baseline. The evidence-aware v2 research candidate is intentionally not connected to runtime yet.</p>
+        <div class="pw-source-links">
+          <a href="https://www.sipri.org/databases/milex" target="_blank" rel="noopener noreferrer">SIPRI</a>
+          <a href="https://ucdp.uu.se/downloads/" target="_blank" rel="noopener noreferrer">UCDP</a>
+        </div>
+      </div>
+    </details>
+
+    <section class="pw-compare">
+      <a id="legacyLink" href="../parity/en/">Open current visual-parity version</a>
+      <p id="legacyNote">Use it side by side while this shared template is being rebuilt.</p>
+    </section>
+
+    <details class="pw-debug">
+      <summary>Architecture diagnostics</summary>
+      <pre id="debug">Loading…</pre>
+    </details>
+  </main>
+
+  <script type="module" src="./app.mjs"></script>
+  <script type="module" src="./parity-b.mjs"></script>
+  <script type="module" src="./parity-share.mjs"></script>
+  <script type="module" src="./embed.mjs"></script>
+  <script type="module" src="./visual-polish.mjs"></script>
+</body>
+</html>

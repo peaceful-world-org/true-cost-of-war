@@ -1,0 +1,53 @@
+/* Monetary-value parity fixes derived from the production calculator.
+ *
+ * The legacy UI keeps metric values white unless the metric itself is a
+ * demographic-loss signal. Gold is reserved for supporting iconography, not
+ * for the financial values. It also keeps currency/number/unit strings from
+ * breaking inside a token (for example, never rendering "млр" + "д").
+ */
+
+/* Production financial KPI values are white; gold belongs to their icons. */
+.pw-reference-card[data-tone="gold"] .pw-reference-card-value {
+  color: #fff;
+}
+
+/* Numeric tokens must remain typographically atomic. */
+.pw-reference-card-value,
+.pw-counter-value,
+.pw-session-value,
+.pw-fund-amount,
+.pw-scale-value,
+.pw-programme-value {
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+/* The unified fund column is slightly narrower than the old duplicated DOM
+ * at some desktop widths. Keep the production visual weight without allowing
+ * a localized compact unit to spill or fracture. */
+.pw-fund-amount {
+  max-width: 100%;
+  font-size: clamp(32px, 3vw, 48px);
+  letter-spacing: -.01em;
+}
+
+/* Financial values use the production white hierarchy. Demographic-loss
+ * colours continue to come from the direct/indirect tone rules. */
+#personalBurden,
+#infrastructureValue,
+#economicLossValue {
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .pw-fund-amount {
+    font-size: clamp(30px, 9vw, 40px);
+  }
+
+  .pw-reference-card-value {
+    max-width: 100%;
+    font-size: clamp(26px, 8vw, 34px);
+  }
+}

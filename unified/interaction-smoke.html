@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en" data-smoke="running">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Unified interaction smoke harness</title>
+  <style>
+    body { margin: 0; font: 14px/1.5 system-ui, sans-serif; background: #111827; color: #e5e7eb; }
+    #smokeResults { margin: 0; padding: 16px; white-space: pre-wrap; }
+    #appFrame { display: block; width: 390px; height: 760px; border: 0; }
+  </style>
+</head>
+<body>
+  <pre id="smokeResults">RUNNING</pre>
+  <iframe id="appFrame" title="Unified interaction smoke target"></iframe>
+
+  <script type="module">
+    const root = document.documentElement;
+    const output = document.querySelector('#smokeResults');
+    const frame = document.querySelector('#appFrame');
+    const notes = [];
+    let resizeHeight = 0;
+
+    function note(message) {
+      notes.push(`PASS: ${message}`);
+      output.textContent = notes.join('\n');
+    }
+
+    function assert(condition, message) {
+      if (!condition) throw new Error(message);
+      note(message);
+    }
+
+    function delay(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    async function waitFor(predicate, label, timeout = 3500) {
+      const started = performance.now();
+      while (performance.now() - started < timeout) {
+        if (predicate()) return;
+        await delay(25);
+      }
+      throw new Error(`timeout waiting for ${label}`);
+    }
+
+    window.addEventListener('message', (event) => {
+      if (event.source !== frame.contentWindow) return;
+      if (event.data?.type === 'pw2-resize' && Number(event.data.height) > 0) {
+        resizeHeight = Number(event.data.height);
+      }
+    });
+
+    try {
+      frame.src = './index.html?lang=en&mode=1year&share=10&year=1990&embed=1';
+      await new Promise((resolve, reject) => {
+        frame.addEventListener('load', resolve, { once: true });
+        setTimeout(() => reject(new Error('iframe load timeout')), 4000);
+      });
+
+      const win = frame.contentWindow;
+      const doc = frame.contentDocument;
+      await waitFor(
+        () => doc.querySelector('#debug')?.textContent.includes('language: en'),
+        'English runtime initialisation',
+      );
+      await waitFor(() => doc.querySelectorAll('.pw-programme').length === 8, 'programme rendering');
+      await waitFor(() => doc.querySelector('.pw-parity-info[data-tooltip-key="missionFunding"]'), 'mission parity rendering');
+      await waitFor(() => doc.querySelector('#personalBurden')?.textContent.trim() !== '—', 'financial KPI rendering');
+      await waitFor(() => doc.querySelector('#impactTotalAmount')?.textContent.trim() !== '—', 'development fund rendering');
+
+      const language = doc.querySelector('#language');
+      assert(doc.documentElement.classList.contains('pw-embed-mode'), 'embed mode bootstraps inside iframe');
+      assert(doc.documentElement.dir === 'ltr', 'English starts in LTR mode');
+      assert(language?.selectedOptions[0]?.textContent.trim() === 'EN', 'mobile language selector uses compact labels');
+      assert(doc.querySelector('#shareLabel')?.textContent.trim() === '10%', 'initial redistribution share is 10%');
+      assert(doc.querySelector('#mainCounterValue')?.textContent.trim() !== '—', 'main counter renders a calculated value');
+
+      const financialValues = [
+        ['#personalBurden', 'personal burden'],
+        ['#infrastructureValue', 'infrastructure damage'],
+        ['#economicLossValue', 'aggregate economic loss'],
+      ];
+      for (const [selector, label] of financialValues) {
+        const node = doc.querySelector(selector);
+        const style = win.getComputedStyle(node);
+        assert(style.color === 'rgb(255, 255, 255)', `${label} value keeps production white hierarchy`);
+        assert(style.whiteSpace === 'nowrap', `${label} value is protected from unit fragmentation`);
+      }
+      const fundAmount = doc.querySelector('#impactTotalAmount');
+      assert(win.getComputedStyle(fundAmount).whiteSpace === 'nowrap', 'development fund amount is protected from unit fragmentation');
+      assert(fundAmount.scrollWidth <= fundAmount.clientWidth + 1, 'development fund amount fits without horizontal spill at mobile width');
+
+      const chip25 = doc.querySelector('.pw-scenario-chip[data-share="25"]');
+      chip25.click();
+      await waitFor(() => doc.querySelector('#shareLabel')?.textContent.trim() === '25%', '25% scenario update');
+      await delay(320);
+      assert(new URL(win.location.href).searchParams.get('share') === '25', 'scenario interaction persists to URL state');
+
+      const mode = doc.querySelector('#mode');
+      mode.value = 'lifetime';
+      mode.dispatchEvent(new Event('change', { bubbles: true }));
+      await waitFor(() => !doc.querySelector('#birthControl').hidden, 'lifetime birth-year control');
+      await delay(320);
+      assert(new URL(win.location.href).searchParams.get('mode') === 'lifetime', 'timeframe interaction persists to URL state');
+
+      const birthYear = doc.querySelector('#birthYear');
+      birthYear.value = '1985';
+      birthYear.dispatchEvent(new Event('input', { bubbles: true }));
+      await delay(320);
+      assert(new URL(win.location.href).searchParams.get('year') === '1985', 'birth-year interaction persists to URL state');
+
+      const toggle = doc.querySelector('#programmeToggle');
+      assert(toggle.hidden === false, 'mobile-width programme disclosure control is available');
+      assert(doc.querySelectorAll('.pw-programme[data-mobile-extra="true"][hidden]').length === 5, 'five extra programmes start collapsed on mobile');
+      toggle.click();
+      await waitFor(() => toggle.getAttribute('aria-expanded') === 'true', 'programme expansion');
+      assert(doc.querySelectorAll('.pw-programme[data-mobile-extra="true"][hidden]').length === 0, 'programme expansion reveals all extra rows');
+
+      const heroInfo = doc.querySelector('.pw-parity-info[data-tooltip-key="hero"]');
+      heroInfo.click();
+      await waitFor(() => heroInfo.getAttribute('aria-expanded') === 'true', 'mobile hero tooltip open state');
+      let inlinePopover = doc.querySelector('.pw-parity-inline-popover');
+      assert(Boolean(inlinePopover), 'mobile methodology tooltip renders inline');
+      assert(heroInfo.closest('.pw-hero-info-row')?.contains(inlinePopover), 'hero tooltip stays beside the lead on mobile');
+      doc.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await waitFor(() => heroInfo.getAttribute('aria-expanded') === 'false', 'Escape closes methodology tooltip');
+      assert(!doc.querySelector('.pw-parity-inline-popover'), 'closed mobile tooltip is removed from layout');
+
+      const mainInfo = doc.querySelector('.pw-parity-info[data-tooltip-key="main"]');
+      assert(Boolean(mainInfo), 'main period info control is restored');
+      mainInfo.click();
+      await waitFor(() => mainInfo.getAttribute('aria-expanded') === 'true', 'mobile main period tooltip opens');
+      inlinePopover = doc.querySelector('.pw-parity-inline-popover');
+      assert(mainInfo.closest('.pw-counter-value-row')?.contains(inlinePopover), 'main period tooltip stays beside the large value on mobile');
+      doc.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+      const scenarioInfo = doc.querySelector('.pw-parity-info[data-tooltip-key="scenario"]');
+      assert(Boolean(scenarioInfo), 'scenario info control is restored');
+      scenarioInfo.click();
+      await waitFor(() => scenarioInfo.getAttribute('aria-expanded') === 'true', 'mobile scenario tooltip opens');
+      inlinePopover = doc.querySelector('.pw-parity-inline-popover');
+      assert(
+        inlinePopover?.previousElementSibling?.classList.contains('pw-scenario-head'),
+        'scenario tooltip appears directly below the scenario heading on mobile',
+      );
+      doc.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+      const missionInfo = doc.querySelector('.pw-parity-info[data-tooltip-key="missionFunding"]');
+      const missionPercent = doc.querySelector('#missionPercentText');
+      assert(Boolean(missionInfo), 'mission funding info control is restored');
+      assert(Boolean(missionPercent) && missionPercent.textContent.includes('%'), 'mission percentage note is restored');
+      assert(doc.querySelectorAll('.pw-mission-primary-copy strong').length >= 2, 'mission copy restores emphasized 1-second and 7-second spans');
+      missionInfo.click();
+      await waitFor(() => missionInfo.getAttribute('aria-expanded') === 'true', 'mission funding tooltip opens');
+      inlinePopover = doc.querySelector('.pw-parity-inline-popover');
+      assert((inlinePopover?.textContent || '').length > 60, 'mission funding tooltip uses extracted source copy');
+      assert(missionInfo.closest('.pw-mission-primary-copy')?.contains(inlinePopover), 'mission funding tooltip stays with its paragraph on mobile');
+      doc.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await waitFor(() => missionInfo.getAttribute('aria-expanded') === 'false', 'Escape closes mission funding tooltip');
+
+      const impactInfo = doc.querySelector('.pw-parity-info[data-tooltip-key="impactEfficiency"]');
+      assert(Boolean(impactInfo), 'impact efficiency info control is restored');
+      assert(Boolean(doc.querySelector('.pw-mission-impact-heading')) && Boolean(doc.querySelector('.pw-mission-impact-highlight')), 'impact title restores two-line production hierarchy');
+      impactInfo.click();
+      await waitFor(() => impactInfo.getAttribute('aria-expanded') === 'true', 'impact efficiency tooltip opens');
+      assert((doc.querySelector('.pw-parity-inline-popover')?.textContent || '').length > 60, 'impact efficiency tooltip uses extracted source copy');
+      doc.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+      doc.querySelector('#buildText').click();
+      await waitFor(() => !doc.querySelector('#shareTextWrap').hidden, 'text summary visibility');
+      const englishSummary = doc.querySelector('#shareTextOutput').textContent;
+      assert(
+        englishSummary.startsWith('Daily global military expenditure amounts to ') &&
+          englishSummary.includes('106.9M') &&
+          englishSummary.includes('53.4M') &&
+          englishSummary.includes('6.7M') &&
+          englishSummary.includes('peaceful-world.org/true-cost-of-war'),
+        'text summary uses the canonical one-day dissemination fact',
+      );
+
+      doc.querySelector('#copyText').click();
+      await waitFor(() => doc.querySelector('#copyState').textContent.trim().length > 0, 'copy feedback');
+      assert(doc.querySelector('#copyState').textContent.trim().length > 0, 'copy action reports success or fallback guidance');
+
+      doc.querySelector('#buildCard').click();
+      await waitFor(() => doc.querySelector('#shareCardPreview').src.startsWith('data:image/png'), 'infographic generation');
+      const card = doc.querySelector('#shareCardPreview');
+      await waitFor(() => card.naturalWidth > 0 && card.naturalHeight > 0, 'infographic image decode');
+      assert(!doc.querySelector('#shareCardWrap').hidden, 'generated infographic preview becomes visible');
+      assert(card.naturalWidth === 1080 && card.naturalHeight === 1080, 'generated infographic is exactly 1080×1080');
+      const englishCardSrc = card.src;
+
+      language.value = 'ar';
+      language.dispatchEvent(new Event('change', { bubbles: true }));
+      await waitFor(() => doc.documentElement.lang === 'ar' && doc.documentElement.dir === 'rtl', 'Arabic RTL language switch');
+      await waitFor(() => language.selectedOptions[0]?.textContent.trim() === 'AR', 'Arabic compact language label');
+      const arabicTitle = doc.querySelector('#title').textContent.trim();
+      assert(arabicTitle && arabicTitle !== 'The True Cost of War', 'Arabic title replaces English copy');
+      await waitFor(() => doc.querySelector('.pw-parity-info[data-tooltip-key="missionFunding"]'), 'Arabic mission parity rebuild');
+      assert(doc.querySelectorAll('.pw-mission-primary-copy strong').length >= 2, 'RTL mission emphasis survives language switch');
+
+      doc.querySelector('#buildText').click();
+      await waitFor(
+        () => doc.querySelector('#shareTextOutput').textContent.startsWith('يبلغ الإنفاق العسكري العالمي اليومي'),
+        'Arabic daily summary regeneration',
+      );
+      assert(doc.querySelector('#shareTextOutput').textContent !== englishSummary, 'shareable text regenerates after language switch');
+      assert(doc.querySelector('#shareTextOutput').textContent.includes('peaceful-world.org/true-cost-of-war/ar'), 'Arabic summary points to the localized public route');
+
+      doc.querySelector('#buildCard').click();
+      await waitFor(() => card.src.startsWith('data:image/png') && card.src !== englishCardSrc, 'Arabic infographic regeneration');
+      await waitFor(() => card.naturalWidth === 1080 && card.naturalHeight === 1080, 'Arabic infographic image decode');
+      assert(card.naturalWidth === 1080 && card.naturalHeight === 1080, 'RTL infographic preserves 1080×1080 output');
+
+      resizeHeight = 0;
+      win.postMessage({ type: 'pw2-request-resize' }, '*');
+      await waitFor(() => resizeHeight > 0, 'iframe resize response');
+      assert(resizeHeight > 300, 'embed resize contract returns a useful height');
+
+      root.dataset.smoke = 'pass';
+      output.textContent = `${notes.join('\n')}\nPASS: interaction smoke complete`;
+    } catch (error) {
+      root.dataset.smoke = 'fail';
+      output.textContent = `${notes.join('\n')}\nFAIL: ${error?.stack || error}`;
+      console.error(error);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+/* Fine-grained parity for the production mission block. Loaded last. */
+
+.pw-mission-primary-copy strong {
+  color: #fff;
+  font-weight: 800;
+}
+
+.pw-mission-primary-copy > .pw-parity-info-sm {
+  margin-inline: 2px 0;
+}
+
+.pw-mission-note {
+  display: inline-block;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, .72);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.pw-mission-percent {
+  color: #fff;
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pw-mission-impact-title {
+  align-items: flex-start;
+}
+
+.pw-mission-impact-text-wrap {
+  min-width: 0;
+  flex: 1;
+}
+
+.pw-mission-impact-heading {
+  color: #fff;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.pw-mission-impact-highlight {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-top: 4px;
+  color: var(--peace);
+  font-family: Montserrat, Inter, system-ui, sans-serif;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.pw-mission-impact-copy {
+  margin-top: 12px;
+}
+
+.pw-parity-info-sm {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  margin-inline-start: 5px;
+  border-color: rgba(255, 255, 255, .14);
+  background: rgba(255, 255, 255, .06);
+  font-size: 10px;
+}
+
+.pw-mission-card > .pw-parity-inline-popover,
+.pw-mission-highlight > .pw-parity-inline-popover {
+  flex-basis: 100%;
+}
+
+@media (max-width: 600px) {
+  .pw-mission-note {
+    font-size: 12px;
+  }
+
+  .pw-mission-impact-heading {
+    font-size: 14px;
+  }
+
+  .pw-mission-impact-highlight {
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 16px;
+  }
+}

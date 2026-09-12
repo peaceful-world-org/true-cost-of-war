@@ -1,0 +1,35 @@
+{
+  "pageTitle": "战争的真实代价 — Unified Candidate",
+  "eyebrow": "Peaceful World · 互动模型",
+  "title": "战争的真实代价",
+  "lead": "这是一个使用共享引擎的战争经济与人类成本模型预览版本。任何生产环境变更之前，我们先在这里测试架构和行为。",
+  "language": "语言",
+  "timeframe": "时间范围",
+  "birthYear": "出生年份",
+  "redirectedShare": "重新分配比例",
+  "opportunityTitle": "同样的资源还可以支持什么",
+  "legacyLink": "打开当前版本进行视觉对比",
+  "legacyNote": "在重建共享模板期间，请并排比较两个版本。",
+  "metrics": {
+    "militarySpend": "军事支出",
+    "directDeaths": "直接死亡",
+    "indirectDeaths": "间接死亡",
+    "lifeYearsLost": "损失的生命年",
+    "infrastructureDamage": "基础设施损失",
+    "economicSetback": "当前模型的经济损失",
+    "redirectedAmount": "重新分配金额",
+    "schoolsEquivalent": "相当于学校数量",
+    "educationMultiples": "教育基准倍数",
+    "healthMultiples": "初级卫生保健基准倍数"
+  },
+  "modes": {
+    "year": "本年度至今（实时）",
+    "1year": "过去 365 天",
+    "10years": "过去 10 年",
+    "lifetime": "我的一生",
+    "day": "一天",
+    "hour": "一小时",
+    "minute": "一分钟",
+    "since1945": "自 1945 年以来"
+  }
+}

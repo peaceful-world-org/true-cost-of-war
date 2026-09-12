@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 2,
+  "languages": {
+    "en": {
+      "displayName": "English",
+      "htmlLang": "en",
+      "intlLocale": "en-US",
+      "dir": "ltr",
+      "formatting": {"numberLocale": "en-US", "currencySymbol": "$", "currencyPosition": "before", "units": {"trillion": "T", "billion": "B", "million": "M"}, "perSecond": "/s"}
+    },
+    "de": {
+      "displayName": "Deutsch",
+      "htmlLang": "de",
+      "intlLocale": "de-DE",
+      "dir": "ltr",
+      "formatting": {"numberLocale": "de-DE", "currencySymbol": "$", "currencyPosition": "before", "units": {"trillion": "Bio.", "billion": "Mrd.", "million": "Mio."}, "perSecond": "/s"}
+    },
+    "es": {
+      "displayName": "Español",
+      "htmlLang": "es",
+      "intlLocale": "es-ES",
+      "dir": "ltr",
+      "formatting": {"numberLocale": "es-ES", "currencySymbol": "$", "currencyPosition": "before", "units": {"trillion": "B", "billion": "mil M", "million": "M"}, "perSecond": "/s"}
+    },
+    "fr": {
+      "displayName": "Français",
+      "htmlLang": "fr",
+      "intlLocale": "fr-FR",
+      "dir": "ltr",
+      "formatting": {"numberLocale": "fr-FR", "currencySymbol": "$", "currencyPosition": "before", "units": {"trillion": "B", "billion": "Md", "million": "M"}, "perSecond": "/s"}
+    },
+    "pt": {
+      "displayName": "Português",
+      "htmlLang": "pt",
+      "intlLocale": "pt-PT",
+      "dir": "ltr",
+      "formatting": {"numberLocale": "en-US", "currencySymbol": "$", "currencyPosition": "before", "units": {"trillion": "T", "billion": "B", "million": "M"}, "perSecond": "/s"}
+    },
+    "ar": {
+      "displayName": "العربية",
+      "htmlLang": "ar",
+      "intlLocale": "ar",
+      "dir": "rtl",
+      "formatting": {"numberLocale": "en-US", "currencySymbol": "$", "currencyPosition": "before", "units": {"trillion": "T", "billion": "B", "million": "M"}, "perSecond": "/ث"}
+    },
+    "fa": {
+      "displayName": "فارسی",
+      "htmlLang": "fa",
+      "intlLocale": "fa",
+      "dir": "rtl",
+      "formatting": {"numberLocale": "en-US", "currencySymbol": "$", "currencyPosition": "before", "units": {"trillion": "T", "billion": "B", "million": "M"}, "perSecond": "/ث"}
+    },
+    "ru": {
+      "displayName": "Русский",
+      "htmlLang": "ru",
+      "intlLocale": "ru-RU",
+      "dir": "ltr",
+      "formatting": {"numberLocale": "ru-RU", "currencySymbol": "$", "currencyPosition": "before", "units": {"trillion": "трлн", "billion": "млрд", "million": "млн"}, "perSecond": "/с"}
+    },
+    "hi": {
+      "displayName": "हिन्दी",
+      "htmlLang": "hi",
+      "intlLocale": "hi-IN",
+      "dir": "ltr",
+      "formatting": {"numberLocale": "en-US", "currencySymbol": "$", "currencyPosition": "before", "units": {"trillion": "T", "billion": "B", "million": "M"}, "perSecond": "/से"}
+    },
+    "ukr": {
+      "displayName": "Українська",
+      "htmlLang": "uk",
+      "intlLocale": "uk-UA",
+      "dir": "ltr",
+      "formatting": {"numberLocale": "ru-RU", "currencySymbol": "$", "currencyPosition": "before", "units": {"trillion": "трлн", "billion": "млрд", "million": "млн"}, "perSecond": "/с"}
+    },
+    "zh-CN": {
+      "displayName": "中文",
+      "htmlLang": "zh-CN",
+      "intlLocale": "zh-CN",
+      "dir": "ltr",
+      "formatting": {"numberLocale": "en-US", "currencySymbol": "$", "currencyPosition": "before", "units": {"trillion": "T", "billion": "B", "million": "M"}, "perSecond": "/秒"}
+    }
+  }
+}

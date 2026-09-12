@@ -1,0 +1,35 @@
+{
+  "pageTitle": "O verdadeiro custo da guerra — Unified Candidate",
+  "eyebrow": "Peaceful World · Modelo interativo",
+  "title": "O verdadeiro custo da guerra",
+  "lead": "Uma pré-visualização com motor partilhado do modelo dos custos económicos e humanos da guerra. Esta versão serve para testar arquitetura e comportamento antes de qualquer alteração em produção.",
+  "language": "Idioma",
+  "timeframe": "Período temporal",
+  "birthYear": "Ano de nascimento",
+  "redirectedShare": "Parcela redirecionada",
+  "opportunityTitle": "O que os mesmos recursos poderiam apoiar",
+  "legacyLink": "Abrir a versão atual de paridade visual",
+  "legacyNote": "Compare as duas versões lado a lado enquanto reconstruímos o modelo partilhado.",
+  "metrics": {
+    "militarySpend": "Despesa militar",
+    "directDeaths": "Mortes diretas",
+    "indirectDeaths": "Mortes indiretas",
+    "lifeYearsLost": "Anos de vida perdidos",
+    "infrastructureDamage": "Danos em infraestruturas",
+    "economicSetback": "Recuo económico do modelo atual",
+    "redirectedAmount": "Montante redirecionado",
+    "schoolsEquivalent": "Equivalente em escolas",
+    "educationMultiples": "Múltiplos da referência de educação",
+    "healthMultiples": "Múltiplos da referência de cuidados de saúde primários"
+  },
+  "modes": {
+    "year": "Este ano (Ao vivo)",
+    "1year": "Últimos 365 dias",
+    "10years": "Últimos 10 anos",
+    "lifetime": "Durante a minha vida",
+    "day": "Um dia",
+    "hour": "Uma hora",
+    "minute": "Um minuto",
+    "since1945": "Desde 1945"
+  }
+}

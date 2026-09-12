@@ -1,0 +1,18 @@
+html.pw-embed-mode,
+html.pw-embed-mode body {
+  background: transparent !important;
+}
+html.pw-embed-mode body { padding: 0 !important; }
+html.pw-embed-mode .pw-shell {
+  width: 100%;
+  max-width: 1240px;
+  border-radius: 0;
+  box-shadow: none;
+}
+html.pw-embed-mode .pw-preview-banner,
+html.pw-embed-mode .pw-compare,
+html.pw-embed-mode .pw-debug,
+html.pw-embed-mode .pw-share-section { display: none !important; }
+@media (max-width: 600px) {
+  html.pw-embed-mode .pw-shell { padding-inline: 14px; }
+}

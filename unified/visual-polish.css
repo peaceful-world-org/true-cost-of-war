@@ -1,0 +1,225 @@
+/*
+ * Final UX polish layer for live counters and information controls.
+ *
+ * Goal: keep the production-derived visual language while removing the last
+ * visible inconsistencies introduced during the unified migration.
+ */
+
+:root {
+  --pw-info-size: 20px;
+  --pw-info-font-size: 10px;
+  --pw-info-gap: 7px;
+}
+
+/* One information-control component everywhere. */
+.pw-parity-info,
+.pw-parity-info-sm {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--pw-info-size) !important;
+  height: var(--pw-info-size) !important;
+  min-width: var(--pw-info-size) !important;
+  min-height: var(--pw-info-size) !important;
+  flex: 0 0 var(--pw-info-size) !important;
+  margin-inline-start: var(--pw-info-gap);
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .15);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .07);
+  color: var(--muted);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: var(--pw-info-font-size) !important;
+  font-weight: 800;
+  line-height: 1 !important;
+  text-transform: none;
+  letter-spacing: 0;
+  vertical-align: middle;
+  opacity: .9;
+  transition: background-color .16s ease, border-color .16s ease, color .16s ease, opacity .16s ease, transform .16s ease;
+}
+
+.pw-parity-info:hover,
+.pw-parity-info:focus-visible,
+.pw-parity-info[aria-expanded="true"],
+.pw-parity-info-sm:hover,
+.pw-parity-info-sm:focus-visible,
+.pw-parity-info-sm[aria-expanded="true"] {
+  border-color: rgba(255, 255, 255, .28);
+  background: rgba(255, 255, 255, .16);
+  color: #fff;
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+.pw-parity-info:focus-visible,
+.pw-parity-info-sm:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, .18);
+}
+
+/* Metric cards: info stays in the upper-right corner, exactly one control size. */
+.pw-reference-card .pw-parity-label-row {
+  align-items: flex-start;
+  gap: 10px;
+}
+.pw-reference-card .pw-parity-label-row > .pw-parity-info {
+  margin-inline-start: auto;
+  margin-top: 1px;
+}
+
+/* Programme rows: info belongs to the title, not to a remote card edge. */
+.pw-programme .pw-parity-label-row {
+  display: inline-flex;
+  width: auto;
+  max-width: 100%;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--pw-info-gap);
+}
+.pw-programme .pw-parity-label-row > .pw-parity-info {
+  margin-inline-start: 0;
+  margin-top: 1px;
+}
+
+/* Introductory methodology control follows the sentence instead of floating
+   at the far edge of the hero. */
+.pw-hero-info-row {
+  display: block;
+  max-width: 950px;
+  margin: 0 0 32px;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.6;
+}
+.pw-hero-info-row .pw-lead {
+  display: inline;
+  max-width: none;
+  margin: 0;
+}
+.pw-hero-info-row > .pw-parity-info {
+  margin-inline-start: 5px;
+  position: relative;
+  top: -1px;
+}
+
+/* Keep the main-total and scenario controls visually attached to what they
+   explain, with the same control geometry as every other information icon. */
+.pw-counter-value-row .pw-parity-info,
+.pw-scenario-title-row .pw-parity-info {
+  margin-inline-start: var(--pw-info-gap);
+  position: relative;
+  top: 0;
+}
+
+/* Treat the scenario title and its info control as one visual unit. The parent
+   .pw-scenario-head can then keep the percentage at the opposite edge without
+   leaving the info control floating between the title and the slider. */
+.pw-scenario-title-row {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  gap: var(--pw-info-gap);
+}
+.pw-scenario-title-row > .pw-parity-info {
+  margin-inline-start: 0;
+  align-self: center;
+}
+
+/* Mission controls used to be a smaller one-off variant. Keep the semantic
+   class for compatibility but render it through the same component token. */
+.pw-mission-primary-copy .pw-parity-info,
+.pw-mission-impact-highlight .pw-parity-info {
+  margin-inline-start: 5px;
+  position: relative;
+  top: -1px;
+}
+
+/* Production live-number typography. No translate, fade, blur or odometer
+   layer: the legacy render loop updates the visible values directly. */
+.pw-flow-value {
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  font-variant-numeric: tabular-nums !important;
+  font-feature-settings: "tnum" 1, "lnum" 1 !important;
+}
+
+.pw-flow-value .pw2-currency-sign {
+  display: inline-block;
+  font-family: var(--font-heading, Montserrat, system-ui, sans-serif);
+  font-size: .85em;
+  font-weight: 700;
+  opacity: .7;
+}
+
+.pw-flow-value .pw2-val-unit {
+  display: inline-block;
+  margin-left: .2em;
+  font-family: var(--font-heading, Montserrat, system-ui, sans-serif);
+  font-size: .55em;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: lowercase;
+  vertical-align: baseline;
+  opacity: .8;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --pw-info-size: 20px;
+    --pw-info-font-size: 10px;
+  }
+
+  .pw-hero-info-row {
+    margin-bottom: 24px;
+    font-size: 16px;
+  }
+
+  .pw-programme .pw-parity-label-row {
+    max-width: calc(100% - 2px);
+  }
+
+  /* On narrow screens the scenario title can wrap to two lines. It therefore
+     needs normal inline text flow rather than two flex children: the info
+     control then follows the colon on the final line instead of sitting in the
+     empty space between the title and the percentage. */
+  .pw-scenario-title-row {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    gap: 0;
+  }
+  .pw-scenario-title-row > #scenarioTitle {
+    display: inline;
+    min-width: 0;
+  }
+  .pw-scenario-title-row > .pw-parity-info {
+    position: static;
+    margin-inline-start: 4px;
+    vertical-align: middle;
+  }
+
+  /* These two controls live inside running copy. Keep them in the inline
+     formatting context so they sit on the text baseline and travel with the
+     words they explain instead of becoming independent flex rows. */
+  .pw-mission-primary-copy .pw-parity-info,
+  .pw-mission-impact-highlight .pw-parity-info {
+    position: static;
+    margin-inline-start: 3px;
+    vertical-align: middle;
+  }
+
+  /* The investment-efficiency sentence may wrap. A flex container turns the
+     info button into a separate flex item and can strand it on its own line;
+     normal inline layout keeps the non-breaking-space + icon attached to the
+     final word of the green statement. */
+  .pw-mission-impact-highlight {
+    display: block;
+  }
+}

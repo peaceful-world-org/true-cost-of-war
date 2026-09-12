@@ -1,0 +1,109 @@
+/* Production-derived iconography mapped onto the unified DOM without duplicating locale markup. */
+
+.pw-reference-card-label,
+.pw-programme-name,
+.pw-session-title {
+  display: flex;
+  align-items: flex-start;
+}
+
+.pw-reference-card-label::before,
+.pw-programme-name::before,
+.pw-session-title::before {
+  content: "";
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  flex: 0 0 1.2em;
+  margin-inline-end: 8px;
+  background: currentColor;
+  -webkit-mask: var(--pw-icon) center / contain no-repeat;
+  mask: var(--pw-icon) center / contain no-repeat;
+  transition: transform .3s ease, filter .3s ease;
+}
+
+.pw-reference-card:hover .pw-reference-card-label::before,
+.pw-programme:hover .pw-programme-name::before {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+#personalBurdenLabel::before {
+  color: var(--gold);
+  background: var(--gold);
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M19%2021v-2a4%204%200%200%200-4-4H9a4%204%200%200%200-4%204v2'/%3E%3Ccircle%20cx='12'%20cy='7'%20r='4'/%3E%3C/svg%3E");
+}
+
+#directLabel {
+  color: var(--danger-direct);
+}
+#directLabel::before {
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M2%2012h4l2-3%203%207%203-6%202%202h2'/%3E%3Cline%20x1='18'%20y1='12'%20x2='22'%20y2='12'%20stroke-dasharray='2%203'/%3E%3C/svg%3E");
+}
+
+#indirectLabel {
+  color: var(--danger);
+}
+#indirectLabel::before {
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='12'%20cy='12'%20r='2'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='7'%20stroke-dasharray='4%204'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='12'%20stroke-dasharray='4%206'/%3E%3C/svg%3E");
+}
+
+#infrastructureLabel::before {
+  color: var(--gold);
+  background: var(--gold);
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Crect%20width='16'%20height='20'%20x='4'%20y='2'%20rx='2'%20ry='2'/%3E%3Cpath%20d='M9%2022v-4h6v4M8%206h.01M16%206h.01M12%206h.01M12%2010h.01M12%2014h.01M16%2010h.01M16%2014h.01M8%2010h.01M8%2014h.01'/%3E%3C/svg%3E");
+}
+
+#lifeYearsLabel {
+  color: #e18d96;
+}
+#lifeYearsLabel::before {
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M5%202h14M5%2022h14M5%202l7%2010-7%2010M19%202l-7%2010%207%2010'/%3E%3C/svg%3E");
+}
+
+#economicLossLabel::before {
+  color: var(--gold);
+  background: var(--gold);
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpolyline%20points='22%2017%2013.5%208.5%208.5%2013.5%202%207'/%3E%3Cpolyline%20points='16%2017%2022%2017%2022%2011'/%3E%3C/svg%3E");
+}
+
+.pw-session-title::before {
+  color: var(--danger);
+  background: var(--danger);
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='12'%20cy='12'%20r='10'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='4'/%3E%3C/svg%3E");
+}
+
+.pw-programme-name::before {
+  color: var(--text);
+  background: var(--text);
+}
+.pw-programme[data-programme="education"] .pw-programme-name::before {
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M4%2019.5v-15A2.5%202.5%200%200%201%206.5%202H20v20H6.5a2.5%202.5%200%200%201%200-5H20'/%3E%3C/svg%3E");
+}
+.pw-programme[data-programme="hunger"] .pw-programme-name::before {
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M3%202v7c0%201.1.9%202%202%202h4a2%202%200%200%200%202-2V2M7%202v20M21%2015V2a5%205%200%200%200-5%205v6c0%201.1.9%202%202%202h3M21%2015v7'/%3E%3C/svg%3E");
+}
+.pw-programme[data-programme="health"] .pw-programme-name::before {
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Crect%20width='18'%20height='18'%20x='3'%20y='3'%20rx='2'/%3E%3Cpath%20d='M12%208v8M8%2012h8'/%3E%3C/svg%3E");
+}
+.pw-programme[data-programme="water"] .pw-programme-name::before {
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M12%202.7c-2.4%202.4-7.2%206.8-7.2%2011.4A7.1%207.1%200%200%200%2012%2021.2a7.1%207.1%200%200%200%207.2-7.1c0-4.6-4.8-9-7.2-11.4z'/%3E%3C/svg%3E");
+}
+.pw-programme[data-programme="electricity"] .pw-programme-name::before {
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M13%202L3%2014h9l-1%208%2010-12h-9l1-8z'/%3E%3C/svg%3E");
+}
+.pw-programme[data-programme="internet"] .pw-programme-name::before {
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='12'%20cy='12'%20r='10'/%3E%3Cpath%20d='M12%202a15.3%2015.3%200%200%201%204%2010%2015.3%2015.3%200%200%201-4%2010%2015.3%2015.3%200%200%201-4-10%2015.3%2015.3%200%200%201%204-10zM2%2012h20'/%3E%3C/svg%3E");
+}
+.pw-programme[data-programme="climate"] .pw-programme-name::before {
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M14%204v10.54a4%204%200%201%201-4%200V4a2%202%200%200%201%204%200Z'/%3E%3C/svg%3E");
+}
+.pw-programme[data-programme="schools"] .pw-programme-name::before {
+  --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M12%202l10%205v2H2V7l10-5zM6%209v11M10%209v11M14%209v11M18%209v11M2%2020h20'/%3E%3C/svg%3E");
+}
+
+@media (max-width: 600px) {
+  .pw-reference-card-label::before,
+  .pw-programme-name::before { margin-inline-end: 7px; }
+  .pw-session-title::before { margin-inline-end: 6px; }
+}

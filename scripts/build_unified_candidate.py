@@ -1,0 +1,238 @@
+#!/usr/bin/env python3
+"""Build the single-template multilingual candidate into the preview artifact.
+
+The candidate is intentionally isolated from production. It uses one HTML
+shell, one CSS file, one JavaScript application, the shared calculation
+runtime, shared formatter/active-time helpers, and one JSON locale file per
+supported language.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import shutil
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE = ROOT / "unified"
+OUT = ROOT / "dist" / "shadow-v2" / "unified"
+ROUTES = ROOT / "data" / "routes.json"
+
+REQUIRED_TOP_LEVEL = {
+    "pageTitle",
+    "eyebrow",
+    "title",
+    "lead",
+    "language",
+    "timeframe",
+    "birthYear",
+    "redirectedShare",
+    "opportunityTitle",
+    "legacyLink",
+    "legacyNote",
+    "metrics",
+    "modes",
+}
+REQUIRED_METRICS = {
+    "militarySpend",
+    "directDeaths",
+    "indirectDeaths",
+    "lifeYearsLost",
+    "infrastructureDamage",
+    "economicSetback",
+    "redirectedAmount",
+    "schoolsEquivalent",
+    "educationMultiples",
+    "healthMultiples",
+}
+REQUIRED_MODES = {"year", "1year", "10years", "lifetime", "day", "hour", "minute", "since1945"}
+REQUIRED_FORMATTING = {"numberLocale", "currencySymbol", "currencyPosition", "units", "perSecond"}
+REQUIRED_FORMAT_UNITS = {"trillion", "billion", "million"}
+
+
+def digest(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def load_json(path: Path) -> dict:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"{path.relative_to(ROOT)}: invalid JSON: {exc}") from exc
+    if not isinstance(value, dict):
+        raise SystemExit(f"{path.relative_to(ROOT)}: root must be an object")
+    return value
+
+
+def validate() -> list[str]:
+    for required in (
+        SOURCE / "index.html",
+        SOURCE / "app.css",
+        SOURCE / "app.mjs",
+        SOURCE / "state.mjs",
+        SOURCE / "PARITY_CHECKLIST.md",
+        SOURCE / "locales" / "manifest.json",
+        ROOT / "src" / "format.mjs",
+        ROOT / "src" / "active-time.mjs",
+    ):
+        if not required.is_file():
+            raise SystemExit(f"Missing unified candidate source: {required.relative_to(ROOT)}")
+
+    route_doc = load_json(ROUTES)
+    route_languages = set(route_doc.get("languages", {}))
+    if not route_languages:
+        raise SystemExit("data/routes.json: no languages found")
+
+    locale_manifest = load_json(SOURCE / "locales" / "manifest.json")
+    if locale_manifest.get("schemaVersion") != 2:
+        raise SystemExit("unified/locales/manifest.json: schemaVersion must be 2 for Sprint A")
+    manifest_languages = locale_manifest.get("languages")
+    if not isinstance(manifest_languages, dict):
+        raise SystemExit("unified/locales/manifest.json: languages must be an object")
+    if set(manifest_languages) != route_languages:
+        missing = sorted(route_languages - set(manifest_languages))
+        extra = sorted(set(manifest_languages) - route_languages)
+        raise SystemExit(f"Unified locale manifest does not match route languages; missing={missing}, extra={extra}")
+
+    for language in sorted(route_languages):
+        meta = manifest_languages[language]
+        if not isinstance(meta, dict):
+            raise SystemExit(f"unified/locales/manifest.json:{language}: metadata must be an object")
+        for key in ("displayName", "htmlLang", "intlLocale", "dir"):
+            if not isinstance(meta.get(key), str) or not meta[key].strip():
+                raise SystemExit(f"unified/locales/manifest.json:{language}: invalid {key}")
+        if meta["dir"] not in {"ltr", "rtl"}:
+            raise SystemExit(f"unified/locales/manifest.json:{language}: dir must be ltr or rtl")
+        if language in {"ar", "fa"} and meta["dir"] != "rtl":
+            raise SystemExit(f"unified/locales/manifest.json:{language}: RTL language must declare dir=rtl")
+
+        formatting = meta.get("formatting")
+        if not isinstance(formatting, dict) or not REQUIRED_FORMATTING.issubset(formatting):
+            raise SystemExit(f"unified/locales/manifest.json:{language}: incomplete formatting profile")
+        if formatting.get("currencyPosition") not in {"before", "after"}:
+            raise SystemExit(f"unified/locales/manifest.json:{language}: currencyPosition must be before or after")
+        units = formatting.get("units")
+        if not isinstance(units, dict) or not REQUIRED_FORMAT_UNITS.issubset(units):
+            raise SystemExit(f"unified/locales/manifest.json:{language}: formatting.units is incomplete")
+        for key in ("numberLocale", "currencySymbol", "perSecond"):
+            if not isinstance(formatting.get(key), str) or not formatting[key]:
+                raise SystemExit(f"unified/locales/manifest.json:{language}: formatting.{key} must be non-empty")
+
+        locale_path = SOURCE / "locales" / f"{language}.json"
+        locale = load_json(locale_path)
+        missing_top = sorted(REQUIRED_TOP_LEVEL - set(locale))
+        if missing_top:
+            raise SystemExit(f"{locale_path.relative_to(ROOT)}: missing keys: {', '.join(missing_top)}")
+        if not isinstance(locale.get("metrics"), dict) or set(locale["metrics"]) != REQUIRED_METRICS:
+            raise SystemExit(f"{locale_path.relative_to(ROOT)}: metrics keys do not match unified schema")
+        if not isinstance(locale.get("modes"), dict) or set(locale["modes"]) != REQUIRED_MODES:
+            raise SystemExit(f"{locale_path.relative_to(ROOT)}: mode keys do not match unified schema")
+
+        for group in (locale, locale["metrics"], locale["modes"]):
+            for key, value in group.items():
+                if isinstance(value, dict):
+                    continue
+                if not isinstance(value, str) or not value.strip():
+                    raise SystemExit(f"{locale_path.relative_to(ROOT)}: {key} must be a non-empty string")
+
+    index = (SOURCE / "index.html").read_text(encoding="utf-8")
+    if 'name="robots" content="noindex,nofollow,noarchive"' not in index:
+        raise SystemExit("unified/index.html must remain noindex")
+    if '<script type="module" src="./app.mjs"></script>' not in index:
+        raise SystemExit("unified/index.html must load the shared app module")
+    for marker in (
+        'id="mainCounterValue"',
+        'id="viewerSpend"',
+        'id="viewerElapsed"',
+        'id="share" class="pw-scenario-range"',
+        'data-share="10"',
+        'data-share="25"',
+        'data-share="50"',
+    ):
+        if marker not in index:
+            raise SystemExit(f"unified/index.html missing interaction-parity marker: {marker}")
+
+    app = (SOURCE / "app.mjs").read_text(encoding="utf-8")
+    required_app_markers = (
+        "calculateLegacySnapshot",
+        "../src/runtime.mjs",
+        "../src/format.mjs",
+        "../src/active-time.mjs",
+        "createActiveTimeTracker",
+        "requestAnimationFrame",
+        "REFERENCE_SECONDS_PER_YEAR",
+        "365.25",
+        "./state.mjs",
+        "readCandidateState",
+        "writeCandidateState",
+        "../data/model.json",
+    )
+    for marker in required_app_markers:
+        if marker not in app:
+            raise SystemExit(f"unified/app.mjs: missing Sprint A marker {marker!r}")
+    if "Intl.NumberFormat" in app:
+        raise SystemExit("unified/app.mjs must use src/format.mjs instead of Intl compact currency formatting")
+    if "setInterval(" in app:
+        raise SystemExit("unified/app.mjs must use the throttled animation-frame loop, not setInterval")
+    if "Date.now() - SESSION_STARTED_AT" in app:
+        raise SystemExit("unified/app.mjs must measure active viewing time, not wall-clock session time")
+
+    state = (SOURCE / "state.mjs").read_text(encoding="utf-8")
+    if "clampInteger(params.get('share'), 5, 50" not in state:
+        raise SystemExit("unified/state.mjs must keep preview share state in the legacy 5-50 range")
+
+    checklist = (SOURCE / "PARITY_CHECKLIST.md").read_text(encoding="utf-8")
+    for gate in ("Embed mode", "Text summary generation", "Mobile summary", "Final independent parity review"):
+        if gate not in checklist:
+            raise SystemExit(f"unified/PARITY_CHECKLIST.md: missing promotion gate/surface {gate!r}")
+
+    return sorted(route_languages)
+
+
+def main() -> None:
+    languages = validate()
+
+    if OUT.exists():
+        shutil.rmtree(OUT)
+    shutil.copytree(SOURCE, OUT)
+
+    outputs = []
+    for path in sorted(p for p in OUT.rglob("*") if p.is_file()):
+        outputs.append({
+            "path": path.relative_to(ROOT / "dist" / "shadow-v2").as_posix(),
+            "sha256": digest(path),
+        })
+
+    manifest = {
+        "schemaVersion": 1,
+        "status": "preview-not-production",
+        "candidate": "unified-v0.4-sprint-a",
+        "architecture": "one HTML + one CSS + one JS app + shared formatter + active-time clock + one state helper + one locale JSON per language + shared data/runtime",
+        "interactionParity": [
+            "legacy-style hero counter",
+            "active-viewing session-spend counter",
+            "reference-style currency/compact formatter",
+            "365.25-day live spending rate",
+            "throttled animation-frame live loop",
+            "1200ms mode-change ease-out",
+            "5-50 redistribution slider",
+            "10/25/50 scenario chips",
+            "metric formula popovers",
+        ],
+        "languageCount": len(languages),
+        "languages": languages,
+        "outputs": outputs,
+    }
+    (OUT / "build-manifest.json").write_text(
+        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+
+    print(f"Built unified candidate v0.4 Sprint A for {len(languages)} languages")
+    print("Production files changed: 0")
+    print("Preview entrypoint: unified/index.html?lang=<language>")
+
+
+if __name__ == "__main__":
+    main()
