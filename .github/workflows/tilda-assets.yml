@@ -1,0 +1,77 @@
+name: Publish Tilda loader assets
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'unified/**'
+      - 'src/**'
+      - 'data/**'
+      - 'scripts/build_tilda_embed.py'
+      - 'scripts/build_tilda_external_loader.py'
+      - '.github/workflows/tilda-assets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: true-cost-of-war-tilda-assets
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build native Russian package
+        run: python scripts/build_tilda_embed.py --lang ru --max-block-bytes 150000
+
+      - name: Build external loader
+        run: python scripts/build_tilda_external_loader.py --lang ru
+
+      - name: Smoke-test external loader
+        run: python scripts/tilda_external_browser_smoke.py
+
+      - name: Publish immutable loader branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          publish_dir="$(mktemp -d)"
+          git fetch origin tilda-dist || true
+          if git show-ref --verify --quiet refs/remotes/origin/tilda-dist; then
+            git worktree add "$publish_dir" origin/tilda-dist
+            cd "$publish_dir"
+            git switch -c tilda-dist
+            find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          else
+            git worktree add --detach "$publish_dir"
+            cd "$publish_dir"
+            git switch --orphan tilda-dist
+            git rm -rf . || true
+          fi
+          cp "$GITHUB_WORKSPACE/dist/tilda/ru-loader.js" ./ru-loader.js
+          printf '%s\n' "$GITHUB_SHA" > SOURCE_COMMIT
+          touch .nojekyll
+          git add ru-loader.js SOURCE_COMMIT .nojekyll
+          git commit -m "Publish Tilda loader for ${GITHUB_SHA}"
+          git push origin HEAD:tilda-dist --force
