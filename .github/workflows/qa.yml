@@ -44,7 +44,7 @@ jobs:
         run: node --test tests/*.test.mjs
 
       - name: Build Tilda-native Russian embed
-        run: python scripts/build_tilda_embed.py --lang ru
+        run: python scripts/build_tilda_embed.py --lang ru --max-block-bytes 150000
 
       - name: Smoke-test Tilda-native Russian embed
         run: python scripts/tilda_browser_smoke.py
