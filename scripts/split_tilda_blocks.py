@@ -114,6 +114,29 @@ def final_block(namespace: str) -> str:
 </script>"""
 
 
+def preview_harness(host_id: str) -> str:
+    return f"""<script>
+window.addEventListener('pw-tcow-ready', () => {{
+  const host = document.getElementById({json.dumps(host_id)});
+  const root = host?.shadowRoot;
+  const share = root?.querySelector('#share');
+  if (!share) {{ host.dataset.pwSmoke = 'missing-share'; return; }}
+  share.value = '25';
+  share.dispatchEvent(new Event('input', {{ bubbles: true }}));
+  share.dispatchEvent(new Event('change', {{ bubbles: true }}));
+  setTimeout(() => {{
+    host.dataset.pwSmokeShare = root.querySelector('#shareLabel')?.textContent?.trim() || '';
+    const info = root.querySelector('.pw-parity-info');
+    if (info) {{
+      info.click();
+      host.dataset.pwSmokeInfo = info.getAttribute('aria-expanded') || '';
+    }}
+    host.dataset.pwSmoke = 'pass';
+  }}, 180);
+}}, {{ once: true }});
+</script>"""
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lang", default="ru")
@@ -132,6 +155,7 @@ def main() -> None:
     runtime = runtime_path.read_text(encoding="utf-8")
     namespace = f"__PW_TCOW_TILDA_SPLIT_{language.upper().replace('-', '_')}__"
     anchor_id = f"pw-tcow-tilda-split-anchor-{language}"
+    host_id = f"pw-tcow-tilda-{language}"
 
     blocks = [init_block(namespace, anchor_id)]
     blocks.extend(split_payload(namespace, "host", host, args.max_block_bytes))
@@ -152,6 +176,7 @@ def main() -> None:
         '<title>Tilda split transport smoke</title></head><body>'
         '<div id="tilda-sentinel">Tilda host page</div>'
         + combined
+        + preview_harness(host_id)
         + "</body></html>"
     )
     (out_dir / f"{args.lang}-t123-preview.html").write_text(preview + "\n", encoding="utf-8")
