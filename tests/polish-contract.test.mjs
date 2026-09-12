@@ -33,11 +33,12 @@ test('info placement distinguishes hero, metric cards and programme titles', () 
   assert.match(css, /\.pw-programme \.pw-parity-label-row[\s\S]*?justify-content:\s*flex-start/);
 });
 
-test('mobile info controls stay grouped with scenario and mission text', () => {
-  assert.match(css, /\.pw-scenario-title-row\s*\{[\s\S]*?display:\s*inline-flex[\s\S]*?align-items:\s*center[\s\S]*?gap:\s*var\(--pw-info-gap\)/);
-  assert.match(css, /\.pw-scenario-title-row > \.pw-parity-info\s*\{[\s\S]*?margin-inline-start:\s*0[\s\S]*?align-self:\s*center/);
-  assert.match(css, /@media \(max-width:\s*600px\)[\s\S]*?\.pw-scenario-title-row\s*\{[\s\S]*?flex:\s*1 1 auto[\s\S]*?gap:\s*6px/);
-  assert.match(css, /@media \(max-width:\s*600px\)[\s\S]*?\.pw-mission-primary-copy \.pw-parity-info,[\s\S]*?\.pw-mission-impact-highlight \.pw-parity-info\s*\{[\s\S]*?margin-inline-start:\s*4px[\s\S]*?top:\s*0/);
+test('mobile inline info controls follow the text they explain', () => {
+  assert.match(css, /@media \(max-width:\s*600px\)[\s\S]*?\.pw-scenario-title-row\s*\{[\s\S]*?display:\s*block[\s\S]*?flex:\s*1 1 auto/);
+  assert.match(css, /\.pw-scenario-title-row > #scenarioTitle\s*\{[\s\S]*?display:\s*inline/);
+  assert.match(css, /\.pw-scenario-title-row > \.pw-parity-info\s*\{[\s\S]*?position:\s*static[\s\S]*?margin-inline-start:\s*4px[\s\S]*?vertical-align:\s*middle/);
+  assert.match(css, /\.pw-mission-primary-copy \.pw-parity-info,[\s\S]*?\.pw-mission-impact-highlight \.pw-parity-info\s*\{[\s\S]*?position:\s*static[\s\S]*?margin-inline-start:\s*3px[\s\S]*?vertical-align:\s*middle/);
+  assert.match(css, /\.pw-mission-impact-highlight\s*\{[\s\S]*?display:\s*block/);
 });
 
 test('live session loop preserves the production timing constants and clock', () => {
