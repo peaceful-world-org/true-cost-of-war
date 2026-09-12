@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Real-browser smoke test for the generated Tilda-native RU embed."""
+"""Real-browser smoke test for the generated split Tilda-native RU embed."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "dist" / "tilda"
-PAGE = SITE / "ru-preview.html"
+PAGE = SITE / "ru-t123-preview.html"
 HOST_ID = "pw-tcow-tilda-ru"
 
 
@@ -83,26 +83,26 @@ def assert_case(name: str, attrs: dict[str, str]) -> None:
 
 def main() -> None:
     if not PAGE.is_file():
-        raise SystemExit("Tilda smoke: build dist/tilda/ru-preview.html first")
+        raise SystemExit("Tilda smoke: build dist/tilda/ru-t123-preview.html first")
 
     browser = browser_binary()
     handler = partial(QuietHandler, directory=str(SITE))
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
-    url = f"http://127.0.0.1:{server.server_port}/ru-preview.html"
+    url = f"http://127.0.0.1:{server.server_port}/{PAGE.name}"
 
     try:
         for name, width, height in (("desktop", 1280, 1000), ("mobile", 390, 844)):
             attrs = host_attrs(dump_dom(browser, url, width, height))
             assert_case(name, attrs)
-            print(f"PASS: Tilda {name} smoke")
+            print(f"PASS: Tilda {name} split smoke")
     finally:
         server.shutdown()
         server.server_close()
         thread.join(timeout=2)
 
-    print("PASS: Tilda-native RU embed renders and responds in a real browser")
+    print("PASS: split Tilda-native RU embed renders and responds in a real browser")
 
 
 if __name__ == "__main__":
