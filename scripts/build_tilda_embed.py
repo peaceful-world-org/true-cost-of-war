@@ -27,6 +27,7 @@ DATA = ROOT / "data"
 DEFAULT_OUT = ROOT / "dist" / "tilda"
 ESBUILD = "esbuild@0.25.10"
 RECOMMENDED_BLOCK_BYTES = 60_000
+TILDA_PAGE_BACKGROUND = "#061932"
 
 SCRIPT_TAG_RE = re.compile(r"<script\b[^>]*>.*?</script>", re.IGNORECASE | re.DOTALL)
 BODY_RE = re.compile(r"<body\b[^>]*>(.*?)</body>", re.IGNORECASE | re.DOTALL)
@@ -232,6 +233,8 @@ def build_css(temp_root: Path, stylesheet_names: list[str]) -> str:
     css = re.sub(r"(?<![-\w])html(?=\{)", ":host", css)
     css = re.sub(r"(?<![-\w])body(?=\{)", ".pw-tilda-body", css)
     css += (
+        f":host{{--page:{TILDA_PAGE_BACKGROUND}!important;background:{TILDA_PAGE_BACKGROUND}!important;}}"
+        f".pw-tilda-body{{background:{TILDA_PAGE_BACKGROUND}!important;}}"
         ":host{display:block;width:100%;max-width:100%;contain:content;}"
         ".pw-preview-banner,.pw-compare,.pw-debug{display:none!important;}"
     )
