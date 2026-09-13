@@ -10,6 +10,7 @@ on:
       - 'data/**'
       - 'scripts/build_tilda_embed.py'
       - 'scripts/build_tilda_external_loader.py'
+      - 'scripts/tilda_external_browser_smoke.py'
       - '.github/workflows/tilda-assets.yml'
   workflow_dispatch:
 
@@ -41,14 +42,28 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Build native Russian package
-        run: python scripts/build_tilda_embed.py --lang ru --max-block-bytes 150000
+      - name: Build and smoke-test all language loaders
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t languages < <(python - <<'PY'
+          import json
+          from pathlib import Path
 
-      - name: Build external loader
-        run: python scripts/build_tilda_external_loader.py --lang ru
+          manifest = json.loads(Path('unified/locales/manifest.json').read_text(encoding='utf-8'))
+          for language in manifest['languages']:
+              print(language)
+          PY
+          )
 
-      - name: Smoke-test external loader
-        run: python scripts/tilda_external_browser_smoke.py
+          printf 'Building Tilda loaders for: %s\n' "${languages[*]}"
+          for language in "${languages[@]}"; do
+            echo "::group::${language}"
+            python scripts/build_tilda_embed.py --lang "$language" --max-block-bytes 150000
+            python scripts/build_tilda_external_loader.py --lang "$language"
+            python scripts/tilda_external_browser_smoke.py --lang "$language"
+            echo "::endgroup::"
+          done
 
       - name: Publish immutable loader branch
         shell: bash
@@ -69,9 +84,9 @@ jobs:
             git switch --orphan tilda-dist
             git rm -rf . || true
           fi
-          cp "$GITHUB_WORKSPACE/dist/tilda/ru-loader.js" ./ru-loader.js
+          cp "$GITHUB_WORKSPACE/dist/tilda/"*-loader.js ./
           printf '%s\n' "$GITHUB_SHA" > SOURCE_COMMIT
           touch .nojekyll
-          git add ru-loader.js SOURCE_COMMIT .nojekyll
-          git commit -m "Publish Tilda loader for ${GITHUB_SHA}"
+          git add .
+          git commit -m "Publish Tilda loaders for ${GITHUB_SHA}"
           git push origin HEAD:tilda-dist --force
