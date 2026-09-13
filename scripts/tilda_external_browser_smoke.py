@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Real-browser smoke test for the external Tilda loader."""
+"""Real-browser smoke test for one external Tilda language loader."""
 
 from __future__ import annotations
 
+import argparse
 import re
 import shutil
 import subprocess
@@ -13,8 +14,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "dist" / "tilda"
-PAGE = SITE / "ru-external-preview.html"
-HOST_ID = "pw-tcow-tilda-ru"
 
 
 class QuietHandler(SimpleHTTPRequestHandler):
@@ -54,18 +53,20 @@ def dump_dom(browser: str, url: str, width: int, height: int) -> str:
     return result.stdout
 
 
-def attrs(dom: str) -> dict[str, str]:
-    match = re.search(rf'<div\b([^>]*\bid="{re.escape(HOST_ID)}"[^>]*)>', dom)
+def attrs(dom: str, host_id: str) -> dict[str, str]:
+    match = re.search(rf'<div\b([^>]*\bid="{re.escape(host_id)}"[^>]*)>', dom)
     if not match:
         raise AssertionError("External Tilda smoke: calculator host is missing")
     return dict(re.findall(r'([:\w-]+)="([^"]*)"', match.group(1)))
 
 
-def assert_case(name: str, values: dict[str, str]) -> None:
+def assert_case(name: str, values: dict[str, str], language: str) -> None:
     if values.get("data-pw-ready") != "true":
         raise AssertionError(f"{name}: loader did not reach ready state: {values}")
-    if values.get("data-pw-language") != "ru":
-        raise AssertionError(f"{name}: wrong language")
+    if values.get("data-pw-language") != language:
+        raise AssertionError(
+            f"{name}: wrong language: {values.get('data-pw-language')!r}, expected {language!r}"
+        )
     if values.get("data-pw-counter") in {None, "", "—"}:
         raise AssertionError(f"{name}: main counter did not render")
     if values.get("data-pw-session") in {None, "", "—"}:
@@ -81,23 +82,33 @@ def assert_case(name: str, values: dict[str, str]) -> None:
 
 
 def main() -> None:
-    if not PAGE.is_file():
-        raise SystemExit("Build dist/tilda/ru-external-preview.html first")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--lang", default="ru", help="Unified language key to smoke-test")
+    args = parser.parse_args()
+
+    language = args.lang
+    safe_language = re.sub(r"[^a-z0-9-]+", "-", language.lower())
+    page = SITE / f"{language}-external-preview.html"
+    host_id = f"pw-tcow-tilda-{safe_language}"
+
+    if not page.is_file():
+        raise SystemExit(f"Build dist/tilda/{page.name} first")
+
     browser = browser_binary()
     handler = partial(QuietHandler, directory=str(SITE))
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
-    url = f"http://127.0.0.1:{server.server_port}/{PAGE.name}"
+    url = f"http://127.0.0.1:{server.server_port}/{page.name}"
     try:
         for name, width, height in (("desktop", 1280, 1000), ("mobile", 390, 844)):
-            assert_case(name, attrs(dump_dom(browser, url, width, height)))
-            print(f"PASS: external Tilda {name} smoke")
+            assert_case(name, attrs(dump_dom(browser, url, width, height), host_id), language)
+            print(f"PASS: external Tilda {language} {name} smoke")
     finally:
         server.shutdown()
         server.server_close()
         thread.join(timeout=2)
-    print("PASS: external Tilda loader renders in a real browser")
+    print(f"PASS: external Tilda {language} loader renders in a real browser")
 
 
 if __name__ == "__main__":
