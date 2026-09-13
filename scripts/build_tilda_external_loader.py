@@ -84,41 +84,43 @@ def main() -> None:
 
     tooltip_harness = f"""
 <script>
-window.addEventListener('pw-tcow-ready', () => {{
+(function waitForCalculator(attempt = 0) {{
   const host = document.getElementById({json.dumps(host_id)});
   const root = host?.shadowRoot;
-  if (!host || !root) return;
+  if (!host || !root || host.dataset.pwReady !== 'true') {{
+    if (attempt < 100) setTimeout(() => waitForCalculator(attempt + 1), 25);
+    return;
+  }}
+
   if (window.matchMedia('(max-width: 600px)').matches) {{
     host.dataset.pwTooltipScroll = 'mobile-inline';
     return;
   }}
 
-  setTimeout(() => {{
-    const trigger = root.querySelector('.pw-parity-info[data-tooltip-key="infrastructure"]');
-    if (!trigger) {{
-      host.dataset.pwTooltipScroll = 'missing-trigger';
-      return;
-    }}
-    trigger.scrollIntoView({{ block: 'center' }});
+  const trigger = root.querySelector('.pw-parity-info[data-tooltip-key="infrastructure"]');
+  if (!trigger) {{
+    host.dataset.pwTooltipScroll = 'missing-trigger';
+    return;
+  }}
+  trigger.scrollIntoView({{ block: 'center' }});
+  requestAnimationFrame(() => {{
+    trigger.click();
     requestAnimationFrame(() => {{
-      trigger.click();
-      requestAnimationFrame(() => {{
-        const popover = root.querySelector('.pw-parity-popover:not([hidden])');
-        if (!popover) {{
-          host.dataset.pwTooltipScroll = 'missing-popover';
-          return;
-        }}
-        const triggerRect = trigger.getBoundingClientRect();
-        const popoverRect = popover.getBoundingClientRect();
-        const triggerCenter = (triggerRect.top + triggerRect.bottom) / 2;
-        const popoverCenter = (popoverRect.top + popoverRect.bottom) / 2;
-        const visible = popoverRect.bottom > 0 && popoverRect.top < window.innerHeight;
-        const nearby = Math.abs(popoverCenter - triggerCenter) < 360;
-        host.dataset.pwTooltipScroll = visible && nearby ? 'pass' : 'misplaced';
-      }});
+      const popover = root.querySelector('.pw-parity-popover:not([hidden])');
+      if (!popover) {{
+        host.dataset.pwTooltipScroll = 'missing-popover';
+        return;
+      }}
+      const triggerRect = trigger.getBoundingClientRect();
+      const popoverRect = popover.getBoundingClientRect();
+      const triggerCenter = (triggerRect.top + triggerRect.bottom) / 2;
+      const popoverCenter = (popoverRect.top + popoverRect.bottom) / 2;
+      const visible = popoverRect.bottom > 0 && popoverRect.top < window.innerHeight;
+      const nearby = Math.abs(popoverCenter - triggerCenter) < 360;
+      host.dataset.pwTooltipScroll = visible && nearby ? 'pass' : 'misplaced';
     }});
-  }}, 250);
-}}, {{ once: true }});
+  }});
+}})();
 </script>
 """
 
