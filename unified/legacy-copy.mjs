@@ -1,4 +1,8 @@
 import { sanitizeLegacyCopy } from './legacy-copy-clean.mjs';
+import {
+  applyLocalizationOverrides,
+  localizationOverrideLanguages,
+} from './localization-overrides.mjs';
 
 const response = await fetch('./legacy-copy.json', { cache: 'no-store' });
 if (!response.ok) {
@@ -11,12 +15,23 @@ if (rawLegacyCopyDocument?.schemaVersion !== 1 || !rawLegacyCopyDocument.languag
   throw new Error('Generated legacy copy has an unsupported schema');
 }
 
+const languageKeys = new Set([
+  ...Object.keys(rawLegacyCopyDocument.languages),
+  ...localizationOverrideLanguages(),
+]);
+
 export const legacyCopyDocument = {
   ...rawLegacyCopyDocument,
   languages: Object.fromEntries(
-    Object.entries(rawLegacyCopyDocument.languages).map(([language, copy]) => [
+    [...languageKeys].map((language) => [
       language,
-      sanitizeLegacyCopy(copy),
+      sanitizeLegacyCopy(
+        applyLocalizationOverrides(
+          language,
+          'production',
+          rawLegacyCopyDocument.languages[language] || {},
+        ),
+      ),
     ]),
   ),
 };
