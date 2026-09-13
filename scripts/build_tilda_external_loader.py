@@ -97,15 +97,17 @@ def main() -> None:
     return;
   }}
 
+  host.dataset.pwTooltipScroll = 'checking';
   const trigger = root.querySelector('.pw-parity-info[data-tooltip-key="infrastructure"]');
   if (!trigger) {{
     host.dataset.pwTooltipScroll = 'missing-trigger';
     return;
   }}
+
   trigger.scrollIntoView({{ block: 'center' }});
-  requestAnimationFrame(() => {{
+  setTimeout(() => {{
     trigger.click();
-    requestAnimationFrame(() => {{
+    setTimeout(() => {{
       const popover = root.querySelector('.pw-parity-popover:not([hidden])');
       if (!popover) {{
         host.dataset.pwTooltipScroll = 'missing-popover';
@@ -118,8 +120,8 @@ def main() -> None:
       const visible = popoverRect.bottom > 0 && popoverRect.top < window.innerHeight;
       const nearby = Math.abs(popoverCenter - triggerCenter) < 360;
       host.dataset.pwTooltipScroll = visible && nearby ? 'pass' : 'misplaced';
-    }});
-  }});
+    }}, 50);
+  }}, 50);
 }})();
 </script>
 """
