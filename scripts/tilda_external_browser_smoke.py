@@ -70,6 +70,12 @@ def assert_case(name: str, values: dict[str, str]) -> None:
         raise AssertionError(f"{name}: main counter did not render")
     if values.get("data-pw-session") in {None, "", "—"}:
         raise AssertionError(f"{name}: session counter did not render")
+    expected_tooltip = "mobile-inline" if name == "mobile" else "pass"
+    if values.get("data-pw-tooltip-scroll") != expected_tooltip:
+        raise AssertionError(
+            f"{name}: scrolled tooltip placement failed: "
+            f"{values.get('data-pw-tooltip-scroll')!r}"
+        )
     if values.get("data-pw-error"):
         raise AssertionError(f"{name}: runtime error: {values['data-pw-error']}")
 
