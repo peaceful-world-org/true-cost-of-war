@@ -3,6 +3,7 @@ import { formatInteger, formatMoney } from '../src/format.mjs';
 import { dailyShareValues, fillValueTemplate, formatCompactPeople } from './daily-share.mjs';
 import { legacyCopy } from './legacy-copy.mjs';
 import { disseminationParityCopy, shellUiCopy } from './ui-copy.mjs';
+import { applyLocalizationOverrides } from './localization-overrides.mjs';
 
 const [manifest, modelDocument] = await Promise.all([
   fetch('./locales/manifest.json', { cache: 'no-store' }).then((r) => r.json()),
@@ -151,7 +152,11 @@ function source() {
 }
 
 function dailyCopy() {
-  return DAILY_FACT_COPY[language()] || DAILY_FACT_COPY.en;
+  return applyLocalizationOverrides(
+    language(),
+    'daily_share',
+    DAILY_FACT_COPY[language()] || DAILY_FACT_COPY.en,
+  );
 }
 
 function publicPageUrl() {

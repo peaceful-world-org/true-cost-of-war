@@ -1,3 +1,8 @@
+import {
+  applyLocalizationOverrides,
+  localizationOverrideGroup,
+} from './localization-overrides.mjs';
+
 export const SHELL_UI_COPY = Object.freeze({
   en: Object.freeze({
     developmentAllocation: 'Reallocated for Development:', defenceAllocation: 'Remaining Military Budget:', showLess: 'Show fewer programmes',
@@ -57,9 +62,16 @@ const DISSEMINATION_PARITY_COPY = Object.freeze({
 });
 
 export function shellUiCopy(language) {
-  return SHELL_UI_COPY[language] || SHELL_UI_COPY.en;
+  return applyLocalizationOverrides(
+    language,
+    'shared_ui',
+    SHELL_UI_COPY[language] || SHELL_UI_COPY.en,
+  );
 }
 
 export function disseminationParityCopy(language) {
-  return DISSEMINATION_PARITY_COPY[language] || null;
+  const base = DISSEMINATION_PARITY_COPY[language] || null;
+  const override = localizationOverrideGroup(language, 'dissemination');
+  if (!base && !override) return null;
+  return applyLocalizationOverrides(language, 'dissemination', base || {});
 }
