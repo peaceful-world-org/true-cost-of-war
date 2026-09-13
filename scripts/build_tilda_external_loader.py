@@ -127,8 +127,8 @@ window.addEventListener('pw-tcow-ready', () => {{
         '<meta name="viewport" content="width=device-width,initial-scale=1">'
         '<title>Tilda external loader smoke</title></head><body>'
         '<div id="tilda-sentinel">Tilda host page</div>'
-        f'<script src="./{args.lang}-loader.js"></script>'
         + tooltip_harness
+        + f'<script src="./{args.lang}-loader.js"></script>'
         + '</body></html>'
     )
     (out_dir / f"{args.lang}-external-preview.html").write_text(preview, encoding="utf-8")
