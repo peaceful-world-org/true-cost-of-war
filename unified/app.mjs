@@ -8,6 +8,10 @@ import {
 } from '../src/format.mjs';
 import { createActiveTimeTracker } from '../src/active-time.mjs';
 import { readCandidateState, writeCandidateState } from './state.mjs';
+import {
+  applyLocalizationOverrides,
+  hasLocalizationOverrideGroup,
+} from './localization-overrides.mjs';
 
 const DEFAULT_LANGUAGE = 'en';
 const MODE_ORDER = ['year', '1year', '10years', 'lifetime', 'day', 'hour', 'minute', 'since1945'];
@@ -121,7 +125,15 @@ function populateLanguages() {
 async function loadLocale(language, requestedMode = elements.mode.value || initialState.mode) {
   const meta = languages[language];
   if (!meta) throw new RangeError(`Unsupported language: ${language}`);
-  const locale = await fetch(`./locales/${language}.json`, { cache: 'no-store' }).then(requireJson);
+
+  let locale = {};
+  const response = await fetch(`./locales/${language}.json`, { cache: 'no-store' });
+  if (response.ok) {
+    locale = await response.json();
+  } else if (!hasLocalizationOverrideGroup(language, 'locale_runtime')) {
+    throw new Error(`${response.url}: HTTP ${response.status}`);
+  }
+  locale = applyLocalizationOverrides(language, 'locale_runtime', locale);
   validateLocale(locale, language);
 
   currentLanguage = language;
@@ -419,7 +431,7 @@ function updateStaticDiagnostics(snapshot) {
     `css: unified/app.css`,
     `js: unified/app.mjs`,
     `state: unified/state.mjs`,
-    `locale: unified/locales/${currentLanguage}.json`,
+    `locale: unified/locales/${currentLanguage}.json + approved sheet overrides`,
     `data: data/model.json schemaVersion=${modelDocument.schemaVersion}`,
     `runtime: src/runtime.mjs`,
     `formatter: src/format.mjs`,
